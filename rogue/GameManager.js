@@ -148,17 +148,11 @@ function GameManager(g){
     {
         const discard = this.discard;
         //register struct linked_list *item;
-        console.log("freelist on " + ptr)
         while (ptr != null) {
-            console.log("freelist loop in")
-
             item = ptr;
             ptr = f.next(item);
             discard(item);
-            console.log("freelist loop")
-
         }
-        console.log("freelist done")
         return null;
     }
 
@@ -175,7 +169,6 @@ function GameManager(g){
         item.l_data = null;
         //FREE(item.l_data);
         //FREE(item);
-        console.log("discard");
     }
 
     /*
@@ -242,7 +235,7 @@ function GameManager(g){
         const new_thing = r.item.things_f.new_thing;
         const add_pack = ()=>{};//r.item.pack.add_pack;
 
-        const OBJPTR = ()=>{return new t.object();}//f.OBJPTR;
+        const OBJPTR = f.OBJPTR;
         const rnd = r.rnd;
 
         const w_magic = r.globalValiable.w_magic; 

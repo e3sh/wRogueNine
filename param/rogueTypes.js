@@ -56,7 +56,7 @@ function rogueTypes(r){
             mf_max;//:	0,					/* max # of this type */
             mf_vol;//:	0,					/* volume of this item */
             mf_show;//: "",					/* appearance on screen */
-            magic_item;//: null,	/* pointer to magic tables */
+            mf_magic;//: null,	/* pointer to magic tables */
         },
 
         /*

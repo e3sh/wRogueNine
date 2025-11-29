@@ -26,8 +26,8 @@ function misc(r){
 	const wake_monster  =()=>{};//monster.monster.wake_monster
 	const find_mons =()=>{};//monster.chase.find_mons
 	const THINGPTR = f.THINGPTR;
-	const isatrap = ()=>{};//r.player.move.isatrap;
-	const trap_at = ()=>{};//r.player.move.trap_at;
+	//const isatrap = r.player.move.isatrap;
+	//const trap_at = r.player.move.trap_at;
 	const wmove = ()=>{};// r.UI.
 	const mvwinch = ()=>{};// r.UI.
 	const mvaddch = ()=>{};// r.UI.
@@ -319,8 +319,8 @@ function misc(r){
 		let obj; //reg struct linked_list *obj;
 		let op; //reg struct object *op;
 
-		for (obj = lvl_obj; obj != null; obj = next(obj)) {
-			op = OBJPTR(obj);
+		for (obj = r.dungeon.lvl_obj; obj != null; obj = f.next(obj)) {
+			op = f.OBJPTR(obj);
 			if (op.o_pos.y == y && op.o_pos.x == x)
 				return obj;
 		}

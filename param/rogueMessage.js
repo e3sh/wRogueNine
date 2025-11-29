@@ -24,6 +24,9 @@ function rogueMessage(r){
         WGHTCHK_1: "Your pack is too heavy for you.",  
         WGHTCHK_2: "You must drop something",
 
+        //UI
+        CMD_MAIN: "You can move again.",
+
     }
     return ms;
    

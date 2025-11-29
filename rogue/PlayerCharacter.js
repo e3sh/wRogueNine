@@ -16,6 +16,8 @@ function PlayerCharacter(r){
 	let cur_weapon	= null;	//struct object *cur_weapon = null;	/* Which weapon he is weilding */
 	let cur_armor	= null;	//struct object *cur_armor = null;	/* the rogue's armor */
 	let cur_ring	= [];	//struct object *cur_ring[2];	/* Which rings are being worn */
+	cur_ring[d.LEFT] = null;
+	cur_ring[d.RIGHT] = null;
 	let him = player.t_stats;	//struct stats *him;	/* pointer to hero stats */
 
 	this.purse		= 0;	/* How much gold the rogue has */
@@ -44,7 +46,7 @@ function PlayerCharacter(r){
 	this.get_cur_weapon =()=>{return cur_weapon; };	
 	this.get_cur_armor	=()=>{return cur_armor;};	
 	this.get_cur_ring	=()=>{return cur_ring; };	
-	this.get_him		=()=>{return him; };	
+	this.get_him		=()=>{return player.t_stats;};	
 	this.get_hero		=()=>{return player.t_pos;};
 	this.get_pstats		=()=>{return player.t_stats;};
 	this.get_pack		=()=>{return player.t_pack;};

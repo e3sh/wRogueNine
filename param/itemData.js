@@ -15,7 +15,7 @@ function itemData(r){
 
 		for (let i in data){
 			let o = new t.magic_item();
-			o.mi_name = data[i][0];
+			o.mi_name = data[i][0]; 
 			o.mi_prob = data[i][1];
 			o.mi_worth= data[i][2];
 			item.push(o); 

@@ -23,6 +23,10 @@ function rogueMessage_jp(r){
         //item
         WGHTCHK_1: "あなたの荷物は重すぎる。",  
         WGHTCHK_2: "何かを落とさなければならない",
+
+        //UI
+        CMD_MAIN: "You can move again.",
+
     }
     return ms;
    

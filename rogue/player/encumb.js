@@ -93,6 +93,8 @@ function encumb(r){
 	this.itemweight = function(wh)
 	//struct object *wh;
 	{
+		const o_on = r.o_on;
+
 		let weight; //reg int 
 
 		weight = wh.o_weight;		/* get base weight */
@@ -118,13 +120,15 @@ function encumb(r){
 	*/
 	function pack_vol()
 	{
+		const itemvol = r.player.encumb.itemvol;
+
 		let obj; //reg struct object *obj;
 		let pc; //reg struct linked_list *pc;
 		let volume; //reg int volume;
 
 		volume = 0;
-		for (pc = r.player.get_pack() ; pc != null ; pc = next(pc)) {
-			obj = OBJPTR(pc);
+		for (pc = r.player.get_pack() ; pc != null ; pc = f.next(pc)) {
+			obj = f.OBJPTR(pc);
 			volume += itemvol(obj);
 		}
 		return volume;

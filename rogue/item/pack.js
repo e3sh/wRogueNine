@@ -19,37 +19,69 @@ function pack_f(r){
 	* is non-null use it as the linked_list pointer instead of
 	* getting it off the ground.
 	*/
-	this.add_pack = function(item, silent)
+	this.add_pack = (item, silent)=>
 	//struct linked_list *item;
 	//bool silent;
 	{
+		const picked_up =()=>{
+			console.log(item);
+			obj = OBJPTR(item);
+			if (!silent)
+				r.UI.msg(`${inv_name(obj,false)} (${pack_char(obj)})`);
+			if (obj.o_type == d.AMULET)
+				r.amulet = true;
+			updpack();	
+		}
+
+		const around =()=>{
+			ip = next(ip);
+			if (ip != null) {
+				op = OBJPTR(ip);
+				lp = next(lp);
+			}
+		}
+		const find_obj = r.player.misc.find_obj;
+		const OBJPTR = f.OBJPTR;
+		const o_on = r.o_on;
+		const itemweight = r.player.encumb.itemweight;
+		const setoflg = r.setoflg; 
+		const next = f.next;
+		const updpack = r.player.encumb.updpack;
+		const inv_name = r.item.things_f.inv_name;
+		const pack_char = this.pack_char;
+
+		const player = r.player.get_player();
+		const him = r.player.get_him();
+		const hero = r.player.get_hero();
+		const pack = r.player.get_pack();
+
 		let ip, lp; //reg struct linked_list *ip, *lp;
 		let obj, op;//reg struct object *obj, *op;
 		let from_floor;
 		let delchar;
 
 		if (player.t_room == null)
-			delchar = PASSAGE;
+			delchar = d.PASSAGE;
 		else
-			delchar = FLOOR;
+			delchar = d.FLOOR;
 		if (item == null) {
 			from_floor = true;
 			if ((item = find_obj(hero.y, hero.x)) == null) {
-				mpos = 0;
-				msg("That object must have been an illusion.");
-				mvaddch(hero.y, hero.x, delchar);
+				//mpos = 0;
+				r.UI.msg("That object must have been an illusion.");
+				r.UI.mvaddch(hero.y, hero.x, delchar);
 				return false;
 			}
 			/*
 			* Check for scare monster scrolls
 			*/
 			obj = OBJPTR(item);
-			if (obj.o_type == SCROLL && obj.o_which == S_SCARE) {
-				if (o_on(obj,ISFOUND)) {
-					msg("The scroll turns to dust as you pick it up.");
+			if (obj.o_type == d.SCROLL && obj.o_which ==d.S_SCARE) {
+				if (o_on(obj,d.ISFOUND)) {
+					r.UI.msg("The scroll turns to dust as you pick it up.");
 					r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj, item);
-					discard(item);
-					mvaddch(hero.y, hero.x, delchar);	
+					r.discard(item);
+					r.UI.mvaddch(hero.y, hero.x, delchar);	
 					return false;
 				}
 			}
@@ -61,26 +93,27 @@ function pack_f(r){
 		* See if this guy can carry any more weight
 		*/
 		if (itemweight(obj) + him.s_pack > him.s_carry) {
-			msg("You can't carry that %s.", obj.o_typname);
+			r.UI.msg("You can't carry that %s.", obj.o_typname);
 			return false;
 		}
 		/*
 		* Check if there is room
 		*/
-		if (packvol + obj.o_vol > V_PACK) {
-			msg("That %s won't fit in your pack.", obj.o_typname);
+		if (r.packvol + obj.o_vol > d.V_PACK) {
+			r.UI.msg("That %s won't fit in your pack.", obj.o_typname);
 			return false;
 		}
 		if (from_floor) {
 			r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj, item);
-			mvaddch(hero.y, hero.x, delchar);
+			r.UI.mvaddch(hero.y, hero.x, delchar);
 		}
 		item.l_prev = null;
 		item.l_next = null;
-		setoflg(obj, ISFOUND);
+		setoflg(obj, d.ISFOUND);
 		/*
 		* start looking thru pack to find the start of items
 		* with the same type.
+		* パック内を調べて、同じ種類のアイテムの先頭を探します。
 		*/
 		lp = pack;
 		for (ip = pack; ip != null; ip = next(ip)) {
@@ -95,21 +128,25 @@ function pack_f(r){
 		}
 		/*
 		* If the pack was empty, just stick the item in it.
+		* パックが空の場合は、アイテムをそのままパックに入れます。
 		*/
 		if (pack == null) {
-			pack = item;
+			r.player.set_pack(item);
 			item.l_prev = null;
 		}
 		/*
 		* If we looked thru the pack, but could not find an
 		* item of the same type, then stick it at the end,
 		* unless it was food, then put it in front.
+		* パック内を調べても同じ種類のアイテムが見つからなかった場合
+		* は、それを最後に入れます。
+		* 食べ物でない場合は、それを前に入れます。
 		*/
 		else if (ip == null) {
-			if (obj.o_type == FOOD) {	/* insert food at front */
+			if (obj.o_type == d.FOOD) {	/* insert food at front */
 				item.l_next = pack;
 				pack.l_prev = item;
-				pack = item;
+				r.player.set_pack(item)
 				item.l_prev = null;
 			}
 			else {						/* insert other stuff at back */
@@ -124,6 +161,11 @@ function pack_f(r){
 		* new item away. If not, stick it at the end of the
 		* items with the same type. Also keep all similar
 		* objects near each other, like all identify scrolls, etc.
+		* ここでは、同じ種類のアイテムが少なくとも1つ見つかりました。
+		* これらのアイテムを調べて、同じグループのアイテムがあるかどうかを確認します。
+		* もしあれば、カウントをインクリメントし、新しいアイテムを捨てます。
+		* なければ、同じ種類のアイテムの最後に入れます。
+		* また、類似のオブジェクト（識別の巻物など）は、すべて互いに近くに置いてください。
 		*/
 		else {
 			let save;//struct linked_list **save;
@@ -132,11 +174,15 @@ function pack_f(r){
 				if (op.o_group == obj.o_group) {
 					if (op.o_flags == obj.o_flags) {
 						op.o_count++;
-						discard(item);
+						r.discard(item);
 						item = ip;
+						picked_up();
+						return true;
 						//goto picked_up;
 					}
 					else {
+						around();
+						continue;
 						//goto around;
 					}
 				}
@@ -146,15 +192,18 @@ function pack_f(r){
 					break;
 				}
 	around:
-				ip = next(ip);
-				if (ip != null) {
-					op = OBJPTR(ip);
-					lp = next(lp);
-				}
+				around();
+				//ip = next(ip);
+				//if (ip != null) {
+				//	op = OBJPTR(ip);
+				//	lp = next(lp);
+				//}
 			}
 			/*
 			* If inserting into last of group at end of pack,
 			* just tack on the end.
+			* パックの末尾のグループの最後に挿入する場合は、
+			* 単に末尾を貼り付けます。
 			*/
 			if (ip == null) {
 				lp.l_next = item;
@@ -163,6 +212,8 @@ function pack_f(r){
 			/*
 			* Insert into the last of a group of objects
 			* not at the end of the pack.
+			* オブジェクトのグループの最後に挿入します。
+			* パックの末尾ではありません。
 			*/
 			else {
 				save = ip.l_prev.l_next;
@@ -173,12 +224,13 @@ function pack_f(r){
 			}
 		}
 	picked_up:
-		obj = OBJPTR(item);
-		if (!silent)
-			msg("%s (%c)",inv_name(obj,false),pack_char(obj));
-		if (obj.o_type == AMULET)
-			amulet = true;
-		updpack();				/* new pack weight & volume */
+		picked_up();
+		//obj = OBJPTR(item);
+		//if (!silent)
+		//	msg("%s (%c)",inv_name(obj,false),pack_char(obj));
+		//if (obj.o_type == AMULET)
+		//	amulet = true;
+		//updpack();				/* new pack weight & volume */
 		return true;
 	}
 
@@ -224,10 +276,11 @@ function pack_f(r){
 	* pick_up:
 	*	Add something to characters pack.
 	*/
-	this.pick_up = function(ch)
+	this.pick_up = (ch)=>
 	//char ch;
 	{
 		const money = r.item.things_f.money;
+		const add_pack = this.add_pack;
 
 		r.change = false;
 		switch(ch) {
@@ -243,7 +296,7 @@ function pack_f(r){
 			case d.STICK:
 				add_pack(null, false);
 			break;default:
-				msg("That item is ethereal !!!");
+				r.UI.msg("That item is ethereal !!!");
 		}
 	}
 
@@ -289,6 +342,8 @@ function pack_f(r){
 	//char *purpose;
 	//int type;
 	{
+		const npch = r.UI.io.npch;
+
 		let obj, pit, savepit;// reg struct linked_list *obj, *pit, *savepit;
 		let pob; //struct object *pob;
 		let ch, och, anr, cnt;
@@ -412,11 +467,11 @@ function pack_f(r){
 		let c; //reg char c;
 
 		c = 'a';
-		for (item = pack; item != null; item = next(item))
-			if (OBJPTR(item) == obj)
+		for (item = r.player.get_pack(); item != null; item = f.next(item))
+			if (f.OBJPTR(item) == obj)
 				return c;
 			else
-				c = npch(c);
+				c = r.UI.io.npch(c);
 		return '%';
 	}
 

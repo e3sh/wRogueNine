@@ -78,7 +78,7 @@ function command(r){
 
 			if (player.t_nocmd > 0) {
 				if (--player.t_nocmd <= 0)
-					msg("You can move again.");	
+					r.UI.msg(ms.CMD_MAIN);	
 			}else{
 				cmd_decode(ch);
 			}
@@ -123,8 +123,8 @@ function command(r){
 		etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
 		etxt.push("");
 		let wml = wlo = 0;
-		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) wml++;
-		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) wlo++;
+		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) {wml++; etxt.push(" " + w.l_data.t_type);}
+		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) {wlo++; etxt.push(" " + w.l_data.o_type);}
 		etxt.push(`mlist:${wml} lvl_obj:${wlo}    `);
 
 		for (let i in etxt){
@@ -141,10 +141,13 @@ function command(r){
 		const CTRL = f.CTRL;
 		const do_move = r.player.move.do_move;
 		const do_run = r.player.move.do_run;
+		const winat = r.UI.winat;
 		const msg = r.UI.msg;
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
 		const unctrl =(text)=>{return text;}
+
+		const hero = r.player.get_hero();
 
 		let countch, newcount = false;
 		/*
@@ -164,7 +167,10 @@ function command(r){
 		if (ki.includes("Numpad5")){
 			//if (typeof(ch) == "string")
 			//ch = ch.toUpperCase();
-			ch =">";	
+			if (winat(hero.y, hero.x) != d.STAIRS)
+				ch = "s";
+			else 
+				ch = r.amulet?"<":">";	
 		}
 		//r.UI.msg(`${ki.length} ${ch}`);
 		
@@ -534,6 +540,16 @@ function command(r){
 
 	function search()
 	{
+		const pl_on = r.player.pl_on;
+		const winat = r.UI.winat;
+		const isatrap = r.player.move.isatrap;
+		const trap_at = r.player.move.trap_at;
+		const herowis =()=>{ return 10;};
+		const tr_name = r.player.misc.tr_name;
+
+		const hero  = r.player.get_hero();
+		const him = r.player.get_him();
+
 		let x, y;
 		let ch;
 
@@ -541,7 +557,7 @@ function command(r){
 		* Look all around the hero, if there is something hidden there,
 		* give him a chance to find it.  If its found, display it.
 		*/
-		if (pl_on(ISBLIND))
+		if (pl_on(d.ISBLIND))
 			return;
 		for (x = hero.x - 1; x <= hero.x + 1; x++) {
 			for (y = hero.y - 1; y <= hero.y + 1; y++) {
@@ -551,21 +567,21 @@ function command(r){
 
 					if ((tp = trap_at(y, x)) == null)
 						break;
-					if (tp.tr_flags & ISFOUND)
+					if (tp.tr_flags & d.ISFOUND)
 						break;		/* no message if its seen */
-					if (mvwinch(cw, y, x) == ch)
+					if (r.UI.mvwinch(cw, y, x) == ch)
 						break;
-					if (rnd(100) > (him.s_lvl * 9 + herowis() * 5))
+					if (r.rnd(100) > (him.s_lvl * 9 + herowis() * 5))
 						break;
-					tp.tr_flags |= ISFOUND;
-					mvwaddch(cw, y, x, tp.tr_type);
+					tp.tr_flags |= d.ISFOUND;
+					r.UI.mvwaddch(cw, y, x, tp.tr_type);
 					r.count = 0;
 					r.running = false;
-					msg(tr_name(tp.tr_type));
+					r.UI.msg(tr_name(tp.tr_type));
 				}
-				else if(ch == SECRETDOOR) {
-					if (rnd(100) < (him.s_lvl * 4 + herowis() * 5)) {
-						mvaddch(y, x, DOOR);
+				else if(ch == d.SECRETDOOR) {
+					if (r.rnd(100) < (him.s_lvl * 4 + herowis() * 5)) {
+						r.UI.mvaddch(y, x, d.DOOR);
 						r.count = 0;
 					}
 				}
@@ -748,13 +764,19 @@ function command(r){
 	*/
 	function u_level()
 	{
+		const winat = r.UI.winat;
+		const msg = r.UI.msg
+		const new_level = r.dungeon.new_level.create;
+	
+		const hero = r.player.get_hero();
+
 		if (winat(hero.y, hero.x) == d.STAIRS)  {
 			if (pl_on(d.ISHELD)) {
 				msg("You are being held.");
 				return;
 			}
 			else {				/* player not held here */
-				if (amulet) {
+				if (r.amulet) {
 					level--;
 					if (level == 0)
 						total_winner();

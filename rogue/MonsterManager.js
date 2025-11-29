@@ -19,6 +19,7 @@ function MonsterManager(r){
 	this.get_mtlev =()=>{return mtlev};
 
 	this.chase = new chase(r);
+	//this.battle = new battle(r);
 
 	r.UI.comment("monster");
 	/*

@@ -16,22 +16,27 @@ function weapons(r){
 	*	Fire a missile in a given direction
 	*/
 	this.missile = function(ydelta, xdelta)
-	int ydelta, xdelta;
+	//int ydelta, xdelta;
 	{
-		reg struct object *obj, *nowwield;
-		reg struct linked_list *item, *nitem;
+		const get_item = get_item;
+		const OBJPTR = f.OBJPTR;
+		const dropcheck = dropcheck;
+		const is_current = is_current
+
+		let obj, nowwield; //reg struct object *obj, *nowwield;
+		let item, nitem; //reg struct linked_list *item, *nitem;
 
 		/*
 		* Get which thing we are hurling
 		*/
 		nowwield = cur_weapon;		/* must save current weap */
-		if ((item = get_item("throw", WEAPON)) == null)
+		if ((item = get_item("throw", d.WEAPON)) == null)
 			return;
 		obj = OBJPTR(item);
 		if (!dropcheck(obj) || is_current(obj))
 			return;
-		if (obj == nowwield || obj.o_type != WEAPON) {
-			reg int c;
+		if (obj == nowwield || obj.o_type != d.WEAPON) {
+			let c;
 
 			msg("Do you want to throw that %s? (y or n)",obj.o_typname);
 			do {
@@ -59,7 +64,7 @@ function weapons(r){
 			obj.o_vol = itemvol(obj);
 			nitem = new_item(sizeof *obj);
 			obj = OBJPTR(nitem);
-			*obj = *(OBJPTR(item));
+			obj = (OBJPTR(item));
 			obj.o_count = 1;
 			obj.o_vol = itemvol(obj);
 			item = nitem;
@@ -67,9 +72,9 @@ function weapons(r){
 		updpack();						/* new pack weight */
 		do_motion(obj, ydelta, xdelta);
 		if (!isalpha(mvwinch(mw, obj.o_pos.y, obj.o_pos.x))
-		|| !hit_monster(&obj.o_pos, obj))
+		|| !hit_monster(obj.o_pos, obj))
 			fall(item, true);
-		mvwaddch(cw, hero.y, hero.x, PLAYER);
+		mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 	}
 
 	/*
@@ -77,10 +82,10 @@ function weapons(r){
 	* across the room
 	*/
 	this.do_motion = function(obj, ydelta, xdelta)
-	struct object *obj;
-	int ydelta, xdelta;
+	//struct object *obj;
+	//int ydelta, xdelta;
 	{
-		reg int ch, y, x;
+		let ch, y, x;
 
 		obj.o_pos = hero;
 		while (1) {
@@ -97,7 +102,7 @@ function weapons(r){
 			y = obj.o_pos.y;
 			x = obj.o_pos.x;
 			ch = winat(y, x);
-			if (step_ok(ch) && ch != DOOR) {
+			if (step_ok(ch) && ch != d.DOOR) {
 				if (cansee(unc(obj.o_pos)) && mvwinch(cw, y, x) != ' ') {
 					mvwaddch(cw, y, x, obj.o_type);
 					draw(cw);
@@ -117,17 +122,17 @@ function weapons(r){
 	//struct linked_list *item;
 	//bool pr;
 	{
-		reg struct object *obj;
-		reg struct room *rp;
-		static struct coord fpos;
+		let obj; //reg struct object *obj;
+		let rp; //reg struct room *rp;
+		let fpos; //static struct coord fpos;
 
 		obj = OBJPTR(item);
-		if (fallpos(&obj.o_pos, &fpos, true)) {
+		if (fallpos(obj.o_pos, fpos, true)) {
 			mvaddch(fpos.y, fpos.x, obj.o_type);
 			obj.o_pos = fpos;
 			rp = player.t_room;
 			if (rp != null && !rf_on(rp,ISDARK)) {
-				light(&hero);
+				light(hero);
 				mvwaddch(cw, hero.y, hero.x, PLAYER);
 			}
 			r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj, item);
@@ -152,23 +157,32 @@ function weapons(r){
 	//struct object *weap;
 	//int type;
 	{
-		reg struct init_weps *iwp;
+		const o_on = r.o_on;
+		const itemvol = r.player.encumb.itemvol;
+		const things = v.things;
+		const newgrp = r.item.things_f.newgrp;
+		const weaps = v.weaps;
 
-		weap.o_type = WEAPON;
+		let iwp //reg struct init_weps *iwp;
+
+		weap.o_type = d.WEAPON;
 		weap.o_which = type;
-		iwp = &weaps[type];
-		strcpy(weap.o_damage,iwp.w_dam);
-		strcpy(weap.o_hurldmg,iwp.w_hrl);
+		iwp = weaps[type];
+
+		weap.o_damage = iwp.w_dam;
+		weap.o_hurldmg = iwp.w_hrl;
 		weap.o_launch = iwp.w_launch;
 		weap.o_flags = iwp.w_flags;
 		weap.o_weight = iwp.w_wght;
-		weap.o_typname = things[TYP_WEAPON].mi_name;
-		if (o_on(weap,ISMANY))
-			weap.o_count = rnd(8) + 8;
+		weap.o_typname = things[d.TYP_WEAPON].mi_name;
+		if (o_on(weap,d.ISMANY))
+			weap.o_count = r.rnd(8) + 8;
 		else
 			weap.o_count = 1;
 		weap.o_group = newgrp();
 		weap.o_vol = itemvol(weap);
+
+		return weap;
 	}
 
 	/*
@@ -190,14 +204,14 @@ function weapons(r){
 	this.num = function(n1, n2)
 	//int n1, n2;
 	{
-		static char numbuf[LINLEN];
+		let numbuf;//static char numbuf[LINLEN];
 
 		if (n1 == 0 && n2 == 0)
 			return "+0";
 		if (n2 == 0)
-			sprintf(numbuf, "%s%d", n1 < 0 ? "" : "+", n1);
+			numbuf = `${n1 < 0 ? "" : "+"}${n1}`;
 		else
-			sprintf(numbuf,"%s%d,%s%d",n1<0 ? "":"+",n1,n2<0 ? "":"+",n2);  
+			numbuf = `${n1<0 ? "":"+"}${n1},${n2<0 ? "":"+"}${n2}`;  
 		return numbuf;
 	}
 
@@ -207,8 +221,8 @@ function weapons(r){
 	*/
 	this.wield = function()
 	{
-		reg struct linked_list *item;
-		reg struct object *obj, *oweapon;
+		let item;//reg struct linked_list *item;
+		let obj, oweapon; //reg struct object *obj, *oweapon;
 
 		oweapon = cur_weapon;
 		if (!dropcheck(cur_weapon)) {
@@ -216,14 +230,14 @@ function weapons(r){
 			return;
 		}
 		cur_weapon = oweapon;
-		if ((item = get_item("wield", WEAPON)) == null)
+		if ((item = get_item("wield", d.WEAPON)) == null)
 			return;
 		obj = OBJPTR(item);
 		if (is_current(obj)) {
 			after = false;
 			return;
 		}
-		msg("Wielding %s", inv_name(obj, true));
+		msg(`Wielding ${inv_name(obj, true)}`);
 		cur_weapon = obj;
 	}
 
@@ -235,7 +249,7 @@ function weapons(r){
 	//struct coord *pos, *newpos;
 	//bool passages;
 	{
-		reg int y, x, ch;
+		let y, x, ch;
 
 		for (y = pos.y - 1; y <= pos.y + 1; y++) {
 			for (x = pos.x - 1; x <= pos.x + 1; x++) {
@@ -243,11 +257,14 @@ function weapons(r){
 				* check to make certain the spot is empty, if it is,
 				* put the object there, set it in the level list
 				* and re-draw the room if he can see it
+				* 該当箇所が空いているか確認し、空いている場合は、
+				* そこにオブジェクトを配置し、レベルリストに設定します。
+				* プレイヤーがオブジェクトを見ることができる場合は、部屋を再描画します。
 				*/
 				if (y == hero.y && x == hero.x)
 					continue;
 				ch = winat(y, x);
-				if (ch == FLOOR || (passages && ch == PASSAGE)) {
+				if (ch == d.FLOOR || (passages && ch == d.PASSAGE)) {
 					newpos.y = y;
 					newpos.x = x;
 					return true;

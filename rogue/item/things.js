@@ -37,14 +37,22 @@ function things_f(r){
 
 	let group = v.group;;
 
+	this.newgrp =()=>{ return ++group;}
+
 	/*
 	 * inv_name:
 	*	Return the name of something as it would appear in an inventory.
 	*/
-	this.inv_name = function(obj, drop)
+	this.inv_name = (obj, drop)=>
 	//struct object *obj;
 	//bool drop;
 	{
+		const vowelstr = r.player.misc.vowelstr;
+		const num = ()=>{return ""}//r.item.weapons.num
+		const o_on = r.o_on;
+		const charge_str =()=>{return 0}//r.item.sticks.charge_str
+		const ring_num = ()=>{} //item.ring.ring_num
+
 		const s_names = r.item.s_names;
 		const p_colors = r.item.p_colors;
 		const r_stones = r.item.r_stones;
@@ -60,13 +68,19 @@ function things_f(r){
 		const r_know = r.item.r_know;	
 		const ws_know = r.item.ws_know;
 
+		const armors = r.item.armors;
+
 		const fruit = r.player.fruit;
+
+		const cur_weapon = r.player.get_cur_weapon();
+		const cur_armor = r.player.get_cur_armor();
+		const cur_ring = r.player.get_cur_ring();
 
 		let pb, tn, pl;//reg char *pb, *tn, *pl;
 		let wh, knowit;//reg int wh, knowit;
 		let nm, inm, q;//char nm[3], *inm, *q;
-
-		wh = obj.o_which;
+				
+		wh = obj.o_which; console.log(wh);
 		knowit = false;
 		if (obj.o_count > 1)
 			pl = "s";
@@ -116,7 +130,7 @@ function things_f(r){
 				if (obj.o_count == 1)
 					pb = `Some ${tn}`;
 				else
-					pb = `${nm} rations of $[tn}`;
+					pb = `${nm} rations of ${tn}`;
 			}
 			knowit = true;
 			break;
@@ -185,9 +199,9 @@ function things_f(r){
 			pb += " (being worn)";
 		if (obj == cur_weapon)
 			pb += " (weapon in hand)";
-		if (obj == cur_ring[LEFT])
+		if (obj == cur_ring[d.LEFT])
 			pb += " (on left hand)";
-		else if (obj == cur_ring[RIGHT])
+		else if (obj == cur_ring[d.RIGHT])
 			pb += " (on right hand)";
 		//if (drop && isupper(prbuf[0]))
 		//	prbuf[0] = tolower(prbuf[0]);
@@ -204,8 +218,8 @@ function things_f(r){
 				pb += " [+]";
 		}
 		if (!drop)
-			strcat(prbuf, ".");
-		return prbuf;
+			pb += ".";
+		return pb;
 	}
 
 	/*
@@ -365,10 +379,10 @@ function things_f(r){
 		const pick_one = this.pick_one;
 		const itemvol = r.player.encumb.itemvol;
 		const extras = this.extras;
-		const init_weapon = ()=>{cur.o_type = d.WEAPON; console.log("initweapon");}
-		const initarmor = ()=>{cur.o_type = d.ARMOR; console.log("initarmor");}
-		const init_ring = ()=>{cur.o_type = d.RING; console.log("initring");}
-		const fix_stick = ()=>{cur.o_type = d.WEAPON; console.log("fixstick");}
+		const init_weapon = r.item.weapon_f.init_weapon;
+		const initarmor = (cur)=>{cur.o_type = d.ARMOR; console.log("initarmor"); return cur;}
+		const init_ring = (cur)=>{cur.o_type = d.RING; console.log("initring"); return cur;}
+		const fix_stick = (cur)=>{cur.o_type = d.STICK; console.log("fixstick"); return cur;}
 
 		let item;//struct linked_list *item;
 		let mi; //struct magic_item *mi;
@@ -377,12 +391,12 @@ function things_f(r){
 
 		item = new_item(new t.object());//sizeof *cur);
 		cur = OBJPTR(item);
-		basic_init(cur);
+		cur = basic_init(cur);
 		if (type == d.DONTCARE) {
 			if (++r.player.no_food > 4 && !treas)
 				whi = d.TYP_FOOD;
 			else
-				whi = pick_one(things);  
+				whi = pick_one(things);
 		}
 		else {
 			whi = getindex(type);
@@ -395,7 +409,9 @@ function things_f(r){
 		}
 		cur.o_typname = things[whi].mi_name;
 		cur.o_weight = things[whi].mi_wght;
-		switch (whi) {
+		console.log(`whi:${whi} which:${which} type:${type} mi`);
+		console.log(mi);
+		switch (Number(whi)) {
 			case d.TYP_AMULET:
 				cur.o_type = d.AMULET;
 				cur.o_hplus = 500;
@@ -416,11 +432,11 @@ function things_f(r){
 				break;
 			case d.TYP_FOOD:
 				no_food = 0;
-				initfood(cur);
+				cur = initfood(cur);
 				break;
 			case d.TYP_WEAPON:
 				cur.o_which = which;
-				init_weapon(cur, which);
+				cur = init_weapon(cur, which);
 				if ((chance = r.rnd(100)) < 10) {
 					r.setoflg(cur,d.ISCURSED);
 					cur.o_hplus -= r.rnd(3)+1;
@@ -433,7 +449,7 @@ function things_f(r){
 				break;
 			case d.TYP_ARMOR:
 				cur.o_which = which;
-				initarmor(cur, which);
+				cur = initarmor(cur, which);
 				if ((chance = r.rnd(100)) < 20) {
 					r.setoflg(cur,d.ISCURSED);
 					cur.o_ac += r.rnd(3)+1;
@@ -443,13 +459,15 @@ function things_f(r){
 				break;
 			case d.TYP_RING:
 				cur.o_which = which;
-				init_ring(cur, false);
+				cur = init_ring(cur, false);
 				break;
 			case d.TYP_STICK:
 			default:
 				cur.o_which = which;
-				fix_stick(cur);
+				cur = fix_stick(cur);
 		}
+		item.l_data = cur;
+		console.log(cur);
 		return item;
 	}
 
@@ -470,6 +488,8 @@ function things_f(r){
 		cur.o_damage = "0d0";
 		cur.o_hurldmg = "0d0";
 		cur.o_flags = cur.o_type = cur.o_which = 0;
+
+		return cur;
 	}
 
 	/*
@@ -518,6 +538,7 @@ function things_f(r){
 				//mag = start;
 			}
 		}
+		console.log("pickone:" + i);
 		return i;// - start;
 	}
 }
