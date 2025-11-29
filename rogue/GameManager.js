@@ -1,0 +1,431 @@
+function GameManager(g){
+
+    const d = rogueDefines();
+    const f = rogueFuncs();
+    const t = rogueTypes();
+    const v = {};//globalValiableInit();
+
+    const ms = rogueMessage_jp(this);
+
+    this.define = d;
+    this.func = f;
+    this.types = t;
+    this.globalValiable = {};//v;
+    this.messages = ms;
+ 
+    itemData(this);
+    monsterData(this);
+
+    global(this);
+
+	for (let i in this.globalValiable){
+    //    this.UI.msg(`${i}: ${this.globalValiable[i].length}`);
+    }
+    for (let i in this.define){
+    //    this.UI.msg(`${i}: ${this.define[i]}`);
+    }
+
+    this.UI = new UIManager(this, g);
+    this.daemon = new DaemonScheduler(this);
+    this.item = new ItemManager(this);
+    this.player = new PlayerCharacter(this);
+    this.dungeon = new DungeonMap(this);
+    this.monster = new MonsterManager(this);
+
+    this.quiet = 0;         /* # of quiet turns */
+    this.nochange = false;  /* true if last stat same as now */
+    this.count = 0;			/* # of times to repeat cmd */
+    this.packvol = 0;       /* volume of things in pack */
+
+    this.after = false;     /* True if we want after daemons */
+    this.running = false;   /* True if player is running */
+    this.wizard = false;    /* True if he is a wizard */
+    this.waswizard = false; /* Was a wizard sometime */
+    this.take = 0;          /* Thing the rogue is taking */
+    this.door_stop = false; /* Stop run when we pass a door */
+    this.runch = "";        /* Direction player is running */
+    this.firstmove = false; /* First move after door_stop */    
+    this.levcount = 0;      /* # of active mons this level */
+    this.levtype = d.NORMLEV;/* type of level this is, maze, etc. */
+    this.amulet = false;    /* He found the amulet */
+    
+	this.oldpos = new t.coord();    //struct coord oldpos;		/* Pos before last look() call */
+	this.delta = new t.coord();     //struct coord delta;			/* Change indicated to get_dir() */
+	this.rndspot = { x:-1, y:-1 };  //struct coord rndspot = { -1, -1 };	/* for random teleporting */
+
+    this.isfight = false;   /* true if player is fighting */
+    
+    this.curprice = -1;     /* current price of item */
+	this.inpool = false;    /* true if hero standing in pool */
+    nlmove = false;		/* true when transported to new level */
+    
+    let entities = [];
+    this.entity = entities;
+
+    this.playing = false;
+
+    const r = this;
+
+    /*
+    * sceneChange param initialize
+    */
+    const SceneList = {
+        0: ()=>{r.UI.command.main();}//null//this.UI.command,
+    }
+
+    let SceneFunc;// =  setthis.UI.command();/* Command execution */;
+
+     this.setScene = (scene)=>{
+        SceneFunc = SceneList[scene];
+    }
+    
+    this.UI.comment("game");
+
+    /*
+    * rnd:
+    *	Pick a very random number.
+    */
+    this.rnd = function(range){
+        return Math.floor(Math.random()*(range));
+    }
+
+    /*
+    * roll:
+    *	Roll a number of dice
+    */
+    this.roll = function(number, sides){
+        let dtotal = 0;
+        while (number--) {
+            dtotal += this.rnd(sides)+1;
+        }
+        return dtotal;
+    }
+
+    /*
+    * detach:
+    *	Takes an item out of whatever linked list it might be in
+    */
+    this.detach = function(list, item)
+    //struct linked_list **list, *item;
+    {
+        if (list == item)
+            list = item.l_next;
+        if (item.l_prev != null)
+            item.l_prev.l_next = item.l_next;
+        if (item.l_next != null)
+            item.l_next.l_prev = item.l_prev;
+        item.l_next = null;
+        item.l_prev = null;
+
+        return list;
+    }
+
+    /*
+    * _attach:	add an item to the head of a list
+    */
+    this.attach = function(list, item)
+    //struct linked_list **list, *item;
+    {
+        if (list != null) 	{
+            item.l_next = list;
+            list.l_prev = item;
+            item.l_prev = null;
+        }
+        else 	{
+            item.l_next = null;
+            item.l_prev = null;
+        }
+        list = item;
+
+        return list
+    }
+
+    /*
+    * _free_list:	Throw the whole blamed thing away
+    */
+    this.free_list = (ptr)=>
+    //struct linked_list **ptr;
+    {
+        const discard = this.discard;
+        //register struct linked_list *item;
+        console.log("freelist on " + ptr)
+        while (ptr != null) {
+            console.log("freelist loop in")
+
+            item = ptr;
+            ptr = f.next(item);
+            discard(item);
+            console.log("freelist loop")
+
+        }
+        console.log("freelist done")
+        return null;
+    }
+
+    /*
+    * discard:  free up an item
+    */
+    this.discard = function(item)
+    //struct linked_list *item;
+    {
+        for (let i in entities)
+            if (entities[i] == item)
+                entities[i].l_data = null;
+        //total -= 2;
+        item.l_data = null;
+        //FREE(item.l_data);
+        //FREE(item);
+        console.log("discard");
+    }
+
+    /*
+    * new_item:	get a new item with a specified size
+    */
+    //struct linked_list *
+    this.new_item = function(size)
+    //int size;
+    {
+        //register struct linked_list *item;
+        for (let i in entities){
+            if (entities[i].l_data == null){
+                entities[i].l_data = size;
+                return entities[i];
+            }
+        }
+        let item = new t.linked_list();
+        item.l_data = size;//new t.object(); //new(size);
+        item.l_next = item.l_prev = null;
+        entities.push(item);
+
+        //r.UI.setDsp(d.DSP_ENTITY);
+        //r.UI.printw( `entity: ${entities.length}` );
+
+        return entities[entities.length-1]; //item;
+    }
+
+    this.entityState = function(){
+        let th = 0;
+        let ob = 0;
+        let c = 0;
+        for (let i in entities){
+            if (entities[i].l_data == null){
+                c++;
+            } else {
+                if (Boolean(entities[i].l_data.o_type)) ob++;
+                if (Boolean(entities[i].l_data.t_type)) th++;
+            }
+        }
+        let el = entities.length;
+        return `ALL:${el} OBJ:${ob} THING:${th} FREE:${c}    `;
+    }
+
+
+    //
+    this.main = function()
+    //char **argv;
+    //char **envp;
+    {
+        const daemon = r.daemon.daemon;
+        const fuse = r.daemon.fuse;
+        const status = r.UI.io.status;;//r.UI.io.status;
+        const doctor = r.daemon.doctor;
+        const stomach = r.daemon.stomach;
+        const runners = ()=>{};//r.monster.runners;
+        const swander = r.daemon.swander;
+        
+        const init_everything = r.item.init_everything;
+        const new_level = r.dungeon.new_level.create;
+
+        const initscr = r.UI.initscr;	
+
+        const pick_one = r.item.things_f.pick_one;
+        const new_thing = r.item.things_f.new_thing;
+        const add_pack = ()=>{};//r.item.pack.add_pack;
+
+        const OBJPTR = ()=>{return new t.object();}//f.OBJPTR;
+        const rnd = r.rnd;
+
+        const w_magic = r.globalValiable.w_magic; 
+        const a_magic = r.globalValiable.a_magic; 
+        const armors = r.globalValiable.armors; 
+
+        r.player.fruit = ms.FRUIT;
+        r.UI.msg(ms.MAINSTART);
+
+        init_everything();
+        initscr();			/* Start up cursor package */
+        //setup();
+
+        new_level(d.NORMLEV);
+
+        /* Start up daemons and fuses */
+
+        daemon(status, true, d.BEFORE);
+        daemon(doctor, true, d.BEFORE);
+        daemon(stomach, true, d.BEFORE);
+        daemon(runners, true, d.AFTER);
+        fuse(swander, true, d.WANDERTIME);
+
+        /* Give the rogue his weaponry */
+
+        let alldone;
+        let gwsc = 0;
+        do {
+            wpt = pick_one(w_magic);
+            switch (Number(wpt))
+            {
+                case d.MACE:	case d.SWORD:	case d.TWOSWORD:
+                case d.SPEAR:	case d.TRIDENT:	case d.SPETUM:
+                case d.BARDICHE:	case d.PIKE:	case d.BASWORD:
+                case d.HALBERD:
+                    alldone = true;
+                break;
+                default:
+                    alldone = false;
+                    //alert(wpt);
+                    gwsc++;
+            }
+        } while(!alldone);
+        if (gwsc) r.UI.comment(`first weapon shuffle: ${gwsc}`);
+
+        item = new_thing(false, d.WEAPON, wpt);
+        obj = OBJPTR(item);
+        obj.o_hplus = rnd(3);
+        obj.o_dplus = rnd(3);
+        obj.o_flags = d.ISKNOW;
+        add_pack(item, true);
+        cur_weapon = obj;
+
+        /* Now a bow */
+
+        item = new_thing(false, d.WEAPON, d.BOW);
+        obj = OBJPTR(item);
+        obj.o_hplus = rnd(3);
+        obj.o_dplus = rnd(3);
+        obj.o_flags = d.ISKNOW;
+        add_pack(item, true);
+
+        /* Now some arrows */
+
+        item = new_thing(false, d.WEAPON, d.ARROW);
+        obj = OBJPTR(item);
+        obj.o_count = 25 + rnd(15);
+        obj.o_hplus = rnd(2);
+        obj.o_dplus = rnd(2);
+        obj.o_flags = d.ISKNOW;
+        add_pack(item, true);
+
+        /* And his suit of armor */
+
+        wpt = pick_one(a_magic);
+        item = new_thing(false, d.ARMOR, wpt);
+        obj = OBJPTR(item);
+        obj.o_flags = d.ISKNOW;
+        obj.o_ac = armors[wpt].a_class - rnd(4);
+        cur_armor = obj;
+        add_pack(item, true);
+        
+        /* Give him some food */
+
+        item = new_thing(false, d.FOOD, 0);
+        add_pack(item, true);
+
+        r.playit();
+    }
+
+    /*
+    ** playit:	The main loop of the program.  Loop while(! the game is over,
+    **		refreshing things and looking at the proper times.
+    */
+
+    this.playit = function()
+    {
+        const roomin = r.monster.chase.roomin;
+
+        //reg char *opts;
+
+        //tcgetattr(0,&terminal);
+
+        /* parse environment declaration of options */
+
+        //if ((opts = getenv("ROGUEOPTS")) != null)
+        //    parse_opts(opts);
+        const player = r.player.get_player();
+        const hero = r.player.get_hero();
+
+        player.t_oldpos = {x:hero.x, y:hero.y};
+        r.player.set_player(player);
+        r.oldrp = roomin(hero);
+        r.nochange = false;
+        //while (playing)
+        //    command();		/* Command execution */
+        //endit(0);
+        r.setScene(0);
+        SceneFunc();
+        r.playing = true;
+    }
+
+    //
+    this.scenestep = function(){
+        if (r.playing) SceneFunc();
+    }
+
+
+
+    /*
+    * o_on:
+    *	Returns true in the objects flag is set
+    */
+    this.o_on =(what,bit)=>
+    //struct object *what;
+    //long bit;
+    {
+        //reg int flag;
+
+        let flag = false;
+        if (what != null)
+            flag = (what.o_flags & bit);
+        return flag;
+    }
+
+
+    /*
+    * o_off:
+    *	Returns true is the objects flag is reset
+    */
+    this.o_off =(what,bit)=>
+    //struct object *what;
+    //long bit;
+    {
+        //reg int flag;
+
+        let flag = false;
+        if (what != null)
+            flag = !(what.o_flags & bit);
+        return flag;
+    }
+
+
+    /*
+    * setoflg:
+    *	Set the specified flag for the object
+    */
+    this.setoflg =(what,bit)=>
+    //struct object *what;
+    //long bit;
+    {
+        what.o_flags |= bit;
+    }
+
+
+    /*
+    * resoflg:
+    *	Reset the specified flag for the object
+    */
+    this.resoflg =(what,bit)=>
+    //struct object *what;
+    //long bit;
+    {
+        what.o_flags &= ~bit;
+    }
+}

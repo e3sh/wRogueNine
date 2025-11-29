@@ -1,0 +1,477 @@
+/*
+ * Routines to deal with the pack
+ *
+ */
+
+function pack_f(r){
+	
+	const d = r.define;
+	const f = r.func;
+	const t = r.types;
+	const v = r.globalValiable;
+	const ms = r.messages;
+
+	const cw = d.DSP_MAIN_FG;
+
+	/*
+	* add_pack:
+	* Pick up an object and add it to the pack.  If the argument
+	* is non-null use it as the linked_list pointer instead of
+	* getting it off the ground.
+	*/
+	this.add_pack = function(item, silent)
+	//struct linked_list *item;
+	//bool silent;
+	{
+		let ip, lp; //reg struct linked_list *ip, *lp;
+		let obj, op;//reg struct object *obj, *op;
+		let from_floor;
+		let delchar;
+
+		if (player.t_room == null)
+			delchar = PASSAGE;
+		else
+			delchar = FLOOR;
+		if (item == null) {
+			from_floor = true;
+			if ((item = find_obj(hero.y, hero.x)) == null) {
+				mpos = 0;
+				msg("That object must have been an illusion.");
+				mvaddch(hero.y, hero.x, delchar);
+				return false;
+			}
+			/*
+			* Check for scare monster scrolls
+			*/
+			obj = OBJPTR(item);
+			if (obj.o_type == SCROLL && obj.o_which == S_SCARE) {
+				if (o_on(obj,ISFOUND)) {
+					msg("The scroll turns to dust as you pick it up.");
+					r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj, item);
+					discard(item);
+					mvaddch(hero.y, hero.x, delchar);	
+					return false;
+				}
+			}
+		}
+		else
+			from_floor = false;
+		obj = OBJPTR(item);
+		/*
+		* See if this guy can carry any more weight
+		*/
+		if (itemweight(obj) + him.s_pack > him.s_carry) {
+			msg("You can't carry that %s.", obj.o_typname);
+			return false;
+		}
+		/*
+		* Check if there is room
+		*/
+		if (packvol + obj.o_vol > V_PACK) {
+			msg("That %s won't fit in your pack.", obj.o_typname);
+			return false;
+		}
+		if (from_floor) {
+			r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj, item);
+			mvaddch(hero.y, hero.x, delchar);
+		}
+		item.l_prev = null;
+		item.l_next = null;
+		setoflg(obj, ISFOUND);
+		/*
+		* start looking thru pack to find the start of items
+		* with the same type.
+		*/
+		lp = pack;
+		for (ip = pack; ip != null; ip = next(ip)) {
+			op = OBJPTR(ip);
+			/*
+			* If we find a matching type then quit.
+			*/
+			if (op.o_type == obj.o_type)
+				break;
+			if (next(ip) != null)
+				lp = next(lp);		/* update "previous" entry */
+		}
+		/*
+		* If the pack was empty, just stick the item in it.
+		*/
+		if (pack == null) {
+			pack = item;
+			item.l_prev = null;
+		}
+		/*
+		* If we looked thru the pack, but could not find an
+		* item of the same type, then stick it at the end,
+		* unless it was food, then put it in front.
+		*/
+		else if (ip == null) {
+			if (obj.o_type == FOOD) {	/* insert food at front */
+				item.l_next = pack;
+				pack.l_prev = item;
+				pack = item;
+				item.l_prev = null;
+			}
+			else {						/* insert other stuff at back */
+				lp.l_next = item;
+				item.l_prev = lp;
+			}
+		}
+		/*
+		* Here, we found at least one item of the same type.
+		* Look thru these items to see if there is one of the
+		* same group. If so, increment the count and throw the
+		* new item away. If not, stick it at the end of the
+		* items with the same type. Also keep all similar
+		* objects near each other, like all identify scrolls, etc.
+		*/
+		else {
+			let save;//struct linked_list **save;
+
+			while (ip != null && op.o_type == obj.o_type) {
+				if (op.o_group == obj.o_group) {
+					if (op.o_flags == obj.o_flags) {
+						op.o_count++;
+						discard(item);
+						item = ip;
+						//goto picked_up;
+					}
+					else {
+						//goto around;
+					}
+				}
+				if (op.o_which == obj.o_which) {
+					if (obj.o_type == FOOD)
+						ip = next(ip);
+					break;
+				}
+	around:
+				ip = next(ip);
+				if (ip != null) {
+					op = OBJPTR(ip);
+					lp = next(lp);
+				}
+			}
+			/*
+			* If inserting into last of group at end of pack,
+			* just tack on the end.
+			*/
+			if (ip == null) {
+				lp.l_next = item;
+				item.l_prev = lp;
+			}
+			/*
+			* Insert into the last of a group of objects
+			* not at the end of the pack.
+			*/
+			else {
+				save = ip.l_prev.l_next;
+				item.l_next = ip;
+				item.l_prev = ip.l_prev;
+				ip.l_prev = item;
+				save = item;
+			}
+		}
+	picked_up:
+		obj = OBJPTR(item);
+		if (!silent)
+			msg("%s (%c)",inv_name(obj,false),pack_char(obj));
+		if (obj.o_type == AMULET)
+			amulet = true;
+		updpack();				/* new pack weight & volume */
+		return true;
+	}
+
+	/*
+	* inventory:
+	*	Show what items are in a specific list
+	*/
+	this.inventory = function(list, type)
+	//struct linked_list *list;
+	//int type;
+	{
+		let pc; //reg struct linked_list *pc;
+		let obj; //reg struct object *obj;
+		let ch;
+		let cnt;
+
+		if (list == null) {			/* empty list */
+			msg(type == 0 ? "Empty handed." : "Nothing appropriate.");
+			return false;
+		}
+		else if (next(list) == null) {	/* only 1 item in list */
+			obj = OBJPTR(list);
+			msg("a) %s", inv_name(obj, false));
+			return true;
+		}
+		cnt = 0;
+		wclear(hw);
+		for (ch = 'a', pc = list; pc != null; pc = next(pc), ch = npch(ch)) {
+			obj = OBJPTR(pc);
+			wprintw(hw,"%c) %s\n\r",ch,inv_name(obj, false));
+			if (++cnt > LINES - 2 && next(pc) != null) {
+				dbotline(hw, morestr);
+				cnt = 0;
+				wclear(hw);
+			} 
+		}
+		dbotline(hw,spacemsg);
+		restscr(cw);
+		return true;
+	}
+
+	/*
+	* pick_up:
+	*	Add something to characters pack.
+	*/
+	this.pick_up = function(ch)
+	//char ch;
+	{
+		const money = r.item.things_f.money;
+
+		r.change = false;
+		switch(ch) {
+			case d.GOLD:
+				money();
+			break;case d.ARMOR:
+			case d.POTION:
+			case d.FOOD:
+			case d.WEAPON:
+			case d.SCROLL:	
+			case d.AMULET:
+			case d.RING:
+			case d.STICK:
+				add_pack(null, false);
+			break;default:
+				msg("That item is ethereal !!!");
+		}
+	}
+
+	/*
+	* picky_inven:
+	*	Allow player to inventory a single item
+	*/
+	this.picky_inven = function()
+	{
+		let item; //reg struct linked_list *item;
+		let ch, mch;
+
+		if (pack == null)
+			msg("You aren't carrying anything.");
+		else if (next(pack) == null)
+			msg("a) %s", inv_name(OBJPTR(pack), false));
+		else {
+			msg("Item: ");
+			mpos = 0;
+			if ((mch = readchar()) == ESCAPE) {
+				msg("");
+				return;
+			}
+			for (ch='a',item=pack; item != null; item=next(item),ch=npch(ch))
+				if (ch == mch) {
+					msg("%c) %s",ch,inv_name(OBJPTR(item), false));
+					return;
+				}
+			if (ch == 'A')
+				ch = 'z';
+			else
+				ch -= 1;
+			msg("Range is 'a' to '%c'", ch);
+		}
+	}
+
+	/*
+	* get_item:
+	*	pick something out of a pack for a purpose
+	*/
+	//struct linked_list *
+	this.get_item = function(purpose, type)
+	//char *purpose;
+	//int type;
+	{
+		let obj, pit, savepit;// reg struct linked_list *obj, *pit, *savepit;
+		let pob; //struct object *pob;
+		let ch, och, anr, cnt;
+
+		if (pack == null) {
+			msg("You aren't carrying anything.");
+			return null;
+		}
+		if (type != WEAPON && (type != 0 || next(pack) == null)) {
+			/*
+			* see if we have any of the type requested
+			*/
+			pit = pack;
+			anr = 0;
+			for (ch = 'a'; pit != null; pit = next(pit), ch = npch(ch)) {
+				pob = OBJPTR(pit);
+				if (type == pob.o_type || type == 0) {
+					++anr;
+					savepit = pit;	/* save in case of only 1 */
+				}
+			}
+			if (anr == 0) {
+				msg("Nothing to %s",purpose);
+				after = false;
+				return null;
+			}
+			else if (anr == 1) {	/* only found one of 'em */
+				do {
+					let opb; //struct object *opb;
+
+					opb = OBJPTR(savepit);
+					msg("%s what (* for the item)?",purpose);
+					och = readchar();
+					if (och == '*') {
+						mpos = 0;
+						msg("%c) %s",pack_char(opb),inv_name(opb,false));
+						continue;
+					}
+					if (och == ESCAPE) {
+						msg("");
+						after = false;
+						return null;
+					}
+					if (isalpha(och) && och != pack_char(opb)) {
+						mpos = 0;
+						msg("You can't %s that !!", purpose);
+						after = false;
+						return null;
+					}
+				} while(!isalpha(och));
+				mpos = 0;
+				return savepit;		/* return this item */
+			}
+		}
+		for (;;) {
+			msg("%s what? (* for list): ",purpose);
+			ch = readchar();
+			mpos = 0;
+			if (ch == ESCAPE) {		/* abort if escape hit */
+				after = false;
+				msg("");			/* clear display */
+				return null;
+			}
+			if (ch == '*') {
+				wclear(hw);
+				pit = pack;		/* point to pack */
+				cnt = 0;
+				for (ch='a'; pit != null; pit=next(pit), ch=npch(ch)) {
+					pob = OBJPTR(pit);
+					if (type == 0 || type == pob.o_type) {
+						wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
+						if (++cnt > LINES - 2 && next(pit) != null) {
+							cnt = 0;
+							dbotline(hw, morestr);
+							wclear(hw);
+						}
+					}
+				}
+				wmove(hw, LINES - 1,0);
+				wprintw(hw,"%s what? ",purpose);
+				draw(hw);		/* write screen */
+				anr = false;
+				do {
+					ch = readchar();
+					if (isalpha(ch) || ch == ESCAPE)
+						anr = true; 
+				} while(!anr);		/* do till we got it right */
+				restscr(cw);		/* redraw orig screen */
+				if (ch == ESCAPE) {
+					after = false;
+					msg("");		/* clear top line */
+					return null;	/* all done if abort */
+				}
+				/* ch has item to get from pack */
+			}
+			for (obj=pack,och='a';obj!=null;obj=next(obj),och=npch(och))
+				if (ch == och)
+					break;
+			if (obj == null) {
+				if (och == 'A')
+					och = 'z';
+				else
+					och -= 1;
+				msg("Please specify a letter between 'a' and '%c'",och);
+				continue;
+			}
+			else 
+				return obj;
+		}
+	}
+
+	/*
+	* pack_char:
+	*	Get the character of a particular item in the pack
+	*/
+	//char
+	this.pack_char = function(obj)
+	//struct object *obj;
+	{
+		let item; //reg struct linked_list *item;
+		let c; //reg char c;
+
+		c = 'a';
+		for (item = pack; item != null; item = next(item))
+			if (OBJPTR(item) == obj)
+				return c;
+			else
+				c = npch(c);
+		return '%';
+	}
+
+	/*
+	* idenpack:
+	*	Identify all the items in the pack
+	*/
+	this.idenpack = function()
+	{
+		let pc; //reg struct linked_list *pc;
+
+		for (pc = pack ; pc != null ; pc = next(pc))
+			whatis(pc);
+	}
+
+
+	/* 
+	* del_pack:
+	*	Take something out of the hero's pack
+	*/
+	this.del_pack = function(what)
+	//struct linked_list *what;
+	{
+		let op; //reg struct object *op;
+
+		op = OBJPTR(what);
+		cur_null(op);		/* check for current stuff */
+		if (op.o_count > 1) {
+			op.o_count--;
+		}
+		else {
+			pack = r.detach(pack,what);
+			discard(what);
+		}
+		updpack();
+	}
+
+	/*
+	* cur_null:
+	*	This updates cur_weapon etc for dropping things
+	*/
+	this.cur_null = function(op)
+	//struct object *op;
+	{
+		const cur_ring = r.player.get_cur_ring;
+
+		if (op == r.player.get_cur_weapon())
+			r.player.set_cur_weapon(null);
+		else if (op == r.player.get_cur_armor())
+			r.player.set_cur_armor(null);
+		else if (op == cur_ring[LEFT])
+			cur_ring[LEFT] = null;
+		else if (op == cur_ring[RIGHT])
+			cur_ring[RIGHT] = null;
+
+		r.player.set_cur_ring(cur_ring);
+	}
+}
