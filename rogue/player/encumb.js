@@ -32,25 +32,26 @@ function encumb(r){
 	* updpack:
 	*	Update his pack weight and adjust fooduse accordingly
 	*/
-	this.updpack = function()
+	this.updpack = ()=>
 	{
 		let topcarry, curcarry;//reg int
 
-		let him = r.player.get_him();
+		const him = r.player.get_him();
 
 		him.s_carry = r.player.encumb.totalenc();			/* get total encumb */
 		curcarry = packweight();			/* get pack weight */
 		topcarry = him.s_carry / 5;		/* 20% of total carry */
 		if (curcarry > 4 * topcarry) {
-			if (rnd(100) < 80)
+			if (r.rnd(100) < 80)
 				r.player.foodlev = 3;				/* > 80% of pack */
 		}
 		else if (curcarry > 3 * topcarry) {
-			if (rnd(100) < 60)
+			if (r.rnd(100) < 60)
 				r.player.foodlev = 2;				/* > 60% of pack */
 		}
 		else
-			r.player.foodlev = 1;					/* <= 60% of pack */
+			r.player.foodlev = 1;			/* <= 60% of pack */
+
 		him.s_pack = curcarry;				/* update pack weight */
 		r.packvol = pack_vol();				/* update pack volume */
 		r.nochange = false;					/* also change display */
@@ -64,12 +65,14 @@ function encumb(r){
 	*/
 	function packweight()
 	{
+		const itemweight = r.player.encumb.itemweight;
+
 		let obj; //reg struct object *obj;
 		let pc; //reg struct linked_list *pc;
 		let weight, i; //reg int weight, i;
 
 		weight = 0;
-		for (pc = pack ; pc != null ; pc = next(pc)) {
+		for (pc = r.player.get_pack() ; pc != null ; pc = next(pc)) {
 			obj = OBJPTR(pc);
 			weight += itemweight(obj) * obj.o_count;
 		}
@@ -138,7 +141,7 @@ function encumb(r){
 	* itemvol:
 	*	Get the volume of an object
 	*/
-	this.itemvol = function(wh)
+	this.itemvol = (wh)=>
 	//struct object *wh;
 	{
 		const getindex = r.player.misc.getindex;
@@ -160,6 +163,7 @@ function encumb(r){
 				else
 					extra = d.V_WS_WAND;
 		}
+
 		volume = thnginfo[what].mf_vol + extra;
 		volume *= wh.o_count;
 		return volume;
@@ -238,7 +242,7 @@ function encumb(r){
 		if (him.s_pack > him.s_carry) {
 			ch = player.t_oldch;
 			extinguish(wghtchk);
-			if ((ch != FLOOR && ch != d.PASSAGE) || isfight) {
+			if ((ch != FLOOR && ch != d.PASSAGE) ||r.isfight) {
 				fuse(wghtchk, true, 1);
 				inwhgt(false);
 				return;
@@ -249,7 +253,7 @@ function encumb(r){
 				if (dropchk == d.SOMTHERE)
 					err = false;
 				else if (dropchk == false) {
-					mpos = 0;
+					//mpos = 0;
 					msg(ms.WGHTCHK_2);
 				}
 				if (dropchk == true)

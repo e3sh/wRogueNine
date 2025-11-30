@@ -12,6 +12,7 @@ function pack_f(r){
 	const ms = r.messages;
 
 	const cw = d.DSP_MAIN_FG;
+	const hw = d.DSP_WINDOW;
 
 	/*
 	* add_pack:
@@ -24,22 +25,17 @@ function pack_f(r){
 	//bool silent;
 	{
 		const picked_up =()=>{
-			console.log(item);
+			//console.log(item);
 			obj = OBJPTR(item);
-			if (!silent)
-				r.UI.msg(`${inv_name(obj,false)} (${pack_char(obj)})`);
+			if (!silent){
+				let pach = pack_char(obj);
+				r.UI.msg(`${inv_name(obj,false)} ${(pach =='%')?"":`(${pach})`}`);
+			}
 			if (obj.o_type == d.AMULET)
 				r.amulet = true;
-			updpack();	
+			updpack();
 		}
 
-		const around =()=>{
-			ip = next(ip);
-			if (ip != null) {
-				op = OBJPTR(ip);
-				lp = next(lp);
-			}
-		}
 		const find_obj = r.player.misc.find_obj;
 		const OBJPTR = f.OBJPTR;
 		const o_on = r.o_on;
@@ -93,14 +89,14 @@ function pack_f(r){
 		* See if this guy can carry any more weight
 		*/
 		if (itemweight(obj) + him.s_pack > him.s_carry) {
-			r.UI.msg("You can't carry that %s.", obj.o_typname);
+			r.UI.msg(`You can't carry that ${obj.o_typname}.`);
 			return false;
 		}
 		/*
 		* Check if there is room
 		*/
 		if (r.packvol + obj.o_vol > d.V_PACK) {
-			r.UI.msg("That %s won't fit in your pack.", obj.o_typname);
+			r.UI.msg(`That ${obj.o_typname} won't fit in your pack.`);
 			return false;
 		}
 		if (from_floor) {
@@ -146,8 +142,9 @@ function pack_f(r){
 			if (obj.o_type == d.FOOD) {	/* insert food at front */
 				item.l_next = pack;
 				pack.l_prev = item;
-				r.player.set_pack(item)
+				r.player.set_pack(item);
 				item.l_prev = null;
+				//r.player.set_pack(item);
 			}
 			else {						/* insert other stuff at back */
 				lp.l_next = item;
@@ -171,6 +168,15 @@ function pack_f(r){
 			let save;//struct linked_list **save;
 
 			while (ip != null && op.o_type == obj.o_type) {
+
+				const around =()=>{
+					ip = next(ip);
+					if (ip != null) {
+						op = OBJPTR(ip);
+						lp = next(lp);
+					}
+				}
+				
 				if (op.o_group == obj.o_group) {
 					if (op.o_flags == obj.o_flags) {
 						op.o_count++;
@@ -187,7 +193,7 @@ function pack_f(r){
 					}
 				}
 				if (op.o_which == obj.o_which) {
-					if (obj.o_type == FOOD)
+					if (obj.o_type == d.FOOD)
 						ip = next(ip);
 					break;
 				}
@@ -208,6 +214,7 @@ function pack_f(r){
 			if (ip == null) {
 				lp.l_next = item;
 				item.l_prev = lp;
+				console.log("tail");
 			}
 			/*
 			* Insert into the last of a group of objects
@@ -221,6 +228,7 @@ function pack_f(r){
 				item.l_prev = ip.l_prev;
 				ip.l_prev = item;
 				save = item;
+				console.log("og-tail");
 			}
 		}
 	picked_up:
@@ -242,33 +250,49 @@ function pack_f(r){
 	//struct linked_list *list;
 	//int type;
 	{
+		const OBJPTR = f.OBJPTR;
+		const next = f.next;
+		const inv_name = r.item.things_f.inv_name;
+		const npch = r.UI.io.npch;
+
 		let pc; //reg struct linked_list *pc;
 		let obj; //reg struct object *obj;
 		let ch;
 		let cnt;
 
 		if (list == null) {			/* empty list */
-			msg(type == 0 ? "Empty handed." : "Nothing appropriate.");
+			r.UI.msg(type == 0 ? "Empty handed." : "Nothing appropriate.");
 			return false;
 		}
 		else if (next(list) == null) {	/* only 1 item in list */
 			obj = OBJPTR(list);
-			msg("a) %s", inv_name(obj, false));
+			r.UI.msg("a) %s", inv_name(obj, false));
 			return true;
 		}
 		cnt = 0;
-		wclear(hw);
+		r.UI.wclear(hw);
+		let buf = [];
 		for (ch = 'a', pc = list; pc != null; pc = next(pc), ch = npch(ch)) {
 			obj = OBJPTR(pc);
-			wprintw(hw,"%c) %s\n\r",ch,inv_name(obj, false));
-			if (++cnt > LINES - 2 && next(pc) != null) {
-				dbotline(hw, morestr);
-				cnt = 0;
-				wclear(hw);
-			} 
+			buf.push(`${ch}) ${inv_name(obj, false)}`);
+			//wprintw(hw,"%c) %s\n\r",ch,inv_name(obj, false));
+			//if (++cnt > LINES - 2 && next(pc) != null) {
+			//	dbotline(hw, morestr);
+			//	cnt = 0;
+			//	wclear(hw);
+			//}
 		}
-		dbotline(hw,spacemsg);
-		restscr(cw);
+		r.UI.setDsp(hw);
+		for (let i in buf){
+			r.UI.mvaddch(i ,0, buf[i]);
+		}
+		//dbotline(hw,spacemsg);
+		//restscr(cw);
+		r.UI.setDsp(d.DSP_MAIN);
+
+		r.setScene(2);
+		r.UI.overlapview(true);
+
 		return true;
 	}
 

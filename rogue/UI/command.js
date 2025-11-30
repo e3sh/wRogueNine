@@ -115,22 +115,33 @@ function command(r){
 			}
 		}
 
+		entityStatus();
+	}
+
+	function entityStatus(){
+
+		const hero = r.player.get_hero();
+
 		let etxt = [];
-		etxt.push(r.entityState());
+		let res = r.entityState();
+		for (let i in res){
+			etxt.push(res[i]);
+		}
 		etxt.push("");
 		etxt.push(`food_left:${r.player.food_left}    `);
 		etxt.push(`player x:${hero.x} y:${hero.y}    `);
 		etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
 		etxt.push("");
-		let wml = wlo = 0;
+		let wml = wlo = pak = 0;
 		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) {wml++; etxt.push(" " + w.l_data.t_type);}
 		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) {wlo++; etxt.push(" " + w.l_data.o_type);}
-		etxt.push(`mlist:${wml} lvl_obj:${wlo}    `);
-
+		for (let w = r.player.get_pack(); w != null ; w = w.l_next) {pak++;}
+		etxt.push(`mlist:${wml} lvl_obj:${wlo} pack:${pak}`);
+		r.UI.wclear(d.DSP_ENTITY);
 		for (let i in etxt){
 			r.UI.mvwaddstr(d.DSP_ENTITY, i, 0, etxt[i]);
 		}
-}
+	}
 
 	/*
 	* cmd_decode
@@ -143,6 +154,7 @@ function command(r){
 		const do_run = r.player.move.do_run;
 		const winat = r.UI.winat;
 		const msg = r.UI.msg;
+		const inventory = r.item.pack_f.inventory;
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
 		const unctrl =(text)=>{return text;}
@@ -172,8 +184,15 @@ function command(r){
 			else 
 				ch = r.amulet?"<":">";	
 		}
+
+		if (ki.includes("NumpadSubtract")||ki.includes("NumpadAdd")||
+			ki.includes("ArrowUp")||ki.includes("ArrowDown")||
+			ki.includes("KeyI")
+		){
+			ch = "i";
+
+		}
 		//r.UI.msg(`${ki.length} ${ch}`);
-		
 		
 		if (false){
 		//if (isdigit(ch)) {
@@ -270,7 +289,7 @@ function command(r){
 				break;
 			case 'Q' : r.after = false; quit(-1);
 				break;
-			case 'i' : r.after = false; inventory(pack, 0);
+			case 'i' : r.after = false; inventory(r.player.get_pack(), 0);
 				break;
 			case 'I' : r.after = false; picky_inven();
 				break;
@@ -789,7 +808,6 @@ function command(r){
 		msg("I see no way up.");
 	}
 
-
 	/*
 	* Let him escape for a while
 	*/
@@ -818,8 +836,6 @@ function command(r){
 		wait_for(cw, '\n');
 		restscr(cw);
 	}
-
-
 
 	/*
 	* call:

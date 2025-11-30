@@ -390,10 +390,13 @@ this.chase = function(r){
 	* runto:
 	*	Set a monster running after something
 	*/
-	this.runto = function(runner, spot)
+	this.runto = (runner, spot)=>
 	//struct coord *runner;
 	//struct coord *spot;
 	{
+		const find_mons = this.find_mons;
+		const THINGPTR = f.THINGPTR;
+
 		let item; //reg struct linked_list *item;
 		let tp; //reg struct thing *tp;
 

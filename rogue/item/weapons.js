@@ -20,7 +20,7 @@ function weapons(r){
 	{
 		const get_item = get_item;
 		const OBJPTR = f.OBJPTR;
-		const dropcheck = dropcheck;
+		const dropcheck = r.item.things_f.dropcheck;
 		const is_current = is_current
 
 		let obj, nowwield; //reg struct object *obj, *nowwield;

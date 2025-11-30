@@ -12,9 +12,11 @@ function UIManager(r, g){
 
     this.io = new io(r);
     this.command = new command(r);
+    this.scene = new scene(r);
 
     const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
+    const hw = d.DSP_WINDOW;
 
     //dispaly functions
     //cursus bridge    
@@ -68,7 +70,6 @@ function UIManager(r, g){
         newpos = strlen(msgbuf);
     }
     */
-
     this.comment =(text)=>{
         g.console[d.DSP_COMMENT].insertln(); 
         g.console[d.DSP_COMMENT].printw(text);
@@ -76,10 +77,17 @@ function UIManager(r, g){
 
     /*
     * readchar:
+    */
+    this.overlapview =(flg)=>{
+        const io = g.task.read("io");
+        io.overlapview = flg;        
+    }
+
+    /*
+    * readchar:
     *	flushes stdout so that screen is up to date and then returns
     *	getchar.
     */
-    
     this.readchar =()=>{
         let ki = g.task.read("io").input.keylist;
         //if (ki.includes("KeyQ")) r.mapcheckTest();

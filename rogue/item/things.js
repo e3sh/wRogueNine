@@ -13,16 +13,6 @@ function things_f(r){
 	const o_on = r.o_on;
 	const new_item = r.new_item;
 	const OBJPTR = f.OBJPTR;
-	const pick_one = this.pick_one;
-	//const getindex = r.player.misc.getindex;
-	//const itemvol = r.player.encumb.itemvol;
-	//const initfood = r.player.misc.initfood;
-	const init_weapon = ()=>{};//r.item.init_weapon;
-	const initarmor = ()=>{};
-	const init_ring = ()=>{};
-	const fix_stick = ()=>{};
-	//const setoflg = r.setoflg;
-	const extras = this.extras;
 
 	const things = v.things;
 	const a_magic = v.a_magic;
@@ -32,8 +22,6 @@ function things_f(r){
 	const r_magic = v.r_magic;
 	const ws_magic = v.ws_magic;
 	const thnginfo = v.thnginfo; 
-
-	const rnd = r.rnd;
 
 	let group = v.group;;
 
@@ -48,10 +36,10 @@ function things_f(r){
 	//bool drop;
 	{
 		const vowelstr = r.player.misc.vowelstr;
-		const num = ()=>{return ""}//r.item.weapons.num
+		const num = r.item.weapon_f.num
 		const o_on = r.o_on;
-		const charge_str =()=>{return 0}//r.item.sticks.charge_str
-		const ring_num = ()=>{} //item.ring.ring_num
+		const charge_str =()=>{return 0};//r.item.sticks.charge_str
+		const ring_num = r.item.ring_f.ring_num;
 
 		const s_names = r.item.s_names;
 		const p_colors = r.item.p_colors;
@@ -68,7 +56,7 @@ function things_f(r){
 		const r_know = r.item.r_know;	
 		const ws_know = r.item.ws_know;
 
-		const armors = r.item.armors;
+		const armors = v.armors;
 
 		const fruit = r.player.fruit;
 
@@ -80,7 +68,7 @@ function things_f(r){
 		let wh, knowit;//reg int wh, knowit;
 		let nm, inm, q;//char nm[3], *inm, *q;
 				
-		wh = obj.o_which; console.log(wh);
+		wh = obj.o_which;
 		knowit = false;
 		if (obj.o_count > 1)
 			pl = "s";
@@ -266,19 +254,30 @@ function things_f(r){
 	* drop:
 	*	put something down
 	*/
-	this.drop = function(item)
+	this.drop = (item)=>
 	//struct linked_list *item;
 	{
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const dropcheck = this.dropcheck;
+		const new_item = r.new_item;
+		const itemvol = r.player.encumb.itemvol;
+		const inv_name = this.inv_name;
+		const fall = r.item.weapon_f.fall;
+		const updpack = r.player.encumb.updpack;
+
+		const hero = r.player.get_hero();
+
 		let ch;//reg char ch;
 		let ll, nll;//reg struct linked_list *ll, *nll;
 		let op;//reg struct object *op;
 
 		if (item == null) {
-			ch = mvinch(hero.y, hero.x);
-			if (ch != FLOOR && ch != PASSAGE && ch != POOL) {
-				msg("There is something there already.");
-				after = false;
-				return SOMTHERE;
+			ch = r.UI.mvinch(hero.y, hero.x);
+			if (ch != d.FLOOR && ch != d.PASSAGE && ch != d.POOL) {
+				r.UI.msg("There is something there already.");
+				r.after = false;
+				return d.SOMTHERE;
 			}
 			if ((ll = get_item("drop", 0)) == null)
 				return false;
@@ -288,11 +287,11 @@ function things_f(r){
 		}
 		op = OBJPTR(ll);
 		if (!dropcheck(op))
-			return CANTDROP;
+			return d.CANTDROP;
 		/*
 		* Take it out of the pack
 		*/
-		if (op.o_count >= 2 && op.o_type != WEAPON) {
+		if (op.o_count >= 2 && op.o_type != d.WEAPON) {
 			nll = new_item(new t.object());//sizeof *op);
 			op.o_count--;
 			op.o_vol = itemvol(op);
@@ -305,22 +304,22 @@ function things_f(r){
 		else {
 			pack = r.detach(pack, ll);
 		}
-		if (ch == POOL) {
-			msg("%s sinks out of sight.",inv_name(op, true));
-			discard(ll);
+		if (ch == d.POOL) {
+			r.UI.msg("%s sinks out of sight.",inv_name(op, true));
+			r.discard(ll);
 		}
 		else {			/* put on dungeon floor */
-			if (levtype == POSTLEV) {
+			if (levtype == d.POSTLEV) {
 				op.o_pos = hero;	/* same place as hero */
 				fall(ll,false);
 				if (item == null)	/* if item wasn't sold */
-					msg("Thanks for your donation to the Fiend's flea market.");
+					r.UI.msg("Thanks for your donation to the Fiend's flea market.");
 			}
 			else {
 				r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj , ll);
-				mvaddch(hero.y, hero.x, op.o_type);
+				r.UI.mvaddch(hero.y, hero.x, op.o_type);
 				op.o_pos = hero;
-				msg("Dropped %s", inv_name(op, true));
+				r.UI.msg("Dropped %s", inv_name(op, true));
 			}
 		}
 		updpack();			/* new pack weight */
@@ -334,10 +333,20 @@ function things_f(r){
 	this.dropcheck = function(op)
 	//struct object *op;
 	{
+		const o_on = r.o_on;
+		const msg = r.UI.msg;
+		const cur_null = r.item.pack_f.cur_null;
+		const waste_time = r.player.misc.waste_time;
+		const toss_ring = ()=>{};//r.item.ring_f.toss_ring;
+
+		const cur_weapon = r.player.get_cur_weapon();
+		const cur_armor = r.player.get_cur_armor();
+		const cur_ring =  r.player.get_cur_ring();
+
 		if (op == null)
 			return true;
-		if (levtype == POSTLEV) {
-			if (o_on(op,ISCURSED) && o_on(op,ISKNOW)) {
+		if (levtype == d.POSTLEV) {
+			if (o_on(op,d.ISCURSED) && o_on(op,d.ISKNOW)) {
 				msg("The trader does not accept shoddy merchandise.");
 				return false;
 			}
@@ -347,19 +356,19 @@ function things_f(r){
 			}
 		}
 		if (op != cur_armor && op != cur_weapon
-		&& op != cur_ring[LEFT] && op != cur_ring[RIGHT])
+		&& op != cur_ring[d.LEFT] && op != cur_ring[d.RIGHT])
 			return true;
-		if (o_on(op,ISCURSED)) {
+		if (o_on(op,d.ISCURSED)) {
 			msg("You can't.  It appears to be cursed.");
 			return false;
 		}
 		if (op == cur_weapon)
-			cur_weapon = null;
+			r.player.set_cur_weapon(null);
 		else if (op == cur_armor) {
 			waste_time();
-			cur_armor = null;
+			r.player.set_cur_armor(null);
 		}
-		else if (op == cur_ring[LEFT] || op == cur_ring[RIGHT])
+		else if (op == cur_ring[d.LEFT] || op == cur_ring[d.RIGHT])
 			toss_ring(op);
 		return true;
 	}
@@ -380,7 +389,7 @@ function things_f(r){
 		const itemvol = r.player.encumb.itemvol;
 		const extras = this.extras;
 		const init_weapon = r.item.weapon_f.init_weapon;
-		const initarmor = (cur)=>{cur.o_type = d.ARMOR; console.log("initarmor"); return cur;}
+		const initarmor = r.item.armor_f.initarmor;
 		const init_ring = (cur)=>{cur.o_type = d.RING; console.log("initring"); return cur;}
 		const fix_stick = (cur)=>{cur.o_type = d.STICK; console.log("fixstick"); return cur;}
 
@@ -389,6 +398,11 @@ function things_f(r){
 		let cur; //struct object *cur;
 		let chance, whi;
 
+		if (typeof(which) == "undefined") 
+			which = d.DONTCARE;
+		else
+			which = Number(which);
+
 		item = new_item(new t.object());//sizeof *cur);
 		cur = OBJPTR(item);
 		cur = basic_init(cur);
@@ -396,7 +410,7 @@ function things_f(r){
 			if (++r.player.no_food > 4 && !treas)
 				whi = d.TYP_FOOD;
 			else
-				whi = pick_one(things);
+				whi = pick_one(things); //if (whi==-1) console.log("p1 alert");
 		}
 		else {
 			whi = getindex(type);
@@ -404,13 +418,13 @@ function things_f(r){
 		mi = thnginfo[whi].mf_magic;
 		if (which == d.DONTCARE) {
 			which = 0;
-			if (mi != null)
-				which = pick_one(mi);
+			if (mi != null){
+				which = Number(pick_one(mi));
+			}
 		}
 		cur.o_typname = things[whi].mi_name;
 		cur.o_weight = things[whi].mi_wght;
-		console.log(`whi:${whi} which:${which} type:${type} mi`);
-		console.log(mi);
+		//console.log(`whi:${whi} which:${which} type:${type} `);
 		switch (Number(whi)) {
 			case d.TYP_AMULET:
 				cur.o_type = d.AMULET;
@@ -467,7 +481,7 @@ function things_f(r){
 				cur = fix_stick(cur);
 		}
 		item.l_data = cur;
-		console.log(cur);
+		//console.log(cur);
 		return item;
 	}
 
@@ -483,8 +497,10 @@ function things_f(r){
 		cur.o_launch = 0;
 		cur.o_typname = null;
 		cur.o_group = ++group;// newgrp();
-		cur.o_weight = cur.o_vol = 0;
-		cur.o_hplus = cur.o_dplus = 0;
+		cur.o_weight = 0;
+		cur.o_vol = 0;
+		cur.o_hplus = 0;
+		cur.o_dplus = 0;
 		cur.o_damage = "0d0";
 		cur.o_hurldmg = "0d0";
 		cur.o_flags = cur.o_type = cur.o_which = 0;
@@ -518,13 +534,14 @@ function things_f(r){
 	//struct magic_item *mag;
 	{
 		let start; //reg struct magic_item *start;
-		let i; //reg int i;
+		let res = -1; //reg int i;
 
 		start = mag;
-		for (i in mag){
+		for (let i in mag){
 			let rn = r.rnd(1000);
 		//for (i = r.rnd(1000); mag.mi_name != null; mag++) {
 		//	if (i < mag.mi_prob)
+			res = i;
 			if (rn < mag[i].mi_prob)
 				break;
 			if (mag[i].mi_name == null) {
@@ -538,7 +555,7 @@ function things_f(r){
 				//mag = start;
 			}
 		}
-		console.log("pickone:" + i);
-		return i;// - start;
+		//console.log("pickone:" + res);
+		return res;// - start;
 	}
 }

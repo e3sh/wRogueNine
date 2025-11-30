@@ -70,7 +70,9 @@ function GameManager(g){
     * sceneChange param initialize
     */
     const SceneList = {
-        0: ()=>{r.UI.command.main();}//null//this.UI.command,
+        0: ()=>{r.UI.command.main();} ,//null//this.UI.command,
+        1: ()=>{r.UI.scene.keywait();},
+        2: ()=>{r.UI.scene.inventry();},
     }
 
     let SceneFunc;// =  setthis.UI.command();/* Command execution */;
@@ -200,18 +202,40 @@ function GameManager(g){
         let th = 0;
         let ob = 0;
         let c = 0;
+        let map = [];
         for (let i in entities){
             if (entities[i].l_data == null){
                 c++;
+                map[i] = ".";
             } else {
-                if (Boolean(entities[i].l_data.o_type)) ob++;
-                if (Boolean(entities[i].l_data.t_type)) th++;
+                if (Boolean(entities[i].l_data.o_type)) {
+                    ob++; map[i] = "o"; 
+                    for (let item = r.player.get_pack(); item != null; item = item.l_next){
+                        if (item.l_data == entities[i].l_data){
+                            map[i] = "p";
+                            break;
+                        }
+                    }
+                }
+                if (Boolean(entities[i].l_data.t_type)) {th++; map[i] = "t"; }
             }
         }
         let el = entities.length;
-        return `ALL:${el} OBJ:${ob} THING:${th} FREE:${c}    `;
+        let res = [];
+        res.push(`ALL:${el} OBJ:${ob} THING:${th} FREE:${c}    `);
+        res.push(`----|----1----|----2----|----3`);
+        let st = "";
+        for (let i in map){
+            st += map[i];
+            if (st.length > 30){
+                res.push(st);
+                st = "";
+            }
+        }
+        res.push(st);
+ 
+        return res;;
     }
-
 
     //
     this.main = function()
@@ -233,7 +257,7 @@ function GameManager(g){
 
         const pick_one = r.item.things_f.pick_one;
         const new_thing = r.item.things_f.new_thing;
-        const add_pack = ()=>{};//r.item.pack.add_pack;
+        const add_pack = r.item.pack_f.add_pack;
 
         const OBJPTR = f.OBJPTR;
         const rnd = r.rnd;
@@ -287,7 +311,7 @@ function GameManager(g){
         obj.o_dplus = rnd(3);
         obj.o_flags = d.ISKNOW;
         add_pack(item, true);
-        cur_weapon = obj;
+        r.player.set_cur_weapon(obj);
 
         /* Now a bow */
 
@@ -315,7 +339,7 @@ function GameManager(g){
         obj = OBJPTR(item);
         obj.o_flags = d.ISKNOW;
         obj.o_ac = armors[wpt].a_class - rnd(4);
-        cur_armor = obj;
+        r.player.set_cur_armor(obj);
         add_pack(item, true);
         
         /* Give him some food */

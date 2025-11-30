@@ -18,6 +18,7 @@ function itemData(r){
 			o.mi_name = data[i][0]; 
 			o.mi_prob = data[i][1];
 			o.mi_worth= data[i][2];
+			o.mi_wght = data[i][2];
 			item.push(o); 
 		}
 		return item;
@@ -58,7 +59,7 @@ function itemData(r){
 			o.mf_max = data[i][0];
 			o.mf_vol = data[i][1];
 			o.mf_show = data[i][2];
-			o.magic_item = data[i][3];
+			o.mf_magic = data[i][3];
 			item.push(o); 
 		}
 		return item;

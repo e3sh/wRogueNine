@@ -417,11 +417,14 @@ function misc(r){
 	this.is_current = function(obj)
 	//struct object *obj;
 	{
+		const cur_ring = r.player.get_cur_ring();
+
 		if (obj == null)
 			return false;
-		if (obj == cur_armor || obj == cur_weapon || obj == cur_ring[d.LEFT]
+		if (obj == r.player.get_cur_armor() || obj == r.player.get_cur_weapon() 
+		|| obj == cur_ring[d.LEFT]
 		|| obj == cur_ring[d.RIGHT]) {
-			msg("Already in use.");
+			r.UI.msg("Already in use.");
 			return true;
 		}
 		return false;
@@ -495,5 +498,7 @@ function misc(r){
 		what.o_typname = things[d.TYP_FOOD].mi_name;
 		what.o_hplus = what.o_dplus = 0;
 		what.o_vol = r.player.encumb.itemvol(what);
+
+		return what;
 	}
 }

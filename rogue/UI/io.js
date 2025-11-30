@@ -77,8 +77,8 @@ function io(r){
 		stef = player.t_stats.s_ef;
 		stre = player.t_stats.s_re;
 		stmx = max_stats.s_re;
-		totwght = him.s_carry / 10;
-		carwght = him.s_pack / 10;
+		totwght = Math.floor(him.s_carry / 10);
+		carwght = Math.floor(him.s_pack / 10);
 		//getyx(cw, oy, ox);
 		if (him.s_maxhp >= 100) {
 		//	hwidth[1] = '3';	/* if hit point >= 100	*/
@@ -133,7 +133,7 @@ function io(r){
 		r.UI.mvaddstr(0, 39,`Ac: ${cur_armor == null ? him.s_arm :cur_armor.o_ac}`);
 		r.UI.mvaddstr(0, 52,`Exp: ${him.s_lvl}/${him.s_exp}`);
 
-		carwght = (r.packvol * 100) / d.V_PACK;
+		carwght = Math.floor((r.packvol * 100) / d.V_PACK);
 		//pb = &buf[strlen(buf)];
 		r.UI.mvaddstr(0, 65,`Vol: ${carwght}`);//%3d%%", carwght);
 		//mvwaddstr(cw, LINES - 2, 0, buf);
@@ -141,6 +141,38 @@ function io(r){
 		//waddstr(cw, hungstr[hungry_state]);
 		//wclrtoeol(cw);
 		//wmove(cw, oy, ox);
+		r.UI.setDsp(d.DSP_MAIN);
+
+		equipstatus();
+	}
+
+	/*
+	* equipstatus:
+	*	Display the hero's equip items
+	*/
+	function equipstatus(){
+
+		const inv_name = r.item.things_f.inv_name;
+
+		const cur_weapon = r.player.get_cur_weapon();
+		const cur_armor  = r.player.get_cur_armor();
+		const cur_ring   = r.player.get_cur_ring();
+
+		const wname = (cur_weapon != null)? inv_name(cur_weapon, false):"-";
+		const aname = (cur_weapon != null)? inv_name(cur_armor , false):"-";
+		const rlname = (cur_ring[d.LEFT] != null) ? inv_name(cur_ring[d.LEFT] , false):"-";
+		const rrname = (cur_ring[d.RIGHT] != null)? inv_name(cur_ring[d.RIGHT], false):"-";
+
+		r.UI.setDsp(d.DSP_EQUIP);
+		r.UI.clear();
+
+		r.UI.mvaddstr(0, 0,`EQUIP)`);
+		r.UI.mvaddstr(1, 0,` ${wname}`);
+		r.UI.mvaddstr(2, 0,` ${aname}`);
+		r.UI.mvaddstr(3, 0,` ${rlname}`);
+		r.UI.mvaddstr(4, 0,` ${rrname}`);
+		r.UI.mvaddstr(6, 0,`SELECT: ${"itemname"}(${"a"})`);
+
 		r.UI.setDsp(d.DSP_MAIN);
 	}
 
@@ -243,7 +275,7 @@ function io(r){
 		if (ch >= 'z')
 			nch = 'A';
 		else
-			nch = ch + 1;
+			nch = String.fromCharCode(ch.charCodeAt(0)+ 1);
 		return nch;
 	}
 }

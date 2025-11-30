@@ -216,7 +216,7 @@ function move(r){
 			r.running = false;
 		else if (isalpha(ch) && pl_off(d.ISETHER)) {
 			r.running = false;
-			fight(nh, cur_weapon, false);
+			fight(nh, r.player.get_cur_weapon(), false);
 			return;
 		}
 		if (rp == null && player.t_room != null)
