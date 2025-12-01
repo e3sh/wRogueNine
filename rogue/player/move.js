@@ -62,6 +62,8 @@ function move(r){
 		const rf_on = r.dungeon.rooms_f.rf_on;
 		const light = this.light;
 		const teleport = ()=>{};
+		const THINGPTR = f.THINGPTR;
+		const next = f.next;
 
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();
@@ -338,6 +340,7 @@ function move(r){
 				mvwaddch(cw, y, x, ch);
 			}
 		}
+		//r.UI.comment("light");
 	}
 
 	/*
@@ -386,6 +389,7 @@ function move(r){
 				}
 			}
 		}
+		//r.UI.comment("show");
 		return ch;
 	}
 

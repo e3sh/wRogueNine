@@ -5,7 +5,7 @@ function GameManager(g){
     const t = rogueTypes();
     const v = {};//globalValiableInit();
 
-    const ms = rogueMessage_jp(this);
+    const ms = rogueMessage(this);
 
     this.define = d;
     this.func = f;
@@ -199,6 +199,8 @@ function GameManager(g){
     }
 
     this.entityState = function(){
+        const inv_name = r.item.things_f.inv_name;
+
         let th = 0;
         let ob = 0;
         let c = 0;
@@ -216,6 +218,12 @@ function GameManager(g){
                             break;
                         }
                     }
+                    for (let item = r.dungeon.lvl_obj; item != null; item = item.l_next){
+                        if (item.l_data == entities[i].l_data){
+                            map[i] = "l";
+                            break;
+                        }
+                    }    
                 }
                 if (Boolean(entities[i].l_data.t_type)) {th++; map[i] = "t"; }
             }
@@ -233,9 +241,35 @@ function GameManager(g){
             }
         }
         res.push(st);
- 
+
+        for (let i in map){
+            if (map[i]=="o"){
+                res.push(`${inv_name(entities[i].l_data,false)}`)
+            }
+        }
         return res;;
     }
+
+    this.on_entity = function(item){
+
+        for (let i in entities){
+            //if (item.l_data == entities[i].l_data)
+            if (item == entities[i])
+                return true;
+        }
+        return false;
+    }
+
+    this.get_entity = function(item){
+
+        for (let i in entities){
+            //if (item.l_data == entities[i].l_data)
+            if (item == entities[i])
+                return entities[i];
+        }
+        return null;
+    }
+
 
     //
     this.main = function()
@@ -380,6 +414,8 @@ function GameManager(g){
         r.setScene(0);
         SceneFunc();
         r.playing = true;
+
+        r.UI.comment("playit");
     }
 
     //

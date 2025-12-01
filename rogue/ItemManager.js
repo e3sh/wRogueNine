@@ -142,6 +142,29 @@ function ItemManager(r){
 
     r.UI.comment("item");
 
+	this.item_flagcheck = function(obj){
+		const o_on = r.o_on;
+
+		let res = "";
+		if (o_on(obj. d.ISCURSD)) res += "/CURSED";
+		if (o_on(obj. d.ISKNOW))  res += "/KNOW";
+		if (o_on(obj. d.ISPOST))  res += "/POST";
+		if (o_on(obj. d.ISPROT))  res += "/PROT";
+		if (o_on(obj. d.ISBLESS)) res += "/BLESS";
+		if (o_on(obj. d.ISMISL))  res += "/MISL";
+		if (o_on(obj. d.ISMANY))  res += "/MANY";
+		
+		//-----1:ISCURSED:
+		//-----2:ISKNOW :
+		//-----4:ISPOST :
+		//----1-:ISPROT :
+		//----4-:ISBLESS:
+		//-2----:ISMISL :
+		//-4----:ISMANY :
+
+		return res;
+	}
+
 	/*
 	* init_everything:
 	*	Set up all important stuff.
@@ -351,8 +374,10 @@ function ItemManager(r){
 		const player = r.player.get_player();
 		let him;
 		
+		player.t_flags = 0;
 		player.t_nomove = 0;
 		player.t_nocmd = 0;
+
 		him = player.t_stats;
 		him.s_lvl = 1;
 		him.s_exp = 0;

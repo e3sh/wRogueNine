@@ -248,6 +248,8 @@ function things_f(r){
 		}
 		else
 			r.UI.msg("That gold must have been counterfeit.");
+
+		r.UI.comment("money");
 	}
 
 	/*

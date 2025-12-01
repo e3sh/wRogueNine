@@ -120,8 +120,11 @@ function command(r){
 
 	function entityStatus(){
 
+		const player = r.player.get_player();
 		const hero = r.player.get_hero();
-
+		const on = f.on;
+		const pl_on = r.player.pl_on;
+		
 		let etxt = [];
 		let res = r.entityState();
 		for (let i in res){
@@ -130,13 +133,61 @@ function command(r){
 		etxt.push("");
 		etxt.push(`food_left:${r.player.food_left}    `);
 		etxt.push(`player x:${hero.x} y:${hero.y}    `);
-		etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
+		//etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
 		etxt.push("");
 		let wml = wlo = pak = 0;
-		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) {wml++; etxt.push(" " + w.l_data.t_type);}
-		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) {wlo++; etxt.push(" " + w.l_data.o_type);}
+		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) {
+			wml++; 
+			let fs = `.....${Number(w.l_data.t_flags).toString(8)}`;
+			let fst = fs.substring(fs.length-6,fs.length);
+			etxt.push(`${w.l_data.t_type}:${fst}:x:${w.l_data.t_pos.x} y:${w.l_data.t_pos.y}`);
+		}
+		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) {wlo++;}// etxt.push(" " + w.l_data.o_type);}
 		for (let w = r.player.get_pack(); w != null ; w = w.l_next) {pak++;}
+		etxt.push("");
 		etxt.push(`mlist:${wml} lvl_obj:${wlo} pack:${pak}`);
+
+		let fs = `.....${Number(player.t_flags).toString(8)}`;
+		etxt.push(`${fs.substring(fs.length-6,fs.length)}:player.t-flags`);
+		etxt.push(`-----1:ISBLIND :${(pl_on(d.ISBLIND)	?"o":"-")}`);
+		etxt.push(`-----4:ISRUN   :${(on(player,d.ISRUN)	?"o":"-")}`);
+		etxt.push(`----1-:ISINVINC:${(on(player,d.ISINVINC)	?"o":"-")}`);
+		etxt.push(`---4--:ISHELD  :${(on(player,d.ISHELD)	?"o":"-")}`);
+		etxt.push(`--1---:ISHUH   :${(on(player,d.ISHUH)	?"o":"-")}`);
+		etxt.push(`--4---:CANHUH  :${(on(player,d.CANHUH)	?"o":"-")}`);
+		etxt.push(`-1----:CANSEE  :${(on(player,d.CANSEE)	?"o":"-")}`);
+		etxt.push(`-4----:ISSLOW  :${(on(player,d.ISSLOW)	?"o":"-")}`);
+		etxt.push(`1-----:ISHASTE :${(on(player,d.ISHASTE)	?"o":"-")}`);
+		etxt.push(`2-----:ISETHER :${(on(player,d.ISETHER)	?"o":"-")}`);
+
+		const ent_title = ()=>{
+			let st = "";
+			for (let w = r.dungeon.mlist; w != null ; w = w.l_next)
+				st += w.l_data.t_type;
+			return st;
+		}
+		const ent_flags = (flg)=>{
+			let st = "";
+			for (let w = r.dungeon.mlist; w != null ; w = w.l_next)
+				st += on(w.l_data, flg)?"o":"-";
+			return st;
+		}
+		etxt.push("");
+		etxt.push(`entity.t-flags:${ent_title()}`);
+		etxt.push(`-----1:ISSTUCK:${ent_flags(d.ISSUTCK	)}`);
+		etxt.push(`-----2:ISPARA :${ent_flags(d.ISPARA	)}`);
+		etxt.push(`-----4:ISRUN  :${ent_flags(d.ISRUN	)}`);
+		etxt.push(`----2-:ISINVIS:${ent_flags(d.ISINVIS	)}`);
+		etxt.push(`----4-:ISMEAN :${ent_flags(d.ISMEAN	)}`);
+		etxt.push(`---1--:ISGREED:${ent_flags(d.ISGREED	)}`);
+		etxt.push(`---2--:ISWOUND:${ent_flags(d.ISWOUND	)}`);
+		etxt.push(`--1---:ISHUH  :${ent_flags(d.ISHUH	)}`);
+		etxt.push(`--2---:ISREGEN:${ent_flags(d.ISREGEN	)}`);
+		etxt.push(`-1----:WASHIT :${ent_flags(d.WASHIT	)}`);
+		etxt.push(`-2----:ISCANC :${ent_flags(d.ISCANC	)}`);
+		etxt.push(`-4----:ISSLOW :${ent_flags(d.ISSLOW	)}`);
+		etxt.push(`1-----:ISHASTE:${ent_flags(d.ISHASTE	)}`);
+
 		r.UI.wclear(d.DSP_ENTITY);
 		for (let i in etxt){
 			r.UI.mvwaddstr(d.DSP_ENTITY, i, 0, etxt[i]);

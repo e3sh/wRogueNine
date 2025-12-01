@@ -24,6 +24,7 @@ function pack_f(r){
 	//struct linked_list *item;
 	//bool silent;
 	{
+		/*
 		const picked_up =()=>{
 			//console.log(item);
 			obj = OBJPTR(item);
@@ -35,7 +36,7 @@ function pack_f(r){
 				r.amulet = true;
 			updpack();
 		}
-
+		*/
 		const find_obj = r.player.misc.find_obj;
 		const OBJPTR = f.OBJPTR;
 		const o_on = r.o_on;
@@ -55,6 +56,7 @@ function pack_f(r){
 		let obj, op;//reg struct object *obj, *op;
 		let from_floor;
 		let delchar;
+		let pack_result;
 
 		if (player.t_room == null)
 			delchar = d.PASSAGE;
@@ -129,6 +131,7 @@ function pack_f(r){
 		if (pack == null) {
 			r.player.set_pack(item);
 			item.l_prev = null;
+			pack_result = "empty-new";
 		}
 		/*
 		* If we looked thru the pack, but could not find an
@@ -145,11 +148,14 @@ function pack_f(r){
 				r.player.set_pack(item);
 				item.l_prev = null;
 				//r.player.set_pack(item);
+				pack_result = "new-food";
 			}
 			else {						/* insert other stuff at back */
 				lp.l_next = item;
 				item.l_prev = lp;
+				pack_result = "new";
 			}
+
 		}
 		/*
 		* Here, we found at least one item of the same type.
@@ -166,6 +172,7 @@ function pack_f(r){
 		*/
 		else {
 			let save;//struct linked_list **save;
+			let picked_up = false;
 
 			while (ip != null && op.o_type == obj.o_type) {
 
@@ -182,8 +189,11 @@ function pack_f(r){
 						op.o_count++;
 						r.discard(item);
 						item = ip;
-						picked_up();
-						return true;
+						picked_up = true;
+						pack_result = "add";
+						break;
+						//picked_up();
+						//return true;
 						//goto picked_up;
 					}
 					else {
@@ -205,41 +215,76 @@ function pack_f(r){
 				//	lp = next(lp);
 				//}
 			}
-			/*
-			* If inserting into last of group at end of pack,
-			* just tack on the end.
-			* パックの末尾のグループの最後に挿入する場合は、
-			* 単に末尾を貼り付けます。
-			*/
-			if (ip == null) {
-				lp.l_next = item;
-				item.l_prev = lp;
-				console.log("tail");
-			}
-			/*
-			* Insert into the last of a group of objects
-			* not at the end of the pack.
-			* オブジェクトのグループの最後に挿入します。
-			* パックの末尾ではありません。
-			*/
-			else {
-				save = ip.l_prev.l_next;
-				item.l_next = ip;
-				item.l_prev = ip.l_prev;
-				ip.l_prev = item;
-				save = item;
-				console.log("og-tail");
+
+			if (!picked_up){
+				/*
+				* If inserting into last of group at end of pack,
+				* just tack on the end.
+				* パックの末尾のグループの最後に挿入する場合は、
+				* 単に末尾を貼り付けます。
+				*/
+				if (ip == null) {
+					lp.l_next = item;
+					item.l_prev = lp;
+					pack_result = "tail";
+				}
+				/*
+				* Insert into the last of a group of objects
+				* not at the end of the pack.
+				* オブジェクトのグループの最後に挿入します。
+				* パックの末尾ではありません。
+				*/
+				else {
+					//item 挿入するリンクリストオブジェクト
+					//ip　現時点で挿入位置にあるリンクリストオブジェクト
+					//console.log("og-tail_before");
+
+					//debug_llcheck(ip.l_prev,"ip.l_prev");
+					//debug_llcheck(item, "item");
+					//debug_llcheck(ip,"ip");
+					let old_iplprev = ip.l_prev; //ip.l_prev は、新しいアイテムが挿入される直前のアイテム
+	
+					item.l_next = ip;	//挿入するアイテムの位置の「次」のアイテムを ip に設定
+					item.l_prev = ip.l_prev; //挿入するアイテムの位置の「前」のアイテムを ip-.l_prev に設定
+					ip.l_prev = item; // 挿入位置の「次」のアイテム ip の前のアイテムを itemへ設定
+
+					old_iplprev.l_next = item; //直前のアイテムの「次」のアイテムをitemに設定
+
+					//save = item;
+					pack_result = "og-tail";
+					//debug_llcheck(save,"save");
+					//debug_llcheck(item, "item");
+					//debug_llcheck(ip,"ip");
+					//console.log((item.l_data == ip.l_prev.l_data)?"ok":"ng");
+				}
 			}
 		}
 	picked_up:
-		picked_up();
-		//obj = OBJPTR(item);
-		//if (!silent)
-		//	msg("%s (%c)",inv_name(obj,false),pack_char(obj));
-		//if (obj.o_type == AMULET)
-		//	amulet = true;
-		//updpack();				/* new pack weight & volume */
+		//picked_up();
+		obj = OBJPTR(item);
+		if (!silent){
+			let pach = pack_char(obj);
+			r.UI.msg(`${inv_name(obj,false)} ${(pach =='%')?"":`(${pach})`}`);
+		}
+		if (obj.o_type == d.AMULET)
+			r.amulet = true;
+		updpack();	/* new pack weight & volume */
+
+		r.UI.comment(`add_pack(${pack_result})`);
 		return true;
+	}
+
+	function debug_llcheck(item, label){
+
+		const OBJPTR = f.OBJPTR;
+		const pack_char = r.item.pack_f.pack_char;
+		const inv_name = r.item.things_f.inv_name;
+
+		let ent = r.on_entity(item)?"y":"n";
+		let obj = OBJPTR(item);
+		let pre = Boolean(item.l_prev)?pack_char(OBJPTR(item.l_prev)):"-";
+		let nex = Boolean(item.l_next)?pack_char(OBJPTR(item.l_next)):"-"; 
+		console.log(`${ent} p[${pre}]-[${label} ${inv_name(obj, false)} ${pack_char(obj)}]-n[${nex}]`);
 	}
 
 	/*
