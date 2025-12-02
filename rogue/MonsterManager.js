@@ -19,7 +19,7 @@ function MonsterManager(r){
 	this.get_mtlev =()=>{return mtlev};
 
 	this.chase = new chase(r);
-	//this.battle = new battle(r);
+	this.battle = new battle(r);
 
 	r.UI.comment("monster");
 	/*
@@ -97,7 +97,8 @@ function MonsterManager(r){
 		const mvwinch = r.UI.mvwinch;
 		const mvwaddch = r.UI.mvwaddch;
 		const goingup = ()=>{return (r.dungeon.level < r.dungeon.max_level)};
-		const iswearing = ()=>{return false;}//r.item.ring.iswearing;
+		const iswearing = ()=>{return false;};//r.item.ring.iswearing;
+		const runto = r.monster.chase.runto;
 
 		let item;//reg struct linked_list *item;
 		let tp; //reg struct thing *tp;
@@ -209,6 +210,15 @@ function MonsterManager(r){
 	*/
 	this.wanderer = function()
 	{
+		const rnd_room = r.dungeon.new_level.rnd_room;
+		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
+		const step_ok = r.UI.io.step_ok;	
+		const new_monster = r.monster.new_monster;
+		const rnd_mon = r.monster.rnd_mon;
+
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
+
 		let ch;
 		let rp, hr = player.t_room;//reg struct room *rp, *hr = player.t_room;
 		let item; //reg struct linked_list *item;
@@ -216,16 +226,18 @@ function MonsterManager(r){
 		let mp; //struct coord mp;
 
 		do {
-			rp = rooms[rnd_room()];
-			if (rp != hr || levtype == d.MAZELEV) {
+			rp = r.dungeon.rooms[rnd_room()];
+			if (rp != hr || r.levtype == d.MAZELEV) {
 				mp = rnd_pos(rp);
-				ch = mvinch(mp.y, mp.x);
+				ch = r.UI.mvinch(mp.y, mp.x);
 			}
 		} while (!step_ok(ch));
 		item = new_monster(rnd_mon(true,false), mp, false);
 		tp = f.THINGPTR(item);
 		tp.t_flags |= d.ISRUN;
 		tp.t_dest = hero;
+
+		console.log("wanderer");
 	}
 
 	/*

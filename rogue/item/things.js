@@ -191,10 +191,10 @@ function things_f(r){
 			pb += " (on left hand)";
 		else if (obj == cur_ring[d.RIGHT])
 			pb += " (on right hand)";
-		//if (drop && isupper(prbuf[0]))
-		//	prbuf[0] = tolower(prbuf[0]);
-		//else if (!drop && islower(*prbuf))
-		//	*prbuf = toupper(*prbuf);
+		if (drop && f.isupper(pb.substring(0,1)))
+			pb = f.tolower(pb);
+		else if (!drop && f.islower(pb.substring(0,1)))
+			pb = f.toupper(pb);
 		if (o_on(obj, d.ISPROT))
 			pb += " [!]";
 		if (o_on(obj, d.ISPOST))

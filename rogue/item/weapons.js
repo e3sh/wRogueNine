@@ -118,34 +118,43 @@ function weapons(r){
 	*	Drop an item someplace around here.
 	*/
 
-	this.fall = function(item, pr)
+	this.fall = (item, pr)=>
 	//struct linked_list *item;
 	//bool pr;
 	{
+		const fallpos = this.fallpos;
+		const rf_on = r.dungeon.rooms_f.rf_on;
+		const light = r.player.move.light;
+		const inv_name = r.item.things_f.inv_name;
+
+		const w_magic = v.w_magic;
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
+
 		let obj; //reg struct object *obj;
 		let rp; //reg struct room *rp;
 		let fpos; //static struct coord fpos;
 
-		obj = OBJPTR(item);
+		obj = f.OBJPTR(item);
 		if (fallpos(obj.o_pos, fpos, true)) {
-			mvaddch(fpos.y, fpos.x, obj.o_type);
+			r.UI.mvaddch(fpos.y, fpos.x, obj.o_type);
 			obj.o_pos = fpos;
 			rp = player.t_room;
-			if (rp != null && !rf_on(rp,ISDARK)) {
+			if (rp != null && !rf_on(rp,d.ISDARK)) {
 				light(hero);
-				mvwaddch(cw, hero.y, hero.x, PLAYER);
+				r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 			}
 			r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj, item);
 			return;
 		}
 
 		if (pr)
-			if (obj.o_type == WEAPON) /* BUGFIX: Identification trick */
-				msg("Your %s vanishes as it hits the ground.", w_magic[obj.o_which].mi_name);
+			if (obj.o_type == d.WEAPON) /* BUGFIX: Identification trick */
+				r.UI.msg(`Your ${w_magic[obj.o_which].mi_name} vanishes as it hits the ground.`);
 			else
-				msg("%s vanishes as it hits the ground.", inv_name(obj,true));
+				r.UI.msg(`${inv_name(obj,true)} vanishes as it hits the ground.`);
 
-		discard(item);
+		r.discard(item);
 	}
 
 	/*
@@ -249,6 +258,10 @@ function weapons(r){
 	//struct coord *pos, *newpos;
 	//bool passages;
 	{
+		const winat = r.UI.winat;
+
+		const hero = r.player.get_hero();
+
 		let y, x, ch;
 
 		for (y = pos.y - 1; y <= pos.y + 1; y++) {

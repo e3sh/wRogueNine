@@ -256,6 +256,8 @@ function wizard(r){
 	function makemons(what)
 	//int what;
 	{
+		const look = r.player.misc.look;
+
 		reg int x, y, oktomake = false, appear = 1;
 		struct coord mp;
 

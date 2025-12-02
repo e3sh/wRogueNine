@@ -64,6 +64,8 @@ function PlayerCharacter(r){
 	this.encumb = new encumb(r);	//重量関係
 	this.misc	= new misc(r);	//
 	this.move	= new move(r);
+	this.pstats = new pstats(r);
+	this.rips = new rips(r);
 
 	r.UI.comment("player");
 }

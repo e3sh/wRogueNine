@@ -2,7 +2,7 @@
  * Players status routines
  *
  */
-function pstats(){
+function pstats(r){
    
 	const d = r.define;
 	const f = r.func;
@@ -14,30 +14,34 @@ function pstats(){
 	* chg_hpt:
 	*	Changes players hit points
 	*/
-	this.hg_hpt = function(howmany, alsomax, what)
+	this.chg_hpt = function(howmany, alsomax, what)
 	//int howmany;
 	//bool alsomax;
 	//char what;
 	{
-		nochange = false;
+		const death = ()=>{r.UI.comment("death")};
+
+		const him = r.player.get_him();
+
+		r.nochange = false;
 		if(alsomax)
 			him.s_maxhp += howmany;
 		him.s_hpt += howmany;
 		if (him.s_hpt < 1) {
-			msg(" ");
+			r.UI.msg(" ");
 			death(what);
 		}
+		r.player.set_him(him);
 	}
-
 
 	/*
 	* rchg_str:
 	*	Update the players real strength 
 	*/
-	this.rchg_str = function(amt)
+	this.rchg_str = (amt)=>
 	//int amt;
 	{
-		chg_abil(STR,amt,true);
+		this.chg_abil(d.STR,amt,true);
 	}
 
 	/*
@@ -47,13 +51,16 @@ function pstats(){
 	this.chg_abil = function(what,amt,how)
 	//int amt, what, how;
 	{
+		const updpack = r.player.encumb.updpack;
+		const wghtchk = r.player.encumb.wghtchk;
+
 		if (amt == 0)
 			return;
 		if (how == true) {			/* real (must be 1st) */
-			updabil(what,amt,&pstats.s_re,true);
+			pstats.s_re = updabil(what,amt,pstats.s_re,true);
 			how = false;
 		}
-		updabil(what,amt,&pstats.s_ef,how);	/* effective */
+		pstats.s_ef = updabil(what,amt,pstats.s_ef,how);	/* effective */
 		updpack();
 		wghtchk(false);
 	}
@@ -66,69 +73,110 @@ function pstats(){
 	//struct real *pst;
 	//int what, amt, how;
 	{
-		register int *wh, *mx, *mr;
-		struct real *mst, *msr;
-		bool is_str = false;
-		int rtype;
+		const him = r.player.get_him();
+		const max_stats = r.player.get_max_stats();
 
-		msr = &him.s_re;
+		let wh, mx, mr;
+		let mst, msr;//struct real *mst, *msr;
+		let is_str = false;
+		let rtype;
+
+		msr = him.s_re;
 		if (how == true)				/* max real abilities */
-			mst = &max_stats.s_re;
+			mst = max_stats.s_re;
 		else							/* max effective abil */
-			mst = &max_stats.s_ef;
+			mst = max_stats.s_ef;
 		switch (what) {
-			case STR:
+			case d.STR:
 				is_str = true;
-				wh = &pst.a_str;
-				mx = &mst.a_str;
-				mr = &msr.a_str;
-				rtype = R_ADDSTR;
-			break;case DEX:
-				wh = &pst.a_dex;
-				mx = &mst.a_dex;
-				mr = &msr.a_dex;
-				rtype = R_DEX;
-			break;case CON:
-				wh = &pst.a_con;
-				mx = &mst.a_con;
-				mr = &msr.a_con;
-				rtype = R_CONST;
-			break;case WIS:
-				wh = &pst.a_wis;
-				mx = &mst.a_wis;
-				mr = &msr.a_wis;
-				rtype = R_KNOW;
-			break;default:
+				wh = pst.a_str;
+				mx = mst.a_str;
+				mr = msr.a_str;
+				rtype = d.R_ADDSTR;
+			break;
+			case d.DEX:
+				wh = pst.a_dex;
+				mx = mst.a_dex;
+				mr = msr.a_dex;
+				rtype = d.R_DEX;
+			break;
+			case d.CON:
+				wh = pst.a_con;
+				mx = mst.a_con;
+				mr = msr.a_con;
+				rtype = d.R_CONST;
+			break;
+			case d.WIS:
+				wh = pst.a_wis;
+				mx = mst.a_wis;
+				mr = msr.a_wis;
+				rtype = d.R_KNOW;
+			break;
+			default:
 				return;
 		}
-		*wh += amt;						/* update by amt */
+		wh += amt;						/* update by amt */
 		if (amt < 0) {					/* if decrement */
-			if (*wh < MINABIL)			/* minimum = 3 */
-				*wh = MINABIL;
+			if (wh < d.MINABIL)			/* minimum = 3 */
+				wh = d.MINABIL;
 			if (how == false) {
-				if (*wh < *mr)			/* if less than real abil */
-					*wh = *mr;			/* make equal to real */
+				if (wh < mr)			/* if less than real abil */
+					wh = mr;			/* make equal to real */
 			}
 		}
 		else {							/* increment */
-			int themax;
+			let themax;
 
-			themax = MAXOTHER;				/* default maximum */
+			themax = d.MAXOTHER;				/* default maximum */
 			if (is_str)
-				themax = MAXSTR;			/* strength maximum */
+				themax = d.MAXSTR;			/* strength maximum */
 			if (how != true)
 				themax += ringex(rtype);	/* get ring extra */
-			if (*wh > themax) {				/* see if > max (if real) */
-				*wh = themax;				/* max = 18  (24 if str) */
+			if (wh > themax) {				/* see if > max (if real) */
+				wh = themax;				/* max = 18  (24 if str) */
 			}
 			/*
 			* Check for updating the max player stats.
 			*/
-			if (*wh > *mx)
-				*mx = *wh;
+			if (wh > mx)
+				mx = wh;
 		}
-	}
+		//result
+		switch (what) {
+			case d.STR:
+				pst.a_str = wh;
+				mst.a_str = mx;
+				msr.a_str = mr;
+				break;
+			case d.DEX:
+				pst.a_dex = wh;
+				mst.a_dex = mx;
+				msr.a_dex = mr;
+				break;
+			case d.CON:
+				pst.a_con = wh;
+				mst.a_con = mx;
+				msr.a_con = mr;
+				break;
+			case d.WIS:
+				pst.a_wis = wh;
+				mst.a_wis = mx;
+				msr.a_wis = mr;
+				break;
+			default:
+				return;
+		}
+		him.s_re = msr;
+		if (how == true)				/* max real abilities */
+			max_stats.s_re = mst;
+		else							/* max effective abil */
+			max_stats.s_ef = mst;
 
+		r.player.set_him(him);
+		r.player.set_max_stats(max_stats);
+
+		return pst;
+	}
 
 	/*
 	* add_haste:
@@ -137,19 +185,27 @@ function pstats(){
 	this.add_haste = function(potion)
 	//bool potion;
 	{
-		if (pl_on(ISHASTE)) {
-			msg("You faint from exhaustion.");
-			player.t_nocmd += rnd(8);
-			player.t_flags &= ~ISHASTE;
+		const pl_on = r.player.pl_on;
+		const extinguish = r.daemon.extinguish; 
+		const fuse = r.daemon.fuse;
+		const nohaste = r.daemon.nohaste;
+
+		const player = r.player.get_player();
+
+		if (pl_on(d.ISHASTE)) {
+			r.UI.msg("You faint from exhaustion.");
+			player.t_nocmd += r.rnd(8);
+			player.t_flags &= ~d.ISHASTE;
 			extinguish(nohaste);
 		}
 		else {
-			player.t_flags |= ISHASTE;
+			player.t_flags |= d.ISHASTE;
 			if (potion)
-				fuse(nohaste, true, roll(10,10));
+				fuse(nohaste, true, r.roll(10,10));
 			else
-				fuse(nohaste, true, roll(40,20));
+				fuse(nohaste, true, r.roll(40,20));
 		}
+		r.player.set_player(player);
 	}
 
 	/*
@@ -160,7 +216,7 @@ function pstats(){
 	//struct stats *who;
 	//bool heave;
 	{
-		reg int edex;
+		let edex;
 
 		edex = who.s_ef.a_dex;
 		if (heave) {				/* an object was thrown here */
@@ -216,7 +272,7 @@ function pstats(){
 	this.getpwis = function(who)
 	//struct stats *who;
 	{
-		reg int ewis;
+		let ewis;
 
 		ewis = who.s_ef.a_wis;
 		if (ewis > 18)
@@ -248,7 +304,7 @@ function pstats(){
 	this.getpcon = function(who)
 	//struct stats *who;
 	{
-		reg int econ;
+		let econ;
 
 		econ = who.s_ef.a_con;
 		if (econ > 18)
@@ -281,7 +337,7 @@ function pstats(){
 	this.str_plus = function(who)
 	//struct stats *who;
 	{
-		reg int hitplus, str;
+		let hitplus, str;
 
 		hitplus = 0;
 		str = who.s_ef.a_str;
@@ -301,8 +357,8 @@ function pstats(){
 			hitplus = -2;
 		else
 			hitplus = -3;		/* < 4 */
-		if (who == him)			/* add pack weight if hero */
-			hitplus += hitweight();
+		if (who == r.player.get_him())			/* add pack weight if hero */
+			hitplus += r.player.encumb.hitweight();
 		return hitplus;
 	}
 
@@ -314,7 +370,7 @@ function pstats(){
 	this.add_dam = function(who)
 	//struct stats *who;
 	{
-		reg int exdam, str;
+		let exdam, str;
 
 		exdam = 0;
 		str = who.s_ef.a_str;
@@ -336,7 +392,7 @@ function pstats(){
 			exdam = 0;
 		else
 			exdam = -1;			/* 3 to 6 */
-		if (who == him)
+		if (who == r.player.get_him())
 			exdam += hungdam();		/* add hungry state if hero */
 		return exdam;
 	}
@@ -348,11 +404,13 @@ function pstats(){
 	*/
 	function hungdam()
 	{
-		switch (hungry_state) {
-			case F_OKAY:
-			case F_HUNGRY:	return 0;
-			break;case F_WEAK:	return -1;
-			break;case F_FAINT:	return -2;
+		switch (r.player.hungry_state) {
+			case d.F_OKAY:
+			case d.F_HUNGRY:  return 0;
+			break;
+			case d.F_WEAK:	return -1;
+			break;
+			case d.F_FAINT:	return -2;
 		}
 	}
 
@@ -360,15 +418,20 @@ function pstats(){
 	* heal_self:
 	*	Heal the hero.
 	*/
-	this.heal_self = function(factor, updmaxhp)
+	this.heal_self = (factor, updmaxhp)=>
 	//int factor;
 	//bool updmaxhp;
 	{
-		him.s_hpt += roll(him.s_lvl + getpcon(him), factor);
+		const getpcon = this.getpcon;
+		const him = r.player.get_him();
+
+		him.s_hpt += r.roll(him.s_lvl + getpcon(him), factor);
 		if (updmaxhp)
 			him.s_maxhp += 1;
 		if (him.s_hpt > him.s_maxhp)
 			him.s_hpt = him.s_maxhp;
-		nochange = false;
+		r.nochange = false;
+
+		r.player.set_him(him);
 	}
 }

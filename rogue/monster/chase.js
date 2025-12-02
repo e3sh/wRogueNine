@@ -29,6 +29,9 @@ this.chase = function(r){
 	*/
 	this.runners = function()
 	{
+		//runners
+		//console.log("runners");
+
 		let tp; //reg struct thing *tp;
 		let mon, nextmon; //reg struct linked_list *mon,*nextmon;
 
@@ -48,6 +51,7 @@ this.chase = function(r){
 				tp.t_turn ^= true;
 			}
 		}
+		//console.log("runners_comp");
 	}
 
 	/*
@@ -408,6 +412,8 @@ this.chase = function(r){
 		tp.t_dest = spot;
 		tp.t_flags |= d.ISRUN;
 		tp.t_flags &= ~d.ISHELD;
+
+		item.l_data = tp;
 	}
 
 

@@ -281,7 +281,7 @@ function GameManager(g){
         const status = r.UI.io.status;;//r.UI.io.status;
         const doctor = r.daemon.doctor;
         const stomach = r.daemon.stomach;
-        const runners = ()=>{};//r.monster.runners;
+        const runners = r.monster.chase.runners;
         const swander = r.daemon.swander;
         
         const init_everything = r.item.init_everything;
@@ -414,6 +414,8 @@ function GameManager(g){
         r.setScene(0);
         SceneFunc();
         r.playing = true;
+
+        //r.player.rips.death(d.K_ARROW);
 
         r.UI.comment("playit");
     }

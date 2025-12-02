@@ -24,7 +24,6 @@ function misc(r){
 
 	const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(str); }
 	const wake_monster  =()=>{};//monster.monster.wake_monster
-	const find_mons =()=>{};//monster.chase.find_mons
 	const THINGPTR = f.THINGPTR;
 	//const isatrap = r.player.move.isatrap;
 	//const trap_at = r.player.move.trap_at;
@@ -41,7 +40,6 @@ function misc(r){
 	const check_level =()=>{};//monster.fight.check_level
 	//const updpack = r.player.encumb.updpack;
 	const del_pack =()=>{};//item.packdel_pack
-	const runto =()=>{};//monster.chase.runto
 	const tolower = (text)=>{return text.toLowerCase();};
 	const readchar = ()=>{};//r.UI.
 	const extras = r.item.things_f.extras;
@@ -162,7 +160,8 @@ function misc(r){
 		const trap_at = r.player.move.trap_at;
 		const rf_on = r.dungeon.rooms_f.rf_on;
 		const wmove = r.UI.wmove;
-		const waddch = r.UI.waddch
+		const waddch = r.UI.waddch;
+		const find_mons = r.monster.chase.find_mons;
 	
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();
@@ -384,10 +383,13 @@ function misc(r){
 	*/
 	this.aggravate = function()
 	{
+		const runto = r.monster.chase.runto;
+
+
 		let mi; //reg struct linked_list *mi;
 
-		for (mi = mlist; mi != null; mi = next(mi))
-			runto((THINGPTR(mi)).t_pos, hero);
+		for (mi = mlist; mi != null; mi = f.next(mi))
+			runto((f.THINGPTR(mi)).t_pos, hero);
 	}
 
 	/*

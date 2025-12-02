@@ -22,8 +22,8 @@ const w = [
         r + "player/encumb.js",
         r + "player/misc.js",
         r + "player/move.js",
-    //    r + "player/pstats.js",
-    //    r + "player/rips.js",
+        r + "player/pstats.js",
+        r + "player/rip.js",
     r + "DungeonMap.js",
         r + "dungeon/new_level.js",
         r + "dungeon/rooms.js",
@@ -32,7 +32,7 @@ const w = [
 
     r + "MonsterManager.js",
         r + "monster/chase.js",
-    //    r + "monster/battle.js",
+        r + "monster/battle.js",
     r + "ItemManager.js",
         r + "item/rings.js",
         r + "item/things.js",
@@ -47,7 +47,7 @@ const w = [
         r + "UI/command.js",
         r + "UI/scene.js",
     //    r + "UI/wizard.js",
-    //    r + "UI/moveEffect.js",
+        r + "UI/moveEffect.js",
     r + "DaemonScheduler.js",
     // Rogue Parameters
     p + "rogueDefines.js",

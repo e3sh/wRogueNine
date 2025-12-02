@@ -15,8 +15,8 @@ class sceneControl extends GameTask {
 
 		this.pre = function(g){
 			io = g.task.read("io");
-			//this.moveEffect = new moveEffect(g);
-			//this.moveEffect.setDrawIndex(160, 0);
+			this.moveEffect = new moveEffect(g);
+			this.moveEffect.setDrawIndex(160, 0);
 
 			//let mode = document.getElementById("lang").checked;
 
@@ -84,10 +84,10 @@ class sceneControl extends GameTask {
 		}
 
 		this.draw = function(g){
-			//this.moveEffect.step();
-			//this.moveEffect.step();
-			//this.moveEffect.step();
-			//this.moveEffect.draw(g);
+			this.moveEffect.step();
+			this.moveEffect.step();
+			this.moveEffect.step();
+			this.moveEffect.draw(g);
 
 			//console draw io
 		}

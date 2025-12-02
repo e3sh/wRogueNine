@@ -234,6 +234,8 @@ function command(r){
 				ch = "s";
 			else 
 				ch = r.amulet?"<":">";	
+
+			//r.daemon.rollwand();
 		}
 
 		if (ki.includes("NumpadSubtract")||ki.includes("NumpadAdd")||
@@ -653,6 +655,7 @@ function command(r){
 					if (r.rnd(100) < (him.s_lvl * 4 + herowis() * 5)) {
 						r.UI.mvaddch(y, x, d.DOOR);
 						r.count = 0;
+						r.UI.setEffect("door",{x:x,y:y},{x:x,y:y-1},90);
 					}
 				}
 			}

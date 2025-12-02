@@ -17,6 +17,7 @@ function scene(r){
 		if (ki.includes("Enter") ||
             ki.includes("NumpadEnter")){
 
+            r.main();
             r.setScene(0);
         }
     }

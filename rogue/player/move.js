@@ -56,7 +56,7 @@ function move(r){
 		const illeg_ch = r.UI.io.illeg_ch;
 		const roomin = r.monster.chase.roomin;
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
-		const fight = ()=>{r.UI.msg("fight")};//r.monster.fight.fight
+		const fight = r.monster.battle.fight
 		const mvwaddch = r.UI.mvwaddch;
 		const mvinch = r.UI.mvinch;
 		const rf_on = r.dungeon.rooms_f.rf_on;
@@ -64,6 +64,7 @@ function move(r){
 		const teleport = ()=>{};
 		const THINGPTR = f.THINGPTR;
 		const next = f.next;
+		const runto = r.monster.chase.runto;
 
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();

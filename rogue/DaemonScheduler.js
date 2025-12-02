@@ -142,8 +142,10 @@ function DaemonScheduler(r){
 
 		//for (dev = d_list; dev < &d_list[demoncnt]; dev++)
 		for (let i=0; i<demoncnt; i++)
-			if (d_list[i].d_type == flag && d_list[i].d_time == DAEMON)
+			if (d_list[i].d_type == flag && d_list[i].d_time == DAEMON){
+				//console.log(d_list[i].d_func);
 				d_list[i].d_func(d_list[i].d_arg);
+			}
 	}
 
 	/*
@@ -183,7 +185,7 @@ function DaemonScheduler(r){
 		//	if (dev.d_type != EMPTY && func == dev.d_func)
 		for (let i=0; i<demoncnt; i++)
 			if (d_list[i].d_type != EMPTY && func == d_list[i].d_func)
-				d_delete(dev);
+				d_delete(d_list[i]);
 	}
 
 	/*
@@ -222,6 +224,7 @@ function DaemonScheduler(r){
 	this.doctor =(fromfuse)=>
 	//	int fromfuse;
 	{
+		//doctor
 		const him = r.player.get_him();
 		const isring = (a,b)=>{return false};
 		const pl_on = r.player.pl_on;
@@ -256,6 +259,7 @@ function DaemonScheduler(r){
 				thp = him.s_maxhp;
 			r.quiet = 0;
 		}
+		//console.log("doctor");
 	}
 
 	/*
@@ -265,8 +269,12 @@ function DaemonScheduler(r){
 	this.swander =(fromfuse)=>
 	//int fromfuse;
 	{
-		const daemon = this.daemon;
-		daemon(this.rollwand, true, d.BEFORE);
+		//swander
+		const daemon = r.daemon.daemon;
+		const rollwand = r.daemon.rollwand;
+
+		daemon(rollwand, true, d.BEFORE);
+		console.log("swander");
 	}
 
 
@@ -277,16 +285,23 @@ function DaemonScheduler(r){
 	this.rollwand =(fromfuse)=>
 	//int fromfuse;
 	{
+		//rollwand
+		const wanderer = r.monster.wanderer;
+		const swander = r.daemon.swander;
+		const rollwand = r.daemon.rollwand;
+		const extinguish = r.daemon.extinguish;
+		const fuse = r.daemon.fuse;
 
 		if (++between >= 4) {
-			if (roll(1, 6) == 4) {
-				if (levtype != d.POSTLEV)		/* no monsters for posts */
+			if (r.roll(1, 6) == 4) {
+				if (r.levtype != d.POSTLEV)		/* no monsters for posts */
 					wanderer();
-				extinguish(this.rollwand);
-				fuse(this.swander, true, d.WANDERTIME);
+				extinguish(rollwand);
+				fuse(swander, true, d.WANDERTIME);
 			}
 			between = 0;
 		}
+		console.log("rollwand");
 	}
 
 
@@ -297,9 +312,14 @@ function DaemonScheduler(r){
 	this.unconfuse =(fromfuse)=>
 	//int fromfuse;
 	{
-		if (pl_on(d.ISHUH))
-			msg(ms.UNCONFUSE);
+		//unconfuse
+		const player = r.player.get_player();
+
+		if (r.player.pl_on(d.ISHUH))
+			r.UI.msg(ms.UNCONFUSE);
 		player.t_flags &= ~d.ISHUH;
+
+		r.player.set_player(player);
 	}
 
 	/*
@@ -309,7 +329,11 @@ function DaemonScheduler(r){
 	this.unsee =(fromfuse)=>
 	//int fromfuse;
 	{
+		//unsee
+		const player = r.player.get_player();
+
 		player.t_flags &= ~d.CANSEE;
+		r.player.set_player(player);
 	}
 
 	/*
@@ -319,9 +343,17 @@ function DaemonScheduler(r){
 	this.sight =(fromfuse)=>
 	//int fromfuse;
 	{
+		//sight
+		const pl_on = r.player.pl_on;
+
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
+
 		if (pl_on(d.ISBLIND))
 			msg(ms.SIGHT);
 		player.t_flags &= ~d.ISBLIND;
+		r.player.set_player(player);
+
 		light(hero);
 	}
 
@@ -332,9 +364,14 @@ function DaemonScheduler(r){
 	this.nohaste =(fromfuse)=>
 	//int fromfuse;
 	{
+		//nohaste
+		const pl_on = r.player.pl_on;
+		const player = r.player.get_player();
+
 		if (pl_on(d.ISHASTE))
 			msg(ms.NOHASTE);
 		player.t_flags &= ~d.ISHASTE;
+		r.player.set_player(player);
 	}
 
 
@@ -345,11 +382,13 @@ function DaemonScheduler(r){
 	this.stomach =(fromfuse)=>
 	//int fromfuse;
 	{
+		//stomach
 		//const updpack = r.player.encumb.updpack;
 		//const msg = r.UI.msg;
 		//const death = ()=>{};
 		const updpack = r.player.encumb.updpack;
 		const wghtchk = r.player.encumb.wghtchk;
+		const death = r.player.rips.death;
 
 		const player = r.player.get_player();
 
@@ -392,6 +431,8 @@ function DaemonScheduler(r){
 		wghtchk(false);
 
 		r.player.set_player(player);
+
+		//console.log("stomach");
 	}
 
 	/*
@@ -401,6 +442,12 @@ function DaemonScheduler(r){
 	this.noteth =(fromfuse)=>
 	//int fromfuse;
 	{
+		//noteth
+		const pl_on = r.player.pl_on;
+		const player = r.player.get_player();
+		const dead_end = r.UI.io.dead_end;
+		const death = r.player.rips.death;
+
 		let ch;
 
 		if (pl_on(d.ISETHER)) {
@@ -413,6 +460,7 @@ function DaemonScheduler(r){
 			}
 		}
 		player.t_flags &= ~ISETHER;
+		r.player.set_player(player);
 	}
 
 	/*
@@ -422,6 +470,9 @@ function DaemonScheduler(r){
 	this.sapem =(fromfuse)=>
 	//int fromfuse;
 	{
+		//sapem
+		const chh_abil = r.player.pstat.chg_abil;
+
 		chg_abil(rnd(4) + 1, -1, true);
 		fuse(this.sapem, true, 150);
 		r.nochange = false;
@@ -434,9 +485,14 @@ function DaemonScheduler(r){
 	this.notslow =(fromfuse)=>
 	//int fromfuse;
 	{
+		//noslow
+		const pl_on = r.player.pl_on;
+		const player = r.player.get_player();
+
 		if (pl_on(d.ISSLOW))
 			msg(ms.NOTSLOW);
 		player.t_flags &= ~d.ISSLOW;
+		r.player.set_player(player);
 	}
 
 	/*
@@ -446,9 +502,14 @@ function DaemonScheduler(r){
 	this.notregen =(fromfuse)=>
 	//int fromfuse;
 	{
+		//notregen
+		const pl_on = r.player.pl_on;
+		const player = r.player.get_player();
+
 		if (pl_on(d.ISREGEN))
 			msg(ms.NOTREGEN);
 		player.t_flags &= ~d.ISREGEN;
+		r.player.set_player(player);
 	}
 
 	/*
@@ -458,8 +519,15 @@ function DaemonScheduler(r){
 	this.notinvinc =(fromfuse)=>
 	//int fromfuse;
 	{
+		//notinvinc
+		const pl_on = r.player.pl_on;
+		const player = r.player.get_player();
+
 		if (pl_on(d.ISINVINC))
 			msg(ms.NOTINVINC);
 		player.t_flags &= ~d.ISINVINC;
+		r.player.set_player(player);
 	}
+
+
 }

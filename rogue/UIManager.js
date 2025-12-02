@@ -18,6 +18,35 @@ function UIManager(r, g){
     const mw = d.DSP_MAIN_BG;
     const hw = d.DSP_WINDOW;
 
+
+
+    //effect
+    const sceneC = g.task.read("scene")
+    const moveEffect = sceneC.moveEffect;
+    this.setEffect = moveEffect.setEffect; 
+
+    let battledmg = 0;
+    this.set_battledmg = function(num){battledmg = num}
+    this.battleEffect = function(asch, x ,y){
+        for (let i=0; i<(2*Math.PI); i+=0.3){
+            this.setEffect(asch, {x:x,y:y} ,{x: x+Math.cos(i)*2.5, y: y+Math.sin(i)*2.5});
+        }
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},90);
+
+    } 
+    this.damageEffect = function(asch, x ,y){
+        for (let i=0; i<(2*Math.PI); i+=0.3){
+            this.setEffect(asch, {x: x+Math.cos(i)*2, y: y+Math.sin(i)*2}, {x:x,y:y});
+        }     
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y+1},90);
+    } 
+    this.hitEffect = function(asch, x ,y){
+        for (let i=0; i<(2*Math.PI); i+=0.3){
+            this.setEffect(asch, {x:x,y:y}, {x: x+Math.cos(i)*1.5, y: y+Math.sin(i)*1.5});
+        }        
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},90);
+    } 
+
     //dispaly functions
     //cursus bridge    
 	this.setDsp =(num)=>{dspmode = num;}
@@ -185,6 +214,8 @@ function UIManager(r, g){
 
     this.displevl = function()
     {
+        const find_mons = r.monster.chase.find_mons;
+
         let ch, mch;//reg char ch, mch;
         let i,j;//reg int i,j;
         let rp;//reg struct room *rp;

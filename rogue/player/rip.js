@@ -3,7 +3,7 @@
  *
  */
 
- function rips(){
+ function rips(r){
     
 	const d = r.define;
 	const f = r.func;
@@ -11,9 +11,9 @@
 	const v = r.globalValiable;
 	const ms = r.messages;
 
-	static char scoreline[100];
+	let scoreline;// [100];
 
-	static char *rip[] = {
+	const rip = [
 		"                          ____________________",
 		"                         /                    \\",
 		"                        /  Bob Kindelberger's  \\",
@@ -33,11 +33,11 @@
 		"                    |                              |",
 		"                   *|     *     *     *     *      |*",
 		"            _______)\\\\//\\\\//\\)//\\\\//)/\\\\//\\\\)/\\\\//\\\\)/\\\\//\\\\//(________",
-	};
+	];
 
-	#define RIP_LINES (sizeof rip / (sizeof (char *)))
+	const RIP_LINES = rip.length;// (sizeof rip / (sizeof (char *)))
 
-	char	*killname();
+	//char	*killname();
 
 	/*
 	* death:
@@ -45,70 +45,83 @@
 	*/
 
 	//#include <time.h>
-	this.death(monst)
+	this.death = (monst)=>
 	//char monst;
 	{
-		reg char dp, *killer;
-		struct tm *lt;
-		time_t date;
-		char buf[LINLEN];
-		struct tm *localtime();
+		const vowelstr = r.player.misc.vowelstr;
 
-		time(&date);
-		lt = localtime(&date);
-		clear();
-		move(3, 0);
-		for (dp = 0; dp < RIP_LINES; dp++)
-			printw("%s\n", rip[dp]);
-		mvaddstr(10, 36 - ((strlen(whoami) + 1) / 2), whoami);
+		const whoami = "player";
+		
+		let purse = r.player.purse;
+
+		let dp, killer;
+		let lt; //struct tm *lt;
+		let date; //time_t date;
+		let buf; //char buf[LINLEN];
+		let localtime;//struct tm *localtime();
+
+		lt = new Date();
+		lt.getFullYear();
+
+		//time(&date);
+		//lt = localtime(&date);
+		r.UI.setDsp(d.DSP_MAIN_FG);
+		r.UI.clear();
+		//r.UI.move(3, 0);
+		for (let i in rip){
+			r.UI.mvaddstr(Number(i)+3, 0, rip[i]);
+		}
+		r.UI.mvaddstr(10, 36 - (whoami.length / 2), whoami);
 		killer = killname(monst);
-		mvaddstr(12, 43, vowelstr(killer));
-		mvaddstr(14, 36 - ((strlen(killer) + 1) / 2), killer);
+		r.UI.mvaddstr(12, 43, vowelstr(killer));
+		r.UI.mvaddstr(14, 36 - (killer.length / 2), killer);
 		purse -= purse/10;
-		sprintf(buf, "%d Gold Pieces", purse);
-		mvaddstr(16, 36 - ((strlen(buf) + 1) / 2), buf);
-		sprintf(prbuf, "%d/%d/%d", lt.tm_mon + 1, lt.tm_mday, 1900+lt.tm_year);
-		mvaddstr(18, 32, prbuf);
-		move(LINES-1, 0);
-		refresh();
-		score(purse, KILLED, monst);
-		byebye(0);
+		buf = `${purse} Gold Pieces`;
+		r.UI.mvaddstr(16, 36 - (buf.length / 2), buf);
+		buf = `${lt.getDate()}/${lt.getMonth()+1}/${lt.getFullYear()}`;
+		r.UI.mvaddstr(18, 32, buf);
+		r.UI.move(d.LINES-1, 0);
+		//refresh();
+		//score(purse, d.KILLED, monst);
+		//byebye(0);
+		r.setScene(1);
 	}
 
 	/*
 	* top ten entry structure
 	*/
-	static struct sc_ent {
-		int sc_score;			/* gold */
-		char sc_name[LINLEN];		/* players name */
-		int sc_flags;			/* reason for being here */
-		int sc_level;			/* dungeon level */
-		int sc_uid;			/* user ID */
-		unsigned char sc_monster;       /* killer */
-		int sc_explvl;			/* experience level */
-		long int sc_exppts;		/* experience points */
-		time_t sc_date;			/* time this score was posted */
-	} top_ten[10];
+	class sc_ent{ //static struct sc_ent {
+		sc_score;			/* gold */
+		sc_name;	//char sc_name[LINLEN];		/* players name */
+		sc_flags;			/* reason for being here */
+		sc_level;			/* dungeon level */
+		sc_uid;			/* user ID */
+		sc_monster;       /* killer */
+		sc_explvl;			/* experience level */
+		sc_exppts;		/* experience points */
+		sc_date;//time_t sc_date;			/* time this score was posted */
+	} 
+	const top_ten = [];//[10];
 
-	char *reason[] = {
+	const reason = [
 		"Killed",
 		"Chickened out",
 		"A Total Winner"
-	};
-	int oldpurse;
+	];
+	let oldpurse;
 
 	/*
 	* score:
 	*	Figure score and post it.
 	*/
-	this.score(amount, aflag, monst)
+	this.score = function(amount, aflag, monst)
 	//char monst;
 	//int amount, aflag;
 	{
-		reg struct sc_ent *scp, *sc2;
-		reg int i, fd, prflags = 0;
-		reg FILE *outf;
-		char *packend;
+		let scp, sc2; //reg struct sc_ent *scp, *sc2;
+		let  i, fd, prflags = 0;
+		let outf; //reg FILE *outf;
+		let packend;
 
 		signal(SIGINT, byebye);
 		signal(SIGQUIT, byebye);
@@ -126,10 +139,10 @@
 		/*
 		* Open file and read list
 		*/
-		if ((fd = open(scorefile, O_RDWR | O_CREAT, 0666)) < 0)
+		if ((fd = open(scorefile, O_RDWR | O_CREAT, "0666")) < 0)
 			return;
-		outf = (FILE *) fdopen(fd, "w");
-		for (scp = top_ten; scp <= &top_ten[9]; scp++) {
+		//outf = (FILE *) fdopen(fd, "w");
+		for (scp = top_ten; scp <= top_ten[9]; scp++) {
 			scp.sc_score = 0;
 			for (i = 0; i < 80; i++)
 				scp.sc_name[i] = rnd(255);
@@ -147,27 +160,27 @@
 				prflags = 1;
 			for(i = 0; i < 10; i++)
 			{
-				unsigned int mon;
+				let mon;
 
-				encread((char *) &top_ten[i].sc_name, LINLEN, fd);
-				encread((char *) scoreline, 100, fd);
+				encread(top_ten[i].sc_name, LINLEN, fd);
+				encread(scoreline, 100, fd);
 				sscanf(scoreline, " %d %d %d %d %u %d %ld %lx \n",
-					&top_ten[i].sc_score,   &top_ten[i].sc_flags,
-					&top_ten[i].sc_level,   &top_ten[i].sc_uid,
-					&mon,                   &top_ten[i].sc_explvl,
-					&top_ten[i].sc_exppts,  &top_ten[i].sc_date);
+					top_ten[i].sc_score,   top_ten[i].sc_flags,
+					top_ten[i].sc_level,   top_ten[i].sc_uid,
+					mon,                   top_ten[i].sc_explvl,
+					top_ten[i].sc_exppts,  top_ten[i].sc_date);
 				top_ten[i].sc_monster = mon;
 			}
 		/*
 		* Insert it in list if need be
 		*/
 		if (!waswizard) {
-			for (scp = top_ten; scp <= &top_ten[9]; scp++)
+			for (scp = top_ten; scp <= top_ten[9]; scp++)
 				if (amount > scp.sc_score)
 					break;
-				if (scp <= &top_ten[9]) {
-					for (sc2 = &top_ten[9]; sc2 > scp; sc2--)
-						*sc2 = *(sc2-1);
+				if (scp <= top_ten[9]) {
+					for (sc2 = top_ten[9]; sc2 > scp; sc2--)
+						sc2 = (sc2-1);
 					scp.sc_score = amount;
 					strcpy(scp.sc_name, whoami);
 					scp.sc_flags = aflag;
@@ -179,21 +192,21 @@
 					scp.sc_uid = playuid;
 					scp.sc_explvl = him.s_lvl;
 					scp.sc_exppts = him.s_exp;
-					time(&scp.sc_date);
+					time(scp.sc_date);
 			}
 		}
 		ignore();
-		fseek(outf, 0L, 0);
+		fseek(outf, 0, 0);
 			for(i = 0; i < 10; i++)
 			{
 				memset(scoreline,0,100);
-				encwrite((char *) top_ten[i].sc_name, LINLEN, outf);
+				encwrite(top_ten[i].sc_name, LINLEN, outf);
 				sprintf(scoreline, " %d %d %d %d %u %d %ld %lx \n",
 					top_ten[i].sc_score, top_ten[i].sc_flags,
 					top_ten[i].sc_level, top_ten[i].sc_uid,
 					top_ten[i].sc_monster, top_ten[i].sc_explvl,
 					top_ten[i].sc_exppts, top_ten[i].sc_date);
-				encwrite((char *) scoreline, 100, outf);
+				encwrite(scoreline, 100, outf);
 			}
 		fclose(outf);
 		signal(SIGINT, byebye);
@@ -211,32 +224,32 @@
 	function showtop(showname)
 	//int showname;
 	{
-		reg int fd, i;
-		char *killer;
-		struct sc_ent *scp;
+		let fd, i;
+		let killer;
+		let scp; //struct sc_ent *scp;
 
 		if ((fd = open(scorefile, O_RDONLY)) < 0)
 			return false;
 		
 			for(i = 0; i < 10; i++)
 			{
-				unsigned int mon;
-				encread((char *) &top_ten[i].sc_name, LINLEN, fd);
-				encread((char *) scoreline, 100, fd);
+				let mon;
+				encread(top_ten[i].sc_name, LINLEN, fd);
+				encread(scoreline, 100, fd);
 				sscanf(scoreline, " %d %d %d %d %u %d %ld %lx \n",
-					&top_ten[i].sc_score,   &top_ten[i].sc_flags,
-					&top_ten[i].sc_level,   &top_ten[i].sc_uid,
-					&mon,                   &top_ten[i].sc_explvl,
-					&top_ten[i].sc_exppts,  &top_ten[i].sc_date);
+					top_ten[i].sc_score,   top_ten[i].sc_flags,
+					top_ten[i].sc_level,   top_ten[i].sc_uid,
+					mon,                   top_ten[i].sc_explvl,
+					top_ten[i].sc_exppts,  top_ten[i].sc_date);
 				top_ten[i].sc_monster = mon;
 			}
 		close(fd);
 		printf("Top Ten Adventurers:\nRank\tScore\tName\n");
-		for (scp = top_ten; scp <= &top_ten[9]; scp++) {
+		for (scp = top_ten; scp <= top_ten[9]; scp++) {
 			if (scp.sc_score > 0) {
 				printf("%d\t%d\t%s: %s\t\t-. %s on level %d",
 				scp - top_ten + 1, scp.sc_score, scp.sc_name,
-				ctime(&scp.sc_date), reason[scp.sc_flags],
+				ctime(scp.sc_date), reason[scp.sc_flags],
 				scp.sc_level);
 				if (scp.sc_flags == KILLED) {
 					killer = killname(scp.sc_monster);
@@ -244,7 +257,7 @@
 				}
 				printf(" [Exp: %d/%ld]",scp.sc_explvl,scp.sc_exppts);
 				if (showname) {
-					struct passwd *pp, *getpwuid();
+					//struct passwd *pp, *getpwuid();
 
 					if ((pp = getpwuid(scp.sc_uid)) == null)
 						printf(" (%d)\n", scp.sc_uid);
@@ -262,7 +275,7 @@
 	* total_winner:
 	*	The hero made it back out alive
 	*/
-	this.total_winner()
+	this.total_winner = function()
 	{
 		clear();
 	addstr("                                                               \n");
@@ -297,10 +310,10 @@
 	//bool winner;
 	//char *howso;
 	{
-		reg char *iname;
-		reg int cnt, worth, ch;
-		reg struct linked_list *item;
-		reg struct object *obj;
+		let iname;
+		let cnt, worth, ch;
+		let item; //reg struct linked_list *item;
+		let obj; ///reg struct object *obj;
 
 		idenpack();
 		cnt = 1;
@@ -343,18 +356,18 @@
 	function killname(monst)
 	//unsigned char monst;
 	{
-		if (monst < MAXMONS + 1)
-			return monsters[monst].m_name;
+		if (monst < d.MAXMONS + 1)
+			return v.monsters[monst].m_name;
 		else		/* things other than monsters */
 			switch (monst) {
-				case K_ARROW:	return "crooked arrow";
-				case K_DART:	return "sharp dart";
-				case K_BOLT:	return "jagged bolt";
-				case K_POOL:	return "magic pool";
-				case K_ROD:	return "exploding rod";
-				case K_SCROLL:	return "burning scroll";
-				case K_STONE: 	return "transmogrification to stone";
-				case K_STARVE:	return "starvation";
+				case d.K_ARROW:	return "crooked arrow";
+				case d.K_DART:	return "sharp dart";
+				case d.K_BOLT:	return "jagged bolt";
+				case d.K_POOL:	return "magic pool";
+				case d.K_ROD:	return "exploding rod";
+				case d.K_SCROLL:	return "burning scroll";
+				case d.K_STONE: 	return "transmogrification to stone";
+				case d.K_STARVE:	return "starvation";
 		}
 		return "Bob Kindelberger";
 	}

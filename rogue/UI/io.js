@@ -53,6 +53,7 @@ function io(r){
 	this.status = function(fromfuse)
 	//int fromfuse;
 	{
+		//status
 		const updpack = r.player.encumb.updpack;
 
 		const player = r.player.get_player();

@@ -17,6 +17,9 @@ function scrolls(r){
 	*/
 	this.read_scroll = function()
 	{
+		const find_mons = r.monster.chase.find_mons;
+		const look = r.player.misc.look;
+		
 		reg struct object *obj;
 		reg struct linked_list *item;
 		reg int i, j, wh;
