@@ -10,6 +10,9 @@ this.chase = function(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+    const mw = d.DSP_MAIN_BG;
+
 	const THINGPTR = f.THINGPTR;
 	const next = f.next;
 	const off = f.off;
@@ -19,7 +22,7 @@ this.chase = function(r){
 	const DISTANCE = f.DISTANCE;
 	
 	const FARAWAY = 32767;
-	const RDIST =(a, b)=>{return f.DISTANCE((a).y, (a).x, (b).y, (b).x)};
+	const RDIST =(a, b)=>{return f.DISTANCE(a.y, a.x, b.y, b.x)};
 
 	let ch_ret; //struct coord ch_ret;	/* Where chasing takes you */
 
@@ -61,8 +64,21 @@ this.chase = function(r){
 	function do_chase(mon)
 	//struct linked_list *mon;
 	{
-		const rf_on = r.dungeon.room.rf_on;
-		const killed = r.dungeon.fight.killed;
+		const rf_on = r.dungeon.rooms_f.rf_on;
+		const killed = r.monster.battle.killed;
+		const cansee = r.monster.chase.cansee;
+		const roomin = r.monster.chase.roomin;
+		//const RDIST =(a, b)=>{return f.DISTANCE((a).y, (a).x, (b).y, (b).x)};
+		const chase = r.monster.chase.chase;
+		const attack = r.monster.battle.attack;
+
+		const trap_at = r.player.move.trap_at;
+		const be_trapped = r.player.move.be_trapped;
+		const remove_monster = r.monster.battle.remove_monster
+		const pl_off = r.player.pl_off;
+		const monhurt = r.monster.monhurt;
+
+		const hero = r.player.get_hero();
 
 		let th;//reg struct thing *th;
 		let rer, ree, rxx;//reg struct room *rer, *ree, *rxx;
@@ -73,8 +89,8 @@ this.chase = function(r){
 		let pthis;//struct coord this;
 		let trp;//struct trap *trp;
 
-		th = THINGPTR(mon);
-		wound = th.t_flags & d.ISWOUND;
+		th = f.THINGPTR(mon);
+		wound = ((th.t_flags & d.ISWOUND) != 0);
 		if (wound)
 			mindist = 0;
 		else
@@ -94,12 +110,12 @@ this.chase = function(r){
 			}
 		}
 		ree = roomin(th.t_dest);	/* room of chasee */
-		pthis = th.t_dest;
+		pthis = {x: th.t_dest.x, y:th.t_dest.y};
 		/*
 		* If the object of our desire is in a different
 		* room, then run to the door nearest to our goal.
 		*/
-		if (mvinch(th.t_pos.y, th.t_pos.x) == d.DOOR)
+		if (r.UI.mvinch(th.t_pos.y, th.t_pos.x) == d.DOOR)
 			ondoor = true;
 		rxx = null;
 		if (rer != null || ree != null) {
@@ -143,6 +159,7 @@ this.chase = function(r){
 			* wounded, find the best door to run to.
 			*/
 			else if (wound) {
+				console.log(wound);
 				let ex;//struct coord *ex;
 				let poss, mdtd, hdtd, ghdtd, nx, gx = 0, best;
 
@@ -170,7 +187,7 @@ this.chase = function(r){
 					dofight = true;		/* fight if we must */
 				mdtd = (gx <= 1 && best < 1);
 				if (ondoor || mdtd) {
-					pthis = hero;
+					pthis = {x:hero.x, y:hero.y};
 					runaway = true;
 					if (!mdtd)
 						dofight = false;
@@ -189,7 +206,7 @@ this.chase = function(r){
 				}
 			}
 		}
-		else if (DISTANCE(hero.y, hero.x, th.t_pos.y, th.t_pos.x) <= 3)
+		else if (f.DISTANCE(hero.y, hero.x, th.t_pos.y, th.t_pos.x) <= 3)
 			dofight = true;
 		/*
 		* this now contains what we want to run to this time
@@ -211,36 +228,39 @@ this.chase = function(r){
 			}
 		}
 		if (pl_off(d.ISBLIND))
-			mvwaddch(cw,th.t_pos.y,th.t_pos.x,th.t_oldch);
-		sch = mvwinch(cw, ch_ret.y, ch_ret.x);
+			r.UI.mvwaddch(cw,th.t_pos.y,th.t_pos.x,th.t_oldch);
+		sch = r.UI.mvwinch(cw, ch_ret.y, ch_ret.x);
 		if (rer != null && rf_on(rer,d.ISDARK) && sch == d.FLOOR &&
-		DISTANCE(ch_ret.y,ch_ret.x,th.t_pos.y,th.t_pos.x) < 3 &&
+		f.DISTANCE(ch_ret.y,ch_ret.x,th.t_pos.y,th.t_pos.x) < 3 &&
 		pl_off(d.ISBLIND))
 			th.t_oldch = ' ';
 		else
 			th.t_oldch = sch;
-		if (cansee(unc(ch_ret)) && off(th, d.ISINVIS))
-			mvwaddch(cw, ch_ret.y, ch_ret.x, th.t_type);
-		mvwaddch(mw, th.t_pos.y, th.t_pos.x, ' ');
-		mvwaddch(mw, ch_ret.y, ch_ret.x, th.t_type);
-		th.t_oldpos = th.t_pos;
-		th.t_pos = ch_ret;
+		if (cansee(ch_ret.y, ch_ret.x) && f.off(th, d.ISINVIS)) 
+			r.UI.mvwaddch(cw, ch_ret.y, ch_ret.x, th.t_type);
+		r.UI.mvwaddch(mw, th.t_pos.y, th.t_pos.x, ' ');
+		r.UI.mvwaddch(mw, ch_ret.y, ch_ret.x, th.t_type);
+		th.t_oldpos.x = th.t_pos.x;
+		th.t_oldpos.y = th.t_pos.y;
+		th.t_pos.x = ch_ret.x;//{x:ch_ret.x, t:ch_ret.y};
+		th.t_pos.y = ch_ret.y;//{x:ch_ret.x, t:ch_ret.y};
 		th.t_room = roomin(ch_ret);
 		i = 5;
 		if (th.t_flags & d.ISREGEN)
 			i = 40;
 		st = th.t_stats;
-		if (rnd(100) < i) {
+		if (r.rnd(100) < i) {
 			if (++st.s_hpt > st.s_maxhp)
 				st.s_hpt = st.s_maxhp;
 			if (!monhurt(th))
 				th.t_flags &= ~d.ISWOUND;
 		}
-		if (stoprun && ce(th.t_pos, th.t_dest))
+		if (stoprun && f.ce(th.t_pos, th.t_dest))
 			th.t_flags &= ~d.ISRUN;
+
+		mon.l_data = th;
 		return d.CHASE;
 	}
-
 
 	/*
 	* chase:
@@ -254,11 +274,23 @@ this.chase = function(r){
 	//bool runaway, dofight;
 	{
 		const cordok = r.UI.cordok;
+		const rndmove = r.player.move.rndmove;
+		const diag_ok = r.monster.chase.diag_ok;
+		const winat = r.UI.winat;
+		const step_ok = r.UI.io.step_ok;
+		const isatrap = r.player.move.isatrap;
+		const trap_at = r.player.move.trap_at;
+		const find_obj = r.player.misc.find_obj;
+		const roomin = r.monster.chase.roomin;
+		const rf_on = r.dungeon.rooms_f.rf_on;
+
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
 
 		let x, y, ch;
 		let dist, thisdist, closest;
 		let er = tp.t_pos;//reg struct coord *er = &tp.t_pos;
-		let closecoord, ctry;//struct coord try, closecoord;
+		let closecoord ={}, ctry ={};//struct coord try, closecoord;
 		let numsteps, onscare;
 
 		/*
@@ -266,7 +298,7 @@ this.chase = function(r){
 		*/
 		ch = d.CHASE;
 		onscare = false;
-		if (on(tp, d.ISHUH)) {
+		if (f.on(tp, d.ISHUH)) {
 			ch_ret = rndmove(tp);
 			dist = f.DISTANCE(hero.y, hero.x, ch_ret.y, ch_ret.x);
 			if (r.rnd(1000) < 5)
@@ -284,8 +316,9 @@ this.chase = function(r){
 				closest = 0;
 			else
 				closest = FARAWAY;
-			ch_ret = er;
-			closecoord = tp.t_oldpos;
+			ch_ret = er;//{x:er.x, y:er.y};
+			closecoord.x = tp.t_oldpos.x;
+			closecoord.y = tp.t_oldpos.y;
 			for (y = er.y - 1; y <= er.y + 1; y += 1) {
 				for (x = er.x - 1; x <= er.x + 1; x += 1) {
 					if (!cordok(y, x))
@@ -300,7 +333,7 @@ this.chase = function(r){
 
 						if (isatrap(ch)) {
 							trp = trap_at(y, x);
-							if (trp != null && off(tp, d.ISHUH)) {
+							if (trp != null && f.off(tp, d.ISHUH)) {
 								/*
 								* Dont run over found traps unless
 								* the hero is standing on it. If confused,
@@ -322,8 +355,8 @@ this.chase = function(r){
 
 							item = find_obj(y, x);
 							if (item != null)
-								if ((OBJPTR(item)).o_which == d.S_SCARE) {
-									if (ce(hero, ctry))
+								if ((f.OBJPTR(item)).o_which == d.S_SCARE) {
+									if (f.ce(hero, ctry))
 										onscare = true;
 									continue;
 								}
@@ -349,7 +382,7 @@ this.chase = function(r){
 							else
 								continue;
 						}
-						thisdist = DISTANCE(y, x, ee.y, ee.x);
+						thisdist = f.DISTANCE(y, x, ee.y, ee.x);
 						if (thisdist <= 0) {
 							ch_ret = ctry;	/* got here but */
 							return d.CHASE;	/* dont fight */
@@ -362,11 +395,12 @@ this.chase = function(r){
 							* the closest spot, unless running away and
 							* in the same room.
 							*/
-							if (!ce(ctry, tp.t_oldpos) || (runaway
+							if (!f.ce(ctry, tp.t_oldpos) || (runaway
 							&& player.t_room == tp.t_room
 							&& tp.t_room != null)) {
 								closest = thisdist;
-								closecoord = ctry;
+								closecoord.x = ctry.x;
+								closecoord.y = ctry.y;
 							}
 						}
 					}
@@ -379,13 +413,14 @@ this.chase = function(r){
 			if (numsteps > 0)			/* move to best spot */
 				ch_ret = closecoord;
 			else {						/* nowhere to go */
-				if (DISTANCE(tp.t_pos.y, tp.t_pos.x, hero.y, hero.x) < 2)
+				if (f.DISTANCE(tp.t_pos.y, tp.t_pos.x, hero.y, hero.x) < 2)
 					if (!onscare)
-						ch_ret = hero;
+						ch_ret = hero;//{x:hero.x, y:hero.y};
 			}
-			if (ce(hero, ch_ret))
+			if (f.ce(hero, ch_ret))
 				ch = d.FIGHT;
 		}
+		//console.log(ch_ret);
 		return ch;
 	}
 
@@ -470,11 +505,10 @@ this.chase = function(r){
 	//struct coord *sp, *ep;
 	{
 		const step_ok = r.UI.io.step_ok;
-		const mvinch = r.UI.mvinch;
 
 		if (ep.x == sp.x || ep.y == sp.y)
 			return true;
-		if (step_ok(mvinch(ep.y,sp.x)) && step_ok(mvinch(sp.y,ep.x)))
+		if (step_ok(r.UI.mvinch(ep.y,sp.x)) && step_ok(r.UI.mvinch(sp.y,ep.x)))
 			return true;
 		return false;
 	}
@@ -487,8 +521,15 @@ this.chase = function(r){
 	this.cansee = function(y, x)
 	//int y, x;
 	{
+		const pl_on = r.player.pl_on;
+		const rf_on = r.dungeon.rooms_f.rf_on;
+		const roomin = r.monster.chase.roomin;
+
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
+
 		let rer; //reg struct room *rer;
-		let tp; //struct coord tp;
+		let tp = {}; //struct coord tp;
 
 		if (pl_on(d.ISBLIND))
 			return false;
@@ -496,12 +537,12 @@ this.chase = function(r){
 		* We can only see if the hero in the same room as
 		* the coordinate and the room is lit or if it is close.
 		*/
-		if (DISTANCE(y, x, hero.y, hero.x) < 3)
+		if (f.DISTANCE(y, x, hero.y, hero.x) < 3)
 			return true;
 		tp.y = y;
 		tp.x = x;
 		rer = roomin(tp);
-		if (rer != null && levtype != d.MAZELEV)
+		if (rer != null && r.levtype != d.MAZELEV)
 			if (rer == player.t_room && !rf_on(rer,d.ISDARK))
 				return true;
 		return false;

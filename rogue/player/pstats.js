@@ -19,7 +19,7 @@ function pstats(r){
 	//bool alsomax;
 	//char what;
 	{
-		const death = ()=>{r.UI.comment("death")};
+		const death = r.player.rips.death;
 
 		const him = r.player.get_him();
 

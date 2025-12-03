@@ -296,7 +296,7 @@ function UIManager(r, g){
     {
         const mvwinch = this.mvwinch;
         const mvinch = this.mvinch;
-        const winch = this.winch;
+        //const winch = this.winch;
 
         let ch = " "; //reg char ch;
 

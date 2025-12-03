@@ -27,6 +27,7 @@ function command(r){
 		const pl_on = r.player.pl_on;
 		const pl_off = r.player.pl_off;
 		const pick_up = r.item.pack_f.pick_up;
+		const waste_time = r.player.misc.waste_time;
 		
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();
@@ -612,11 +613,12 @@ function command(r){
 
 	function search()
 	{
+		const getpwis = r.player.pstats.getpwis;
 		const pl_on = r.player.pl_on;
 		const winat = r.UI.winat;
 		const isatrap = r.player.move.isatrap;
 		const trap_at = r.player.move.trap_at;
-		const herowis =()=>{ return 10;};
+		const herowis =()=>{ return getpwis(him);};
 		const tr_name = r.player.misc.tr_name;
 
 		const hero  = r.player.get_hero();

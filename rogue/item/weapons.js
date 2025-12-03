@@ -11,6 +11,9 @@ function weapons(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+	const hw = d.DSP_WINDOW;
+
 	/*
 	* missile:
 	*	Fire a missile in a given direction
@@ -133,7 +136,7 @@ function weapons(r){
 
 		let obj; //reg struct object *obj;
 		let rp; //reg struct room *rp;
-		let fpos; //static struct coord fpos;
+		let fpos = {}; //static struct coord fpos;
 
 		obj = f.OBJPTR(item);
 		if (fallpos(obj.o_pos, fpos, true)) {

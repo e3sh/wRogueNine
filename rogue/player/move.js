@@ -402,6 +402,15 @@ function move(r){
 	//struct thing *th;
 	//struct coord *tc;
 	{
+		const trap_at = r.player.move.trap_at;
+		const monsters = v.monsters;
+		const cansee = r.monster.chase.cansee;
+		const new_level = r.dungeon.new_level.create;
+		const teleport = ()=>{};
+		const pl_on = r.player.pl_on;
+		const getpdex = r.player.pstats.getpdex;
+		const death = r.player.rips.death;
+
 		const player = r.player.get_player();
 
 		let trp; //reg struct trap *trp;
@@ -414,14 +423,15 @@ function move(r){
 		ishero = (th == player);
 		if (ishero) {
 			stuckee = "You";
-			count = running = false;
+			r.count = r.running = false;
 		}
 		else {
 			stuckee = `The ${monsters[th.t_indx].m_name}`;
 		}
 		seeit = cansee(tc.y, tc.x);
 		if (seeit)
-			mvwaddch(cw, tc.y, tc.x, trp.tr_type);
+			console.log(trp);
+			r.UI.mvwaddch(cw, tc.y, tc.x, trp.tr_type);
 		trp.tr_flags |= d.ISFOUND;
 		sayso = true;
 
@@ -429,7 +439,7 @@ function move(r){
 
 			nlmove = true;
 			if (seeit && sayso)
-				msg("%s fell into a trap!", stuckee);
+				r.UI.msg(`${stuckee} fell into a trap!`);
 			return d.GONER;
 		}
 
@@ -447,7 +457,7 @@ function move(r){
 					nlmove = true;
 					level += 1;
 					new_level(d.MAZELEV);
-					msg("You are surrounded by twisty passages!");
+					r.UI.msg("You are surrounded by twisty passages!");
 				}
 				else
 					ch = goner();
@@ -467,31 +477,31 @@ function move(r){
 				}
 				nlmove = true;
 				if (seeit && sayso)
-					msg("%s fell into a trap!", stuckee);
+					r.UI.msg(`${stuckee} fell into a trap!`);
 			break;
 			case d.BEARTRAP:
 				th.t_nomove += d.BEARTIME;
 				if (seeit) {
-					strcat(stuckee, (ishero ? " are" : " is"));
-					msg("%s caught in a bear trap.", stuckee);
+					r.UI.msg(`${stuckee + (ishero ? " are" : " is")} caught in a bear trap.`);
 				}
 			break;
 			case d.SLEEPTRAP:
 				if (ishero && pl_on(d.ISINVINC))
-					msg("You feel momentarily dizzy.");
+					r.UI.msg("You feel momentarily dizzy.");
 				else {
 					if (ishero)
 						th.t_nocmd += d.SLEEPTIME;
 					else
 						th.t_nomove += d.SLEEPTIME;
 					if (seeit)
-						msg("%s fall%s asleep in a strange white mist.",
-						stuckee, (ishero ? "":"s"));
-				}
+						r.UI.msg(`${stuckee} fall${ishero ? "":"s"} asleep in a strange white mist.`);
+					}
 			break;
 			case d.ARROWTRAP: {
 				let resist, ac;
 				let it;//struct stats *it;
+
+				const cur_armor = r.player.get_cur_armor;
 
 				stuckee[0] = tolower(stuckee[0]);
 				it = th.t_stats;
@@ -504,8 +514,7 @@ function move(r){
 					resist = -100;		/* invincible is impossible to hit */
 				if (swing(3 + (level / 4), resist, 1)) {
 					if (seeit)
-						msg("%sAn arrow shot %s.", (ishero ? "Oh no! " : ""),
-						stuckee);
+						r.UI.msg(`${ishero ? "Oh no! " : ""}An arrow shot ${stuckee}.`);
 					if (ishero)
 						chg_hpt(-roll(1,6),false,d.K_ARROW);
 					else {
@@ -521,11 +530,11 @@ function move(r){
 					let arrow; //struct object *arrow;
 
 					if (seeit)
-						msg("An arrow shoots past %s.", stuckee);
+						r.UI.msg("An arrow shoots past %s.", stuckee);
 					item = new_thing(false, d.WEAPON, d.ARROW);
-					arrow = OBJPTR(item);
+					arrow = f.OBJPTR(item);
 					arrow.o_hplus = 3;
-					arrow.o_dplus = rnd(2);
+					arrow.o_dplus = r.rnd(2);
 					arrow.o_count = 1;
 					arrow.o_pos = th.t_pos;
 					fall(item, false);
@@ -536,7 +545,7 @@ function move(r){
 				let resist, ac;
 				let it;//struct stats *it;
 
-				stuckee[0] = tolower(stuckee[0]);
+				stuckee[0] = f.tolower(stuckee[0]);
 				it = th.t_stats;
 				if (ishero && cur_armor != null)
 					ac = cur_armor.o_ac;
@@ -547,7 +556,7 @@ function move(r){
 					resist = -100;		/* invincible is impossible to hit */
 				if (swing(3 + (level / 4), resist, 0)) {
 					if (seeit)
-						msg("A small dart just hit %s.", stuckee);
+						r.UI.msg(`A small dart just hit ${stuckee}`);
 					if (ishero) {
 						if (!save(d.VS_POISON))
 							chg_abil(d.CON,-1,true);
@@ -558,7 +567,7 @@ function move(r){
 					else {
 						if (!save_throw(d.VS_POISON, th))
 							it.s_ef.a_str -= 1;
-						it.s_hpt -= roll(1, 4);
+						it.s_hpt -= r.roll(1, 4);
 						if (it.s_hpt < 1) {
 							sayso = false;
 							ch = goner();
@@ -566,31 +575,31 @@ function move(r){
 					}
 				}
 				else if (seeit)
-					msg("A small dart whizzes by %s.", stuckee);
+					r.UI.msg(`A small dart whizzes by ${stuckee}.`);
 			}
 			break;
 			case d.POOL:
-				if (!ishero && rnd(100) < 10) {
+				if (!ishero && r.rnd(100) < 10) {
 					if (seeit)
-						msg("The %s drowns !!", stuckee);
+						r.UI.msg(`The ${stuckee} drowns !!`);
 					ch = goner();
 				}
-				if ((trp.tr_flags & d.ISGONE) && rnd(100) < 10) {
+				if ((trp.tr_flags & d.ISGONE) && r.rnd(100) < 10) {
 					nlmove = true;
-					if (rnd(100) < 15)
+					if (r.rnd(100) < 15)
 						teleport(rndspot);	   /* teleport away */
-					else if(rnd(100) < 15 && level > 2) {
-						level -= rnd(2) + 1;
+					else if(r.rnd(100) < 15 && r.dungeon.level > 2) {
+						r.dungeon.level -= r.rnd(2) + 1;
 						new_level(d.NORMLEV);
-						msg("You here a faint groan from below.");
+						r.UI.msg("You here a faint groan from below.");
 					}
-					else if(rnd(100) < 40) {
-						level += rnd(4);
+					else if(r.rnd(100) < 40) {
+						r.dungeon.level += rnd(4);
 						new_level(d.NORMLEV);
-						msg("You find yourself in strange surroundings.");
+						r.UI.msg("You find yourself in strange surroundings.");
 					}
-					else if(rnd(100) < 6 && pl_off(d.ISINVINC)) {
-						msg("Oh no!!! You drown in the pool!!! --More--");
+					else if(r.rnd(100) < 6 && pl_off(d.ISINVINC)) {
+						r.UI.msg("Oh no!!! You drown in the pool!!! --More--");
 						wait_for(cw, ' ');
 						death(d.K_POOL);
 					}
@@ -750,12 +759,19 @@ function move(r){
 	this.trap_at = function(y, x)
 	//int y, x;
 	{
+		const traps = r.dungeon.traps;
+		const ntraps = r.dungeon.ntraps;
+
 		let tp, ep;//reg struct trap *tp, *ep;
 
 		ep = traps[ntraps];
-		for (tp = traps; tp < ep; tp += 1)
-			if (tp.tr_pos.y == y && tp.tr_pos.x == x)
+		//for (tp = traps; tp < ep; tp += 1)
+		for (let i in traps){
+			tp = traps[i];
+			if (tp.tr_pos.y == y && tp.tr_pos.x == x){
 				break;
+			}
+		}
 		if (tp >= ep)
 			tp = null;
 		return tp;
@@ -769,13 +785,17 @@ function move(r){
 	this.rndmove = function(who)
 	//struct thing *who;
 	{
-
+		const cordok = r.UI.cordok;
+		const winat = r.UI.winat;
+		const step_ok = r.UI.io.step_ok;
+		const diag_ok = r.monster.chase.diag_ok;
+		const find_obj = r.player.misc.find_obj;
 
 		let x, y, ex, ey, ch;
 		let nopen = 0;
 		let item;//struct linked_list *item;
 		let ret;//static struct coord ret;  /* what we will be returning */
-		let dest;//static struct coord dest;
+		let dest = {};//static struct coord dest;
 
 		ret = who.t_pos;
 		/*
@@ -800,10 +820,10 @@ function move(r){
 						* check for scare monster scrolls
 						*/
 						item = find_obj(y, x);
-						if (item != null && (OBJPTR(item)).o_which == d.S_SCARE)
+						if (item != null && (f.OBJPTR(item)).o_which == d.S_SCARE)
 							continue;
 					}
-					if (rnd(++nopen) == 0)
+					if (r.rnd(++nopen) == 0)
 						ret = dest;
 				}
 			}

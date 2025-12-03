@@ -7,6 +7,8 @@ function GameManager(g){
 
     const ms = rogueMessage(this);
 
+    //props
+
     this.define = d;
     this.func = f;
     this.types = t;
@@ -82,6 +84,8 @@ function GameManager(g){
     }
     
     this.UI.comment("game");
+
+    //methods
 
     /*
     * rnd:
@@ -414,8 +418,6 @@ function GameManager(g){
         r.setScene(0);
         SceneFunc();
         r.playing = true;
-
-        //r.player.rips.death(d.K_ARROW);
 
         r.UI.comment("playit");
     }

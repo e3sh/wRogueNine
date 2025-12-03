@@ -51,7 +51,7 @@ function battle(r){
 			return 0;
 
 		if ((item = find_mons(mp.y, mp.x)) == null) {
-			r.UI.mvaddch(mp.y, mp.x, FLOOR);
+			r.UI.mvaddch(mp.y, mp.x, d.FLOOR);
 			r.UI.mvwaddch(mw, mp.y, mp.x, ' ');
 			look(false);
 			r.UI.msg("That monster must have been an illusion.");
@@ -145,6 +145,36 @@ function battle(r){
 	this.attack = (mp)=>
 	//struct thing *mp;
 	{
+		const pl_on = r.player.pl_on;
+		const pl_off = r.player.pl_off;
+		const roll_em = this.roll_em;
+		const death = r.player.rips.death;
+		const off = f.off;
+		const hurt_armor = r.item.armor_f.hurt_armor;
+		const save = this.save;
+		const iswearing = ()=>{}; //r.item.ring.iswearing;
+		const chg_abil = r.player.pstats.chg_abil;
+		const herostr = ()=>{ return player.t_stats.s_ef.a_str; }
+		const chg_hpt = r.player.pstats.chg_hpt;
+		const midx = r.monster.midx;
+		const GOLDCALC = ()=>{ return (r.rnd(50 + 10 * r.dungeon.level) + 2) };
+		const find_mons = r.monster.chase.find_mons;
+		const remove_monster = this.remove_monster;
+		const get_worth = ()=>{};//trader
+		const cur_null = r.item.pack_f.cur_null;
+		const updpack = r.player.encumb.updpack;
+		const rchg_str = r.player.pstats.rchg_str;
+		const fuse = r.daemon.fuse;
+		const lengthen = r.daemon.lengthen;
+		const notslow = r.daemon.notslow; 
+
+		const e_levels = v.e_levels;
+		const monsters = v.monsters;
+
+		const player = r.player.get_player();
+		const cur_armor = r.player.get_cur_armor();
+		const him = r.player.get_him();
+
 		let mname;
 
 		if (pl_on(d.ISETHER))		/* ethereal players cant be hit */
@@ -162,56 +192,60 @@ function battle(r){
 			mname = monsters[mp.t_indx].m_name;
 		if (roll_em(mp.t_stats, him, null, false)) {
 			if (pl_on(d.ISINVINC)) {
-				msg("%s does not harm you.",prname(mname,true));
+				r.UI.msg(`${prname(mname,true)} does not harm you.`);
 			}
 			else {
-				nochange = false;
-				if (mp.t_type != 'E')
+				r.nochange = false;
+				if (mp.t_type != 'E'){
+					let tgt = r.player.get_hero()
+					r.UI.damageEffect("x", tgt.x, tgt.y);
 					hit(mname);
+				}
 				if (him.s_hpt <= 0)
 					death(mp.t_indx);
 				if (off(mp, d.ISCANC))
 					switch (mp.t_type) {
 					case 'R':
 						if (hurt_armor(cur_armor)) {
-							msg("Your armor weakens.");
+							r.UI.msg("Your armor weakens.");
 							cur_armor.o_ac++;
 						}
+
 					break;
 					case 'E':
 					/*
 					* The gaze of the floating eye hypnotizes you
 					*/
 						if (pl_off(d.ISBLIND) && player.t_nocmd <= 0) {
-							player.t_nocmd = rnd(16) + 25;
-							msg("You are transfixed.");
+							player.t_nocmd = r.rnd(16) + 25;
+							r.UI.msg("You are transfixed.");
 						}
 					break;
 					case 'Q':
 						if (!save(d.VS_POISON) && !iswearing(d.R_SUSAB)) {
 							if (him.s_ef.a_dex > d.MINABIL) {
 								chg_abil(d.DEX, -1, true);
-								msg("You feel less agile.");
+								r.UI.msg("You feel less agile.");
 							}
 						}
 					break;
 					case 'A':
 						if (!save(d.VS_POISON) && herostr() > d.MINABIL) {
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
-								if (levcount > 0) {
-									chg_abil(STR, -1, true);
-									msg("A sting has weakened you");
+								if (r.levcount > 0) {
+									chg_abil(d.STR, -1, true);
+									r.UI.msg("A sting has weakened you");
 								}
 							}
 							else
-								msg("Sting has no effect.");
+								r.UI.msg("Sting has no effect.");
 						}
 					break;
 					case 'W':
 						if (r.rnd(100) < 15 && !iswearing(d.R_SUSAB)) {
 							if (him.s_exp <= 0)
 								death(mp.t_indx);
-							msg("You suddenly feel weaker.");
+							r.UI.msg("You suddenly feel weaker.");
 							if (--him.s_lvl == 0) {
 								him.s_exp = 0;
 								him.s_lvl = 1;
@@ -220,29 +254,31 @@ function battle(r){
 								him.s_exp = e_levels[him.s_lvl - 1] + 1;
 							chg_hpt(-r.roll(1,10),true,mp.t_indx);
 						}
+
 					break;
 					case 'F':
 						player.t_flags |= d.ISHELD;
-						sprintf(monsters[midx('F')].m_stats.s_dmg,"%dd1",++fung_hit);
+						monsters[midx('F')].m_stats.s_dmg = `${++r.monster.fung_hit}d1`;
 					break;
 					case 'L': {
 						let lastpurse;
 						let lep;//struct linked_list *lep;
-
+						let purse = r.player.purse;
 						lastpurse = purse;
-						purse -= GOLDCALC;
+						purse -= GOLDCALC();
 						if (!save(d.VS_MAGIC))
-							purse -= GOLDCALC + GOLDCALC + GOLDCALC + GOLDCALC;
+							purse -= GOLDCALC() + GOLDCALC() + GOLDCALC() + GOLDCALC();
 						if (purse < 0)
 							purse = 0;
 						if (purse != lastpurse)
-							msg("Your purse feels lighter.");
+							r.UI.msg("Your purse feels lighter.");
 						lep = find_mons(mp.t_pos.y,mp.t_pos.x);
 						if (lep != null)
 						{
 							remove_monster(mp.t_pos, lep);
 							mp = null;
 						}
+						r.player.purse = purse;
 					}
 					break;
 					case 'N': {
@@ -256,16 +292,16 @@ function battle(r){
 						* the most bucks.
 						*/
 						steal = null;
-						for (list = pack; list != null; list = next(list)) {
-							wo = get_worth(OBJPTR(list));
+						for (list = r.player.get_pack(); list != null; list = f.next(list)) {
+							wo = get_worth(f.OBJPTR(list));
 							if (wo > stworth) {
 								stworth = wo;
 								steal = list;
 							}
 						}
 						if (steal != null) {
-							sobj = OBJPTR(steal);
-							if (o_off(sobj, d.ISPROT)) {
+							sobj = f.OBJPTR(steal);
+							if (f.o_off(sobj, d.ISPROT)) {
 								let nym; //struct linked_list *nym;
 
 								nym = find_mons(mp.t_pos.y, mp.t_pos.x);
@@ -274,8 +310,8 @@ function battle(r){
 									remove_monster(mp.t_pos, nym);
 									mp = null;
 								}
-								msg("She stole %s!", inv_name(sobj, true));
-								pack = r.detach(pack, steal);
+								r.UI.msg(`She stole ${inv_name(sobj, true)}!`);
+								r.player_set_pack(r.detach(r.player.get_pack(), steal));
 								r.discard(steal);
 								cur_null(sobj);
 								updpack();
@@ -285,8 +321,8 @@ function battle(r){
 					break;
 					case 'c':
 						if (!save(d.VS_PETRIFICATION)) {
-							msg("Your body begins to solidify.");
-							msg("You are turned to stone !!! --More--");
+							r.UI.msg("Your body begins to solidify.");
+							r.UI.msg("You are turned to stone !!! --More--");
 							wait_for(cw, ' ');
 							death(mp.t_indx);
 						}
@@ -296,7 +332,7 @@ function battle(r){
 							player.t_flags |= d.ISHELD;
 						if (!save(d.VS_POISON)) {
 							if (iswearing(d.R_SUSAB) || iswearing(d.R_SUSTSTR))
-								msg("Sting has no effect.");
+								r.UI.msg("Sting has no effect.");
 							else {
 								let fewer, ostr;
 
@@ -307,26 +343,26 @@ function battle(r){
 									fewer = ostr - herostr();
 									fuse(rchg_str, fewer - 1, 10);
 								}
-								msg("You feel weaker now.");
+								r.UI.msg("You feel weaker now.");
 							}
 						}
 					break;
 					case 'g':
 						if (!save(d.VS_BREATH) && !iswearing(d.R_BREATH)) {
-							msg("You feel singed.");
+							r.UI.msg("You feel singed.");
 							chg_hpt(-r.roll(1,8),false,mp.t_indx);
 						}
 					break;
 					case 'h':
 						if (!save(d.VS_BREATH) && !iswearing(d.R_BREATH)) {
-							msg("You are seared.");
+							r.UI.msg("You are seared.");
 							chg_hpt(-r.roll(1,4),false,mp.t_indx);
 						}
 					break;
 					case 'p':
 						if (!save(d.VS_POISON) && herostr() > d.MINABIL) {
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
-								msg("You are gnawed.");
+								r.UI.msg("You are gnawed.");
 								chg_abil(d.STR,-1,true);
 							}
 						}
@@ -334,7 +370,7 @@ function battle(r){
 					case 'u':
 						if (!save(d.VS_POISON) && herostr() > d.MINABIL) {
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
-								msg("You are bitten.");
+								r.UI.msg("You are bitten.");
 								chg_abil(d.STR, -1, true);
 								fuse(rchg_str, 1, roll(5,10));
 							}
@@ -342,7 +378,7 @@ function battle(r){
 					break;
 					case 'w':
 						if (!save(d.VS_POISON) && !iswearing(d.R_SUSAB)) {
-							msg("You feel devitalized.");
+							r.UI.msg("You feel devitalized.");
 							chg_hpt(-1,true,mp.t_indx);
 						}
 					break;
@@ -351,7 +387,7 @@ function battle(r){
 							if (pl_on(d.ISSLOW))
 								lengthen(notslow,r.roll(3,10));
 							else {
-								msg("You feel impaired.");
+								r.UI.msg("You feel impaired.");
 								player.t_flags |= d.ISSLOW;
 								fuse(notslow,true,r.roll(5,10));
 							}
@@ -370,8 +406,12 @@ function battle(r){
 			}
 			miss(mname);
 		}
-		flushinp();					/* flush type ahead */
-		count = 0;
+		//flushinp();					/* flush type ahead */
+		r.count = 0;
+
+		r.player.set_player(player);
+		r.player.set_him(him);
+		r.player.set_cur_armor(cur_armor);
 
 		if (mp == null)
 			return(-1);
@@ -614,6 +654,8 @@ function battle(r){
 	//int which;
 	//struct thing *tp;
 	{
+		const getpwis = r.player.pstats.getpwis;
+
 		let need;
 		let st;//reg struct stats *st;
 
@@ -627,10 +669,10 @@ function battle(r){
 	* save:
 	*	See if he saves against various nasty things
 	*/
-	this.ave = function(which)
+	this.save = (which)=>
 	//int which;
 	{
-		return save_throw(which, r.player.get_player());
+		return this.save_throw(which, r.player.get_player());
 	}
 
 	/*
@@ -639,6 +681,10 @@ function battle(r){
 	*/
 	this.raise_level = function()
 	{
+		const e_levels = v.e_levels;
+		const him = r.player.get_him();
+		const check_level = r.monster.battle.check_level;
+
 		him.s_exp = e_levels[him.s_lvl-1] + 1;
 		check_level();
 	}
@@ -652,10 +698,12 @@ function battle(r){
 	//struct object *weap;
 	//char *mname;
 	{
-		if (weap.o_type == WEAPON)
-			msg("The %s hits the %s.",w_magic[weap.o_which].mi_name,mname);
+		const w_magic = v.w_magic;
+
+		if (weap.o_type == d.WEAPON)
+			r.UI.msg(`The ${w_magic[weap.o_which].mi_name} hits the ${mname}.`);
 		else
-			msg("You hit the %s.", mname);
+			r.UI.msg(`You hit the ${mname}.`);
 	}
 
 
@@ -667,10 +715,12 @@ function battle(r){
 	//struct object *weap;
 	//char *mname;
 	{
-		if (weap.o_type == WEAPON)
-			msg("The %s misses the %s.", w_magic[weap.o_which].mi_name,mname);
+		const w_magic = v.w_magic;
+
+		if (weap.o_type == d.WEAPON)
+			r.UI.msg(`The ${w_magic[weap.o_which]} misses the ${mname}.`);
 		else
-			msg("You missed the %s.", mname);
+			r.UI.msg(`You missed the ${mname}.`);
 	}
 
 

@@ -20,7 +20,7 @@ function monsterData(r){
 			o.m_show  = data[i][1];
 			o.m_carry = data[i][2];
 			o.m_lev   = setupMonlev(data[i][3]);
-			o.m_flag  = data[i][4];
+			o.m_flags = data[i][4];
 			o.m_stats = setupStats(data[i][5]);
 			item.push(o); 
 		}

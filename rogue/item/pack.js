@@ -552,7 +552,7 @@ function pack_f(r){
 	{
 		let pc; //reg struct linked_list *pc;
 
-		for (pc = pack ; pc != null ; pc = next(pc))
+		for (pc = r.player.get_pack() ; pc != null ; pc = f.next(pc))
 			whatis(pc);
 	}
 
@@ -561,19 +561,19 @@ function pack_f(r){
 	* del_pack:
 	*	Take something out of the hero's pack
 	*/
-	this.del_pack = function(what)
+	this.del_pack = (what)=>
 	//struct linked_list *what;
 	{
 		let op; //reg struct object *op;
 
-		op = OBJPTR(what);
-		cur_null(op);		/* check for current stuff */
+		op = f.OBJPTR(what);
+		this.cur_null(op);		/* check for current stuff */
 		if (op.o_count > 1) {
 			op.o_count--;
 		}
 		else {
-			pack = r.detach(pack,what);
-			discard(what);
+			r.player.set_pack( r.detach(r.player.get_pack(),what) );
+			r.discard(what);
 		}
 		updpack();
 	}

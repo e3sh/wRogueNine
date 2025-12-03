@@ -233,7 +233,12 @@ function encumb(r){
 	//int fromfuse;
 	{
 		const inwhgt = r.player.misc.inwhgt;
+		const extinguish = r.daemon.extinguish;
+		const fuse = r.daemon.fuse;
+		const drop = r.item.things_f.drop;
+		const wghtchk = r.player.encumb.wghtchk;
 
+		const player = r.player.get_player();
 		const him = r.player.get_him();	
 		let  dropchk, err = true;
 		let ch;
@@ -242,19 +247,19 @@ function encumb(r){
 		if (him.s_pack > him.s_carry) {
 			ch = player.t_oldch;
 			extinguish(wghtchk);
-			if ((ch != FLOOR && ch != d.PASSAGE) ||r.isfight) {
+			if ((ch != d.FLOOR && ch != d.PASSAGE) ||r.isfight) {
 				fuse(wghtchk, true, 1);
 				inwhgt(false);
 				return;
 			}
-			msg(ms.WGHTCHK_1);
+			r.UI.msg(ms.WGHTCHK_1);
 			do {
 				dropchk = drop(null);
 				if (dropchk == d.SOMTHERE)
 					err = false;
 				else if (dropchk == false) {
 					//mpos = 0;
-					msg(ms.WGHTCHK_2);
+					r.UI.msg(ms.WGHTCHK_2);
 				}
 				if (dropchk == true)
 					err = false;

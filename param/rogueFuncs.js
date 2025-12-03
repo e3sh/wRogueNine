@@ -16,7 +16,7 @@ function rogueFuncs(r){
          (rp).r_pos.x <= (cp).x && (cp).y <= (rp).r_pos.y + 
          ((rp).r_max.y - 1) && (rp).r_pos.y <= (cp).y)
       },
-      unc:(cp)=>{return {x:cp.y, y:cp.x}},
+      unc:(cp)=>{return {x:cp.x, y:cp.y}},
 
       cmov:(xy)=>{move((xy).y, (xy).x)},
       DISTANCE:(y1,x1,y2,x2)=>{

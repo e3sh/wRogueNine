@@ -15,35 +15,17 @@ function misc(r){
 
 	const do_daemons = r.daemon.do_daemon;
 	const do_fuses = r.daemon.do_fuses;
-
-	const getyx = ()=>{};
-	const mvwaddch = ()=>{};
 	const pl_on =(what)=> { return (player.t_flags & what); }
-	const rf_on = ()=>{};//r.dungeon.room.rf_on;
-	const show = ()=>{};//r.player.move.show;
 
-	const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(str); }
-	const wake_monster  =()=>{};//monster.monster.wake_monster
-	const THINGPTR = f.THINGPTR;
-	//const isatrap = r.player.move.isatrap;
-	//const trap_at = r.player.move.trap_at;
-	const wmove = ()=>{};// r.UI.
-	const mvwinch = ()=>{};// r.UI.
-	const mvaddch = ()=>{};// r.UI.
-
-	const next = f.next;
-	const OBJPTR = f.OBJPTR;
 	const get_item =()=>{};//item.pack.get_item
 	const msg = r.UI.msg;
 	const o_on = r.o_on;
 	const rnd = r.rnd;
-	const check_level =()=>{};//monster.fight.check_level
-	//const updpack = r.player.encumb.updpack;
+
 	const del_pack =()=>{};//item.packdel_pack
 	const tolower = (text)=>{return text.toLowerCase();};
 	const readchar = ()=>{};//r.UI.
 	const extras = r.item.things_f.extras;
-	//const itemvol = r.player.encumb.itemvol;
 	
 	let inwhgt = false;
 	this.inwhgt = (flg)=>{ inwhgt = flg;}
@@ -184,7 +166,7 @@ function misc(r){
 			for (x = oex - 1; x <= oex + 1; x += 1)
 				for (y = oey - 1; y <= oey + 1; y += 1)
 					if ((y != hero.y || x != hero.x) && show(y, x) == d.FLOOR)
-						mvwaddch(cw, y, x, ' ');
+						r.UI.mvwaddch(cw, y, x, ' ');
 		}
 		rp = player.t_room;
 		inpass = (rp == null);				/* true when not in a room */
@@ -204,7 +186,7 @@ function misc(r){
 						else
 							it = find_mons(y, x);
 						if (it == null)				/* lost monster */
-							mvaddch(y, x, d.FLOOR);
+							r.UI.mvaddch(y, x, d.FLOOR);
 						else {
 							tp = THINGPTR(it);
 							if (isatrap(tp.t_oldch = r.UI.mvinch(y, x))) {
@@ -300,7 +282,7 @@ function misc(r){
 		}
 		if (r.door_stop && !r.firstmove && r.passcount > 1)
 			r.running = false;
-		mvwaddch(cw, hero.y, hero.x, d.PLAYER);
+		r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 		wmove(cw, oldy, oldx);
 		player.t_oldpos = {x:hero.x, y:hero.y};
 		r.oldrp = rp;
@@ -333,6 +315,7 @@ function misc(r){
 	this.eat = function()
 	{
 		const updpack = r.player.encumb.updpack;
+		const check_level = r.monster.battle.check_level;
 
 		let item; //reg struct linked_list *item;
 		let obj; //reg struct object *obj;
@@ -340,10 +323,10 @@ function misc(r){
 
 		if ((item = get_item("eat", d.FOOD)) == null)
 			return;
-		obj = OBJPTR(item);
+		obj = f.OBJPTR(item);
 		if (obj.o_type != d.FOOD) {
-			msg("That's Inedible!");
-			after = false;
+			r.UI.msg("That's Inedible!");
+			r.after = false;
 			return;
 		}
 		cursed = 1;

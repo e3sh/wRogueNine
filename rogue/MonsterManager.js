@@ -21,6 +21,8 @@ function MonsterManager(r){
 	this.chase = new chase(r);
 	this.battle = new battle(r);
 
+	this.fung_hit = 0; /* # of time fungi has hit */
+
 	r.UI.comment("monster");
 	/*
 	* rnd_mon:
@@ -100,6 +102,8 @@ function MonsterManager(r){
 		const iswearing = ()=>{return false;};//r.item.ring.iswearing;
 		const runto = r.monster.chase.runto;
 
+		const hero = r.player.get_hero();
+
 		let item;//reg struct linked_list *item;
 		let tp; //reg struct thing *tp;
 		let mp; //reg struct monster *mp;
@@ -125,6 +129,7 @@ function MonsterManager(r){
 		tp.t_nocmd = 0;
 		mvwaddch(mw, cp.y, cp.x, tp.t_type);
 
+		//console.log(mp);
 		/*
 		* copy monster data
 		*/
@@ -201,6 +206,7 @@ function MonsterManager(r){
 				mch = 'M';		/* no disguise in treasure room */
 			tp.t_disguise = mch;
 		}
+		item.l_data = tp;
 		return item;
 	}
 
@@ -305,7 +311,7 @@ function MonsterManager(r){
 		* Hide invisible monsters
 		*/
 		if ((tp.t_flags & d.ISINVIS) && pl_off(d.CANSEE))
-			ch = mvinch(y, x);
+			ch = r.UI.mvinch(y, x);
 		/*
 		* Let greedy ones guard gold
 		*/
@@ -315,6 +321,7 @@ function MonsterManager(r){
 				tp.t_flags |= d.ISRUN;
 			}
 		}
+		it.l_data = tp;
 		return it;
 	}
 
@@ -379,13 +386,13 @@ function MonsterManager(r){
 	* unhold:
 	*	Release the player from being held
 	*/
-	this.unhold = function(whichmon)
+	this.unhold = (whichmon)=>
 	//char whichmon;
 	{
 		switch (whichmon) {
 			case 'F':
-				fung_hit = 0;
-				strcpy(monsters[midx('F')].m_stats.s_dmg, "000d0");
+				this.fung_hit = 0;
+				monsters[midx('F')].m_stats.s_dmg = "000d0";
 			case 'd':
 				player.t_flags &= ~d.ISHELD;
 		}

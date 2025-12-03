@@ -236,7 +236,7 @@ function DaemonScheduler(r){
 		ohp = thp;
 		r.quiet += 1;
 
-		ccon = him.s_ef.a_con;
+		ccon = him.s_ef.a_con; 
 		if (ccon > 16 && !r.isfight)
 			thp += r.rnd(ccon - 15);
 		if (lv < 8) {
@@ -245,7 +245,7 @@ function DaemonScheduler(r){
 		}
 		else {
 			if (r.quiet >= 3)
-				thp += rnd(lv - 7) + 1;
+				thp += r.rnd(lv - 7) + 1;
 		}
 		if (isring(d.LEFT, d.R_REGEN))
 			thp += 1;
@@ -259,6 +259,8 @@ function DaemonScheduler(r){
 				thp = him.s_maxhp;
 			r.quiet = 0;
 		}
+		him.s_hpt = thp;
+		r.player.set_him(him);
 		//console.log("doctor");
 	}
 
