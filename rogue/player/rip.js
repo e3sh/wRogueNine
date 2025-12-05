@@ -78,12 +78,14 @@
 		purse -= purse/10;
 		buf = `${purse} Gold Pieces`;
 		r.UI.mvaddstr(16, 36 - (buf.length / 2), buf);
-		buf = `${lt.getDate()}/${lt.getMonth()+1}/${lt.getFullYear()}`;
-		r.UI.mvaddstr(18, 32, buf);
+		//buf = `${lt.getDate()}/${lt.getMonth()+1}/${lt.getFullYear()}`;
+		buf = `${lt.getFullYear()}/${lt.getMonth()+1}/${lt.getDate()}`;
+		r.UI.mvaddstr(18, 36 - (buf.length / 2), buf);
 		r.UI.move(d.LINES-1, 0);
 		//refresh();
 		//score(purse, d.KILLED, monst);
 		//byebye(0);
+		r.UI.io.status();
 		r.setScene(1);
 	}
 

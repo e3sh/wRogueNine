@@ -51,6 +51,13 @@ function PlayerCharacter(r){
 	this.get_pstats		=()=>{return player.t_stats;};
 	this.get_pack		=()=>{return player.t_pack;};
 
+	let cur_select = null;
+	this.get_select =()=>{return cur_select};
+	this.set_select =(obj)=>{cur_select = obj};
+	let cur_dest = null;
+	this.get_dest =()=>{return cur_dest};
+	this.set_dest =(obj)=>{cur_dest = obj};
+
 	/*
     * pl_on: Returns true if the player's flag is set
     */

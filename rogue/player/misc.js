@@ -22,21 +22,25 @@ function misc(r){
 	const o_on = r.o_on;
 	const rnd = r.rnd;
 
-	const del_pack =()=>{};//item.packdel_pack
 	const tolower = (text)=>{return text.toLowerCase();};
 	const readchar = ()=>{};//r.UI.
 	const extras = r.item.things_f.extras;
 	
 	let inwhgt = false;
 	this.inwhgt = (flg)=>{ inwhgt = flg;}
+	this.get_inwhgt =()=>{return inwhgt;}
 
 	/*
 	* waste_time:
 	*	Do nothing but let other things happen
 	*/
-	this.waste_time = function()
+	this.waste_time = ()=>
 	{
-		if (inwhgt)		/* if from wghtchk, then done */
+		const do_daemons = r.daemon.do_daemon;
+		const do_fuses = r.daemon.do_fuses;
+		const get_inwhgt = r.player.misc.get_inwhgt;
+		
+		if (get_inwhgt())		/* if from wghtchk, then done */
 			return;
 		do_daemons(d.BEFORE);
 		do_daemons(d.AFTER);
@@ -316,6 +320,11 @@ function misc(r){
 	{
 		const updpack = r.player.encumb.updpack;
 		const check_level = r.monster.battle.check_level;
+		const del_pack = r.item.pack_f.del_pack;
+		const get_item = r.item.pack_f.get_item;
+		const o_on = r.o_on;
+
+		const him = r.player.get_him();
 
 		let item; //reg struct linked_list *item;
 		let obj; //reg struct object *obj;
@@ -335,28 +344,29 @@ function misc(r){
 		else if (o_on(obj, d.ISBLESS))
 			cursed -= 1;
 		if (obj.o_which == d.FRUITFOOD) {
-			msg("My, that was a yummy %s.", fruit);
+			r.UI.msg(`My, that was a yummy ${ms.FRUIT}.`);
 			goodfood = 100;
 		}
 		else {
-			if (rnd(100) > 80 || o_on(obj, d.ISCURSED)) {
-				msg("Yuk, this food tastes like ARA.");
+			if (r.rnd(100) > 80 || o_on(obj, d.ISCURSED)) {
+				r.UI.msg("Yuk, this food tastes like ARA.");
 				goodfood = 300;
 				him.s_exp += 1;
 				check_level();
+				r.player.set_him(him);
 			}
 			else {
-				msg("Yum, that tasted good.");
+				r.UI.msg("Yum, that tasted good.");
 				goodfood = 200;
 			}
 		}
 		goodfood *= cursed;
-		if ((food_left += d.HUNGERTIME + rnd(400) - goodfood) > d.STOMACHSIZE)
-			food_left = d.STOMACHSIZE;
-		hungry_state = d.F_OKAY;
+		if ((r.player.food_left += d.HUNGERTIME + r.rnd(400) - goodfood) > d.STOMACHSIZE)
+			r.player.food_left = d.STOMACHSIZE;
+		r.player.hungry_state = d.F_OKAY;
 		updpack();					/* update pack */
-		if (obj == cur_weapon)
-			cur_weapon = null;
+		if (obj == r.player.get_cur_weapon())
+			r.player.set_cur_weapon(null);
 		del_pack(item);		/* get rid of the food */
 	}
 

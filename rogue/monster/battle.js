@@ -152,7 +152,7 @@ function battle(r){
 		const off = f.off;
 		const hurt_armor = r.item.armor_f.hurt_armor;
 		const save = this.save;
-		const iswearing = ()=>{}; //r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const chg_abil = r.player.pstats.chg_abil;
 		const herostr = ()=>{ return player.t_stats.s_ef.a_str; }
 		const chg_hpt = r.player.pstats.chg_hpt;
@@ -515,7 +515,10 @@ function battle(r){
 				weap.o_hplus = weap.o_dplus = 0;
 			}
 		}
-		while(1) {
+
+		let bdice = cp.split("/"); console.log(`cp:${cp} bd:${bdice.length}`);
+		for (let i in bdice){
+		//while(1) {
 			let damage;
 			let hplus = prop_hplus + (weap == null ? 0 : weap.o_hplus);
 			let dplus = prop_dplus + (weap == null ? 0 : weap.o_dplus);
@@ -535,12 +538,12 @@ function battle(r){
 			//	break;
 			//nsides = atoi(++cp);
 
-			console.log(cp);
-			let spw = cp.split("d");
-			if (cp.indexOf("d") == -1) break;
+			if (bdice[i].indexOf("d") == -1) break;
+			let spw = bdice[i].split("d");
+
 			ndice = Number(spw[0]);
 			nsides = Number(spw[1]);
-			console.log(`cp${cp} ndice${ndice} nsides${nsides}`);
+			console.log(`${bdice[i]}/ ndice${ndice} nsides${nsides}`);
 
 			if (def == him) {			/* defender is hero */
 				if (cur_armor != null)
@@ -572,9 +575,10 @@ function battle(r){
 				}
 				did_hit = true;
 			}
-			if (cp.indexOf('/') == -1)
-				break;
-			cp = cp.substring(cp.IndexOf('/'));
+			//if (cp.indexOf('/') == -1)
+			//	break;
+			//cp = cp.substring(cp.indexOf('/')+1);
+
 		}
 		return did_hit;
 	}

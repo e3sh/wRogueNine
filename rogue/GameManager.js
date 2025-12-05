@@ -75,6 +75,7 @@ function GameManager(g){
         0: ()=>{r.UI.command.main();} ,//null//this.UI.command,
         1: ()=>{r.UI.scene.keywait();},
         2: ()=>{r.UI.scene.inventry();},
+        3: ()=>{r.UI.scene.get_item();},
     }
 
     let SceneFunc;// =  setthis.UI.command();/* Command execution */;
@@ -384,6 +385,8 @@ function GameManager(g){
 
         item = new_thing(false, d.FOOD, 0);
         add_pack(item, true);
+
+        r.player.set_select(null);
 
         r.playit();
     }

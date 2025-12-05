@@ -99,7 +99,7 @@ function MonsterManager(r){
 		const mvwinch = r.UI.mvwinch;
 		const mvwaddch = r.UI.mvwaddch;
 		const goingup = ()=>{return (r.dungeon.level < r.dungeon.max_level)};
-		const iswearing = ()=>{return false;};//r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const runto = r.monster.chase.runto;
 
 		const hero = r.player.get_hero();
@@ -259,7 +259,7 @@ function MonsterManager(r){
 		const rf_on = r.dungeon.rooms_f.rf_on;
 		const on = f.on;
 		const off = f.off;
-		const iswearing = ()=>{}; //r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const pl_off = r.player.pl_off;
 		const unconfuse = r.daemon.unconfuse;
 		const save = ()=>{};

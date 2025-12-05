@@ -17,6 +17,9 @@ function potions(r){
 	*/
 	this.quaff = function()
 	{
+		const iswearing = r.item.ring_f.iswearing;
+		const del_pack = r.item.pack_f.del_pack;
+
 		reg struct object *obj;
 		reg struct linked_list *item, *titem;
 		reg struct thing *th;

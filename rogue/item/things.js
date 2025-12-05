@@ -217,7 +217,7 @@ function things_f(r){
 	this.money = function()
 	{
 		const ce = f.ce;
-		const iswearing = ()=>{return false;}
+		const iswearing = r.item.ring_f.iswearing;
 		const runto = r.monster.chase.runto;
 		const cmov = (xy)=>{r.UI.move(xy.y, xy.x)};
 		const next = f.next;
@@ -307,11 +307,11 @@ function things_f(r){
 			pack = r.detach(pack, ll);
 		}
 		if (ch == d.POOL) {
-			r.UI.msg("%s sinks out of sight.",inv_name(op, true));
+			r.UI.msg(`${inv_name(op, true)} sinks out of sight.`);
 			r.discard(ll);
 		}
 		else {			/* put on dungeon floor */
-			if (levtype == d.POSTLEV) {
+			if (r.levtype == d.POSTLEV) {
 				op.o_pos = hero;	/* same place as hero */
 				fall(ll,false);
 				if (item == null)	/* if item wasn't sold */
@@ -321,7 +321,7 @@ function things_f(r){
 				r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj , ll);
 				r.UI.mvaddch(hero.y, hero.x, op.o_type);
 				op.o_pos = hero;
-				r.UI.msg("Dropped %s", inv_name(op, true));
+				r.UI.msg(`Dropped ${inv_name(op, true)}`);
 			}
 		}
 		updpack();			/* new pack weight */
@@ -347,7 +347,7 @@ function things_f(r){
 
 		if (op == null)
 			return true;
-		if (levtype == d.POSTLEV) {
+		if (r.levtype == d.POSTLEV) {
 			if (o_on(op,d.ISCURSED) && o_on(op,d.ISKNOW)) {
 				msg("The trader does not accept shoddy merchandise.");
 				return false;

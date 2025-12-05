@@ -3,7 +3,7 @@
  *
  */
 
-function rings(){
+function rings(r){
     
 	const d = r.define;
 	const f = r.func;
@@ -177,14 +177,14 @@ function rings(){
 		let ring;
 		obj; //reg struct object *obj;
 		
-		if (cur_ring[LEFT] == null && cur_ring[RIGHT] == null) {
+		if (cur_ring[d.LEFT] == null && cur_ring[d.RIGHT] == null) {
 			msg("You're not wearing any rings.");
 			return;
 		}
-		else if (cur_ring[LEFT] == null)
-			ring = RIGHT;
-		else if (cur_ring[RIGHT] == null)
-			ring = LEFT;
+		else if (cur_ring[d.LEFT] == null)
+			ring = d.RIGHT;
+		else if (cur_ring[d.RIGHT] == null)
+			ring = d.LEFT;
 		else
 			if ((ring = gethand(true)) < 0)
 				return;

@@ -25,7 +25,6 @@ function ItemManager(r){
 	const p_colors = this.p_colors;
 	const r_stones = this.r_stones;
 	const ws_stuff = this.ws_stuff;
-
 	
 	const s_guess = this.s_guess; 
 	const p_guess = this.p_guess; 
@@ -141,6 +140,17 @@ function ItemManager(r){
     }
 
     r.UI.comment("item");
+
+	this.reset_mi_probs = ()=>{
+
+		for (let i in things) things[i].mi_prob = things[i].mi_prob_bup;
+		for (let i in a_magic) a_magic[i].mi_prob = a_magic[i].mi_prob_bup;
+		for (let i in w_magic) w_magic[i].mi_prob = w_magic[i].mi_prob_bup;
+		for (let i in p_magic) p_magic[i].mi_prob = p_magic[i].mi_prob_bup;
+		for (let i in s_magic) s_magic[i].mi_prob = s_magic[i].mi_prob_bup;
+		for (let i in r_magic) r_magic[i].mi_prob = r_magic[i].mi_prob_bup;
+		for (let i in ws_magic) ws_magic[i].mi_prob = ws_magic[i].mi_prob_bup;
+	}
 
 	this.item_flagcheck = function(obj){
 		const o_on = r.o_on;
@@ -372,7 +382,7 @@ function ItemManager(r){
 	{
 		const totalenc = r.player.encumb.totalenc;
 		const player = r.player.get_player();
-		let him;
+		let him, max_stats;
 		
 		player.t_flags = 0;
 		player.t_nomove = 0;
@@ -396,8 +406,9 @@ function ItemManager(r){
 
 		player.t_stats = him;
 		r.player.set_player(player);
-		r.player.set_max_stats(him);
+		r.player.set_max_stats(max_stats);
 		r.player.set_him(him);
+		r.player.set_pack(pack);
 	}
 
 

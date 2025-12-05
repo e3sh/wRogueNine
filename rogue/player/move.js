@@ -43,7 +43,7 @@ function move(r){
 		const msg = r.UI.msg;
 		const pl_on = r.player.pl_on;
 		const pl_off = r.player.pl_off;
-		const iswearing = ()=>{return false}; //r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const rndmove = this.rndmove;
 		const cordok = r.UI.cordok;
 		const diag_ok = r.monster.chase.diag_ok;
@@ -254,7 +254,7 @@ function move(r){
 		const pl_on = r.player.pl_on;
 		const mvaddch = r.UI.mvaddch;
 		const mvwaddch = r.UI.mvwaddch;
-		const iswearing = ()=>{}; //r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const cansee = r.monster.chase.cansee;
 		const look = r.player.misc.look;
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
@@ -353,7 +353,7 @@ function move(r){
 	{
 		const winat = r.UI.winat;	
 		const isatrap = this.isatrap;
-		const iswearing = ()=>{}; //r.item.ring.iswearing;
+		const iswearing = r.item.ring_f.iswearing;
 		const trap_at = this.trap_at;
 		const mvaddch = r.UI.mvaddch;
 		const mvinch = r.UI.mvinch;
@@ -823,11 +823,15 @@ function move(r){
 						if (item != null && (f.OBJPTR(item)).o_which == d.S_SCARE)
 							continue;
 					}
-					if (r.rnd(++nopen) == 0)
+					if (r.rnd(++nopen) == 0){
 						ret = dest;
+						//ret.x = dest.x;
+						//ret.y = dest.y;
+					}
 				}
 			}
 		}
+		//who.t_pos = ret;
 		return ret;
 	}
 

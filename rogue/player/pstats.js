@@ -54,6 +54,8 @@ function pstats(r){
 		const updpack = r.player.encumb.updpack;
 		const wghtchk = r.player.encumb.wghtchk;
 
+		const pstats = r.player.get_pstats();
+
 		if (amt == 0)
 			return;
 		if (how == true) {			/* real (must be 1st) */

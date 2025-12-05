@@ -158,11 +158,15 @@ function io(r){
 		const cur_weapon = r.player.get_cur_weapon();
 		const cur_armor  = r.player.get_cur_armor();
 		const cur_ring   = r.player.get_cur_ring();
+		const select = r.player.get_select();
+		const dest = r.player.get_dest();
 
 		const wname = (cur_weapon != null)? inv_name(cur_weapon, false):"-";
 		const aname = (cur_weapon != null)? inv_name(cur_armor , false):"-";
-		const rlname = (cur_ring[d.LEFT] != null) ? inv_name(cur_ring[d.LEFT] , false):"-";
-		const rrname = (cur_ring[d.RIGHT] != null)? inv_name(cur_ring[d.RIGHT], false):"-";
+		const rlname = (cur_ring[d.LEFT] != null) ? inv_name(cur_ring[d.LEFT] , false):"";
+		const rrname = (cur_ring[d.RIGHT] != null)? inv_name(cur_ring[d.RIGHT], false):"";
+		const selname = (select != null)? `SEL) ${inv_name(select, false)}`:"";
+		const dstname = (dest != null)? `=> : ${inv_name(dest, false)}`:"";
 
 		r.UI.setDsp(d.DSP_EQUIP);
 		r.UI.clear();
@@ -172,7 +176,8 @@ function io(r){
 		r.UI.mvaddstr(2, 0,` ${aname}`);
 		r.UI.mvaddstr(3, 0,` ${rlname}`);
 		r.UI.mvaddstr(4, 0,` ${rrname}`);
-		r.UI.mvaddstr(6, 0,`SELECT: ${"itemname"}(${"a"})`);
+		r.UI.mvaddstr(6, 0,`${selname}`);
+		r.UI.mvaddstr(7, 0,`${dstname}`);
 
 		r.UI.setDsp(d.DSP_MAIN);
 	}

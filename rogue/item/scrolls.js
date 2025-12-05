@@ -19,6 +19,7 @@ function scrolls(r){
 	{
 		const find_mons = r.monster.chase.find_mons;
 		const look = r.player.misc.look;
+		const del_pack = r.item.pack_f.del_pack;
 		
 		reg struct object *obj;
 		reg struct linked_list *item;

@@ -207,6 +207,8 @@ function command(r){
 		const winat = r.UI.winat;
 		const msg = r.UI.msg;
 		const inventory = r.item.pack_f.inventory;
+		const eat = r.player.misc.eat;
+		const drop = r.item.things_f.drop;
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
 		const unctrl =(text)=>{return text;}
@@ -244,8 +246,20 @@ function command(r){
 			ki.includes("KeyI")
 		){
 			ch = "i";
-
 		}
+
+		if (ki.includes("Numpad0")
+		){
+			ch = "e";
+		}
+
+		if (ki.includes("KeyD")
+		){
+			ch = "d";
+		}
+
+
+
 		//r.UI.msg(`${ki.length} ${ch}`);
 		
 		if (false){

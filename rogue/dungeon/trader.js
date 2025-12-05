@@ -11,7 +11,10 @@ function trader(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
-	#define NOTPRICED -1
+	const NOTPRICED = -1;
+
+	let trader;
+	let cutpurch; /* name of item ready to buy */
 
 	/*
 	* do_post:
@@ -19,43 +22,54 @@ function trader(r){
 	*/
 	this.do_post = function()
 	{
-		struct coord tp;
-		reg int i;
-		reg struct room *rp;
-		reg struct object *op;
-		reg struct linked_list *ll;
+		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
+		const draw_room = r.dungeon.rooms.f.draw_room;
+		const new_thing = r.item.things_f.new_thing;
+		const OBJPTR = f.OBJPTR;
+
+		const cw = d.DSP_MAIN_FG;
+		const mw = d.DSP_MAIN_BG;
+
+		let tp; //struct coord tp;
+		let i;
+		let rp;//reg struct room *rp;
+		let op;//reg struct object *op;
+		let ll;//reg struct linked_list *ll;
+
+		const rooms = r.dungeon.rooms;
 
 		r.dungeon.lvl_obj = r.free_list(r.dungeon.lvl_obj);		/* throw old items away */
 
-		for (rp = rooms; rp < &rooms[MAXROOMS]; rp++) {
-			rp.r_goldval = 0;			/* no gold */
-			rp.r_nexits = 0;			/* no exits */
-			rp.r_flags = ISGONE;		/* kill all rooms */
+		//for (rp = rooms; rp < rooms[d.MAXROOMS]; rp++) {
+		for (let i in rooms){
+			rooms[i].r_goldval = 0;			/* no gold */
+			rooms[i].r_nexits = 0;			/* no exits */
+			rooms[i].r_flags = d.ISGONE;		/* kill all rooms */
 		}
-		rp = &rooms[0];					/* point to only room */
+		rp = rooms[0];					/* point to only room */
 		rp.r_flags = 0;				/* this room NOT gone */
 		rp.r_max.x = 40;
 		rp.r_max.y = 10;				/* 10 * 40 room */
-		rp.r_pos.x = (COLS - rp.r_max.x) / 2;	/* center horizontal */
+		rp.r_pos.x = (d.COLS - rp.r_max.x) / 2;	/* center horizontal */
 		rp.r_pos.y = 1;				/* 2nd line */
 		draw_room(rp);					/* draw the only room */
-		i = roll(4,10);					/* 10 to 40 items */
+		i = r.roll(4,10);					/* 10 to 40 items */
 		for (; i > 0 ; i--) {			/* place all the items */
-			ll = new_thing(false, ANYTHING);		/* get something */
+			ll = new_thing(false, d.ANYTHING);		/* get something */
 			r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj, ll);
 			op = OBJPTR(ll);
-			setoflg(op, ISPOST);		/* object in trading post */
-			tp = *rnd_pos(rp);
+			r.setoflg(op, d.ISPOST);		/* object in trading post */
+			tp = rnd_pos(rp);
 			op.o_pos = tp;
-			mvaddch(tp.y,tp.x,op.o_type);
+			r.UI.mvaddch(tp.y,tp.x,op.o_type);
 		}
 		trader = 0;
-		wmove(cw,12,0);
-		waddstr(cw,"Welcome to Friendly Fiend's Flea Market\n\r");
-		waddstr(cw,"=======================================\n\r");
-		waddstr(cw,"$: Prices object that you stand upon.\n\r");
-		waddstr(cw,"#: Buys the object that you stand upon.\n\r");
-		waddstr(cw,"%: Trades in something in your pack for gold.\n\r");
+		r.UI.wmove(cw,12,0);
+		r.UI.waddstr(cw,"Welcome to Friendly Fiend's Flea Market\n\r");
+		r.UI.waddstr(cw,"=======================================\n\r");
+		r.UI.waddstr(cw,"$: Prices object that you stand upon.\n\r");
+		r.UI.waddstr(cw,"#: Buys the object that you stand upon.\n\r");
+		r.UI.waddstr(cw,"%: Trades in something in your pack for gold.\n\r");
 		trans_line();
 	}
 
@@ -65,14 +79,14 @@ function trader(r){
 	*/
 	this.price_it = function()
 	{
-		static char *bargain[] = {
+		const  bargain = [
 			"great bargain",
 			"quality product",
 			"exceptional find",
-		};
-		reg struct linked_list *item;
-		reg struct object *obj;
-		reg int worth;
+		];
+		let item; //reg struct linked_list *item;
+		let obj; //reg struct object *obj;
+		let worth;
 
 		if (!open_market())		/* after buying hours */
 			return false;
@@ -86,9 +100,9 @@ function trader(r){
 				worth = 25;
 			worth *= 3;							/* slightly expensive */
 			curprice = worth;					/* save price */
-			strcpy(curpurch, obj.o_typname);	/* save item */
+			curpurch = obj.o_typname;	/* save item */
 		}
-		msg("That %s is a %s for only %d pieces of gold", curpurch,
+		r.UI.msg("That %s is a %s for only %d pieces of gold", curpurch,
 		bargain[rnd(3)], curprice);
 		return true;
 	}
@@ -99,30 +113,30 @@ function trader(r){
 	*/
 	this.buy_it = function()
 	{
-		reg int wh;
+		let  wh;
 
 		if (purse <= 0) {
-			msg("You have no money.");
+			r.UI.msg("You have no money.");
 			return;
 		}
 		if (curprice < 0) {		/* if not yet priced */
 			wh = price_it();
 			if (!wh)			/* nothing to price */
 				return;
-			msg("Do you want to buy it? ");
+			r.UI.msg("Do you want to buy it? ");
 			do {
 				wh = readchar();
 				if (isupper(wh))
 					wh = tolower(wh);
-				if (wh == ESCAPE || wh == 'n') {
+				if (wh == d.ESCAPE || wh == 'n') {
 					msg("");
 					return;
 				}
-			} while(!(wh == 'y');
+			} while(wh != 'y');
 		}
 		mpos = 0;
 		if (curprice > purse) {
-			msg("You can't afford to buy that %s !",curpurch);
+			r.UI.msg("You can't afford to buy that %s !",curpurch);
 			return;
 		}
 		/*
@@ -139,8 +153,8 @@ function trader(r){
 			purse -= curprice;		/* take his money */
 			++trader;				/* another transaction */
 			trans_line();			/* show remaining deals */
-			curprice = NOTPRICED;
-			curpurch[0] = '\0';
+			curprice =d.NOTPRICED;
+			curpurch = '';
 		}
 	}
 
@@ -150,9 +164,9 @@ function trader(r){
 	*/
 	this.sell_it = function()
 	{
-		reg struct linked_list *item;
-		reg struct object *obj;
-		reg int wo, ch;
+		let item; //reg struct linked_list *item;
+		let obj; //reg struct object *obj;
+		let wo, ch;
 
 		if (!open_market())		/* after selling hours */
 			return;
@@ -178,7 +192,7 @@ function trader(r){
 				msg("");
 				return;
 			}
-		} while(! (ch == 'y');
+		} while(ch != 'y');
 		mpos = 0;
 		if (drop(item) == true) {		/* drop this item */	
 			nochange = false;		/* show gold value */
@@ -213,30 +227,35 @@ function trader(r){
 	this.get_worth = function(obj)
 	//struct object *obj;
 	{
-		reg int worth, wh;
+		let worth, wh;
 
 		worth = 0;
 		wh = obj.o_which;
 		switch (obj.o_type) {
 		case FOOD:
 			worth = 2;
-		break;case WEAPON:
+		break;
+		case WEAPON:
 			if (wh < MAXWEAPONS) {
 				worth = w_magic[wh].mi_worth;
 				worth *= (2 + (4 * obj.o_hplus + 4 * obj.o_dplus));
 			}
-		break;case ARMOR:
+		break;
+		case ARMOR:
 			if (wh < MAXARMORS) {
 				worth = a_magic[wh].mi_worth;
 				worth *= (1 + (10 * (armors[wh].a_class - obj.o_ac)));
 			}
-		break;case SCROLL:
+		break;
+		case SCROLL:
 			if (wh < MAXSCROLLS)
 				worth = s_magic[wh].mi_worth;
-		break;case POTION:
+		break;
+		case POTION:
 			if (wh < MAXPOTIONS)
 				worth = p_magic[wh].mi_worth;
-		break;case RING:
+		break;
+		case RING:
 			if (wh < MAXRINGS) {
 				worth = r_magic[wh].mi_worth;
 				if (magring(obj)) {
@@ -246,14 +265,17 @@ function trader(r){
 						worth = 50;
 				}
 			}
-		break;case STICK:
+		break;
+		case STICK:
 			if (wh < MAXSTICKS) {
 				worth = ws_magic[wh].mi_worth;
 				worth += 20 * obj.o_charges;
 			}
-		break;case AMULET:
+		break;
+		case AMULET:
 			worth = 1000;
-		break;default:
+		break;
+		default:
 			worth = 0;
 		}
 		if (worth < 0)
@@ -281,10 +303,12 @@ function trader(r){
 	*/
 	this.do_maze = function()
 	{
-		struct coord tp;
-		reg int i, least;
-		reg struct room *rp;
-		bool treas;
+		let tp; //struct coord tp;
+		let i, least;
+		let rp; //reg struct room *rp;
+		let treas;
+
+		
 
 		for (rp = rooms; rp < &rooms[MAXROOMS]; rp++) {
 			rp.r_goldval = 0;

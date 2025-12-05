@@ -304,6 +304,8 @@ function pack_f(r){
 		let obj; //reg struct object *obj;
 		let ch;
 		let cnt;
+		
+		r.player.set_dest(null);
 
 		if (list == null) {			/* empty list */
 			r.UI.msg(type == 0 ? "Empty handed." : "Nothing appropriate.");
@@ -364,7 +366,8 @@ function pack_f(r){
 			case d.RING:
 			case d.STICK:
 				add_pack(null, false);
-			break;default:
+			break;
+			default:
 				r.UI.msg("That item is ethereal !!!");
 		}
 	}
@@ -375,30 +378,34 @@ function pack_f(r){
 	*/
 	this.picky_inven = function()
 	{
+		const npch = r.UI.io.npch;
+		const inv_name = r.item.things_f.inv_name;
+		const pack = r.player.get_pack(); 
+
 		let item; //reg struct linked_list *item;
 		let ch, mch;
 
 		if (pack == null)
-			msg("You aren't carrying anything.");
-		else if (next(pack) == null)
-			msg("a) %s", inv_name(OBJPTR(pack), false));
+			r.UI.msg("You aren't carrying anything.");
+		else if (f.next(pack) == null)
+			r.UI.msg(`a) ${inv_name(f.OBJPTR(pack), false)}`);
 		else {
-			msg("Item: ");
-			mpos = 0;
+			r.UI.msg("Item: ");
+			//mpos = 0;
 			if ((mch = readchar()) == ESCAPE) {
-				msg("");
+				r.UI.msg("");
 				return;
 			}
-			for (ch='a',item=pack; item != null; item=next(item),ch=npch(ch))
+			for (ch='a',item=pack; item != null; item=f.next(item),ch=npch(ch))
 				if (ch == mch) {
-					msg("%c) %s",ch,inv_name(OBJPTR(item), false));
+					r.UI.msg(`${ch}) ${inv_name(f.OBJPTR(item), false)}`);
 					return;
 				}
 			if (ch == 'A')
 				ch = 'z';
 			else
 				ch -= 1;
-			msg("Range is 'a' to '%c'", ch);
+			r.UI.msg(`Range is 'a' to '${ch}'`);
 		}
 	}
 
@@ -407,121 +414,154 @@ function pack_f(r){
 	*	pick something out of a pack for a purpose
 	*/
 	//struct linked_list *
-	this.get_item = function(purpose, type)
+	this.get_item = (purpose, type)=>
 	//char *purpose;
 	//int type;
 	{
 		const npch = r.UI.io.npch;
+		const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
+		const pack_char = this.pack_char;
+		const inv_name = r.item.things_f.inv_name;
+
+		const pack = r.player.get_pack(); 
 
 		let obj, pit, savepit;// reg struct linked_list *obj, *pit, *savepit;
 		let pob; //struct object *pob;
 		let ch, och, anr, cnt;
+		let buf = [];
 
 		if (pack == null) {
-			msg("You aren't carrying anything.");
+			r.UI.msg("You aren't carrying anything.");
 			return null;
 		}
-		if (type != WEAPON && (type != 0 || next(pack) == null)) {
+		if (type != d.WEAPON && (type != 0 || f.next(pack) == null)) {
 			/*
 			* see if we have any of the type requested
 			*/
 			pit = pack;
 			anr = 0;
-			for (ch = 'a'; pit != null; pit = next(pit), ch = npch(ch)) {
-				pob = OBJPTR(pit);
+			for (ch = 'a'; pit != null; pit = f.next(pit), ch = npch(ch)) {
+				pob = f.OBJPTR(pit);
 				if (type == pob.o_type || type == 0) {
 					++anr;
 					savepit = pit;	/* save in case of only 1 */
 				}
 			}
 			if (anr == 0) {
-				msg("Nothing to %s",purpose);
-				after = false;
+				r.UI.msg(`Nothing to ${purpose}`);
+				r.after = false;
 				return null;
 			}
 			else if (anr == 1) {	/* only found one of 'em */
-				do {
-					let opb; //struct object *opb;
+				//do {
+				//	let opb; //struct object *opb;
 
-					opb = OBJPTR(savepit);
-					msg("%s what (* for the item)?",purpose);
-					och = readchar();
-					if (och == '*') {
-						mpos = 0;
-						msg("%c) %s",pack_char(opb),inv_name(opb,false));
-						continue;
-					}
-					if (och == ESCAPE) {
-						msg("");
-						after = false;
-						return null;
-					}
-					if (isalpha(och) && och != pack_char(opb)) {
-						mpos = 0;
-						msg("You can't %s that !!", purpose);
-						after = false;
-						return null;
-					}
-				} while(!isalpha(och));
-				mpos = 0;
+				//	opb = f.OBJPTR(savepit);
+				//	r.UI.msg(`${purpose} what (* for the item)?`);
+				//	och = readchar();
+				//	if (och == '*') {
+						//mpos = 0;
+				//		r.UI.msg(`${pack_char(opb)}) ${inv_name(opb,false)}`);
+				//		continue;
+				//	}
+					//if (och == d.ESCAPE) {
+					//	r.UI.msg("");
+					//	r.after = false;
+					//	return null;
+					//}
+					//if (isalpha(och) && och != pack_char(opb)) {
+						//mpos = 0;
+					//	r.UI.msg("You can't %s that !!", purpose);
+					//	r.after = false;
+					//	return null;
+					//}
+				//} while(!isalpha(och));
+				//mpos = 0;
+				r.player.set_dest( f.OBJPTR(savepit) );	
 				return savepit;		/* return this item */
 			}
 		}
-		for (;;) {
-			msg("%s what? (* for list): ",purpose);
-			ch = readchar();
-			mpos = 0;
-			if (ch == ESCAPE) {		/* abort if escape hit */
-				after = false;
-				msg("");			/* clear display */
-				return null;
+		if (r.player.get_dest() != null) {
+			for (pit = pack; pit != null; pit = f.next(pit)) {
+				pob = f.OBJPTR(pit);
+				if (pob == r.player.get_dest()) {
+					r.player.set_dest(null);
+					console.log("getitem_dest")
+					return pit;
+				}
 			}
-			if (ch == '*') {
-				wclear(hw);
+		}
+
+		//for (;;) {
+			r.UI.msg(`${purpose} what?`);// (* for list): ",purpose);
+
+			//ch = readchar();
+			//mpos = 0;
+			//if (ch == d.ESCAPE) {		/* abort if escape hit */
+			//	after = false;
+			//	r.UI.msg("");			/* clear display */
+			//	return null;
+			//}
+			//if (false){
+			//if (ch == '*') {
+				r.UI.wclear(hw);
+
 				pit = pack;		/* point to pack */
 				cnt = 0;
-				for (ch='a'; pit != null; pit=next(pit), ch=npch(ch)) {
-					pob = OBJPTR(pit);
+				for (ch='a'; pit != null; pit=f.next(pit), ch=npch(ch)) {
+					pob = f.OBJPTR(pit);
 					if (type == 0 || type == pob.o_type) {
-						wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
-						if (++cnt > LINES - 2 && next(pit) != null) {
-							cnt = 0;
-							dbotline(hw, morestr);
-							wclear(hw);
-						}
+						buf.push(`${ch}) ${inv_name(pob, false)}`);
+						//wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
+						cnt++;
+						//if (++cnt > LINES - 2 && next(pit) != null) {
+						//	cnt = 0;
+						//	dbotline(hw, morestr);
+						//	wclear(hw);
+						//}
 					}
 				}
-				wmove(hw, LINES - 1,0);
-				wprintw(hw,"%s what? ",purpose);
-				draw(hw);		/* write screen */
-				anr = false;
-				do {
-					ch = readchar();
-					if (isalpha(ch) || ch == ESCAPE)
-						anr = true; 
-				} while(!anr);		/* do till we got it right */
-				restscr(cw);		/* redraw orig screen */
-				if (ch == ESCAPE) {
-					after = false;
-					msg("");		/* clear top line */
-					return null;	/* all done if abort */
+				buf.push(`${purpose} what?`);
+				//wmove(hw, LINES - 1,0);
+				//wprintw(hw,"%s what? ",purpose);
+				r.UI.setDsp(hw);
+				for (let i in buf){
+					r.UI.mvaddch(i ,0, buf[i]);
 				}
+				//draw(hw);		/* write screen */
+				//anr = false;
+				//do {
+				//	ch = readchar();
+				//	if (isalpha(ch) || ch == ESCAPE)
+				//		anr = true; 
+				//} while(!anr);		/* do till we got it right */
+				//restscr(cw);		/* redraw orig screen */
+				//if (ch == ESCAPE) {
+				//	after = false;
+				//	msg("");		/* clear top line */
+				//	return null;	/* all done if abort */
+				//}
 				/* ch has item to get from pack */
-			}
-			for (obj=pack,och='a';obj!=null;obj=next(obj),och=npch(och))
-				if (ch == och)
-					break;
-			if (obj == null) {
-				if (och == 'A')
-					och = 'z';
-				else
-					och -= 1;
-				msg("Please specify a letter between 'a' and '%c'",och);
-				continue;
-			}
-			else 
-				return obj;
-		}
+			//}
+			//for (obj=pack,och='a';obj!=null;obj=f.next(obj),och=npch(och))
+			//	if (ch == och)
+			//		break;
+			//if (obj == null) {
+			//	if (och == 'A')
+			//		och = 'z';
+			//	else
+			//		och -= 1;
+			//	r.UI.msg(`Please specify a letter between 'a' and '${och}'`);
+			//	continue;
+			//}
+			//else 
+			//	return obj;
+		//}
+		r.UI.setDsp(d.DSP_MAIN);
+
+		r.UI.scene.set_gi_param(purpose, type);
+		r.setScene(3); 
+		r.UI.overlapview(true);
 	}
 
 	/*
@@ -564,6 +604,8 @@ function pack_f(r){
 	this.del_pack = (what)=>
 	//struct linked_list *what;
 	{
+		const updpack = r.player.encumb.updpack;
+
 		let op; //reg struct object *op;
 
 		op = f.OBJPTR(what);
@@ -591,11 +633,11 @@ function pack_f(r){
 			r.player.set_cur_weapon(null);
 		else if (op == r.player.get_cur_armor())
 			r.player.set_cur_armor(null);
-		else if (op == cur_ring[LEFT])
-			cur_ring[LEFT] = null;
-		else if (op == cur_ring[RIGHT])
-			cur_ring[RIGHT] = null;
-
+		else if (op == cur_ring[d.LEFT])
+			cur_ring[d.LEFT] = null;
+		else if (op == cur_ring[d.RIGHT])
+			cur_ring[d.RIGHT] = null;
+	
 		r.player.set_cur_ring(cur_ring);
 	}
 }

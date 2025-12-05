@@ -60,6 +60,7 @@ function sticks(r){
 	{
 		const find_mons = r.monster.chase.find_mons;
 		const runto = r.monster.chase.runto;
+		const del_pack = r.item.pack_f.del_pack;
 
 		reg struct linked_list *item;
 		reg struct object *obj;

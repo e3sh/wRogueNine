@@ -19,6 +19,7 @@ function itemData(r){
 			o.mi_prob = data[i][1];
 			o.mi_worth= data[i][2];
 			o.mi_wght = data[i][2];
+			o.mi_prob_bup = data[i][1]; //resetstart
 			item.push(o); 
 		}
 		return item;

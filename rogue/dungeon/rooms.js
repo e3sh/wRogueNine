@@ -15,13 +15,14 @@ function room(r){
 	* do_rooms:
 	*	Place the rooms in the dungeon
 	*/
-	this.do_rooms = function()
+	this.do_rooms = ()=>
 	{
 		const rnd_room = r.dungeon.new_level.rnd_room;
 		const rf_on = this.rf_on;
 		const GOLDCALC = ()=>{ return (r.rnd(50 + 10 * r.dungeon.level) + 2) };
 		const add_mon = this.add_mon;
 		const fatal = console.log;
+		const draw_room = this.draw_room;
 		
 		let mloops, mchance, nummons, left_out, roomtries;
 		let treas = false;
@@ -190,7 +191,7 @@ function room(r){
 	* draw_room:
 	*	Draw a box around a room
 	*/
-	function draw_room(rp)
+	this.draw_room =(rp)=>
 	//struct room *rp;
 	{
 		let j, k;
