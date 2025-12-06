@@ -170,7 +170,7 @@ function move(r){
 		if (pl_off(d.ISETHER)) {
 			if (isatrap(ch)) {
 				ch = be_trapped(nh, player);
-				if (nlmove) {
+				if (r.nlmove) {
 					r.nlmove = false;
 					return;
 				}
@@ -437,7 +437,7 @@ function move(r){
 
 		const goner =()=>{
 
-			nlmove = true;
+			r.nlmove = true;
 			if (seeit && sayso)
 				r.UI.msg(`${stuckee} fell into a trap!`);
 			return d.GONER;
@@ -446,7 +446,7 @@ function move(r){
 		switch (ch = trp.tr_type) {
 			case d.POST:
 				if (ishero) {
-					nlmove = true;
+					r.nlmove = true;
 					new_level(d.POSTLEV);
 				}
 				else
@@ -454,7 +454,7 @@ function move(r){
 			break;
 			case d.MAZETRAP:
 				if (ishero) {
-					nlmove = true;
+					r.nlmove = true;
 					level += 1;
 					new_level(d.MAZELEV);
 					r.UI.msg("You are surrounded by twisty passages!");
@@ -463,7 +463,7 @@ function move(r){
 					ch = goner();
 			break;
 			case d.TELTRAP:
-				nlmove = true;
+				r.nlmove = true;
 				teleport(trp.tr_goto, th);
 			break;
 			case d.TRAPDOOR:
@@ -475,7 +475,7 @@ function move(r){
 	goner:
 					ch = d.GONER;
 				}
-				nlmove = true;
+				r.nlmove = true;
 				if (seeit && sayso)
 					r.UI.msg(`${stuckee} fell into a trap!`);
 			break;
@@ -503,7 +503,7 @@ function move(r){
 
 				const cur_armor = r.player.get_cur_armor;
 
-				stuckee[0] = tolower(stuckee[0]);
+				stuckee = f.tolower(stuckee);
 				it = th.t_stats;
 				if (ishero && cur_armor != null)
 					ac = cur_armor.o_ac;
@@ -585,9 +585,9 @@ function move(r){
 					ch = goner();
 				}
 				if ((trp.tr_flags & d.ISGONE) && r.rnd(100) < 10) {
-					nlmove = true;
+					r.nlmove = true;
 					if (r.rnd(100) < 15)
-						teleport(rndspot);	   /* teleport away */
+						teleport(r.rndspot);	   /* teleport away */
 					else if(r.rnd(100) < 15 && r.dungeon.level > 2) {
 						r.dungeon.level -= r.rnd(2) + 1;
 						new_level(d.NORMLEV);
@@ -604,10 +604,10 @@ function move(r){
 						death(d.K_POOL);
 					}
 					else
-						nlmove = false;
+						r.nlmove = false;
 			}
 		}
-		flushinp();		/* flush typeahead */
+		//flushinp();		/* flush typeahead */
 		return ch;
 	}
 
@@ -617,6 +617,8 @@ function move(r){
 	*/
 	this.dip_it = function()
 	{
+		const p_know = r.item.p_know; 
+
 		let what; //reg struct linked_list *what;
 		let ob; //reg struct object *ob;
 		let tp; //reg struct trap *tp;

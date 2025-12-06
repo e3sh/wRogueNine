@@ -11,18 +11,30 @@ function wizard(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
-	extern struct termios terminal;
+	const cw = d.DSP_MAIN_FG;
+    const mw = d.DSP_MAIN_BG;
+
+	//extern struct termios terminal;
 
 	/*
 	* whatis:
 	*	What a certain object is
 	*/
-	function whatis(what)
+	this.whatis = function(what)
 	//struct linked_list *what;
 	{
-		reg struct object *obj;
-		reg struct linked_list *item;
-		reg int wh;
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const setoflg = r.setoflg; 
+
+		const s_know = r.item.s_know;	
+		const p_know = r.item.p_know;	
+		const r_know = r.item.r_know;	
+		const ws_know = r.item.ws_know;
+
+		let obj; //reg struct object *obj;
+		let item;//reg struct linked_list *item;
+		let wh;
 
 		if (what == null) {				/* we need to ask */
 			if ((item = get_item("identify", 0)) == null)
@@ -31,38 +43,24 @@ function wizard(r){
 		else							/* no need to ask */
 			item = what;
 		obj = OBJPTR(item);
-		setoflg(obj, ISKNOW);
+		setoflg(obj, d.ISKNOW);
 		wh = obj.o_which;
 		switch (obj.o_type) {
-			case SCROLL:
+			case d.SCROLL:
 				s_know[wh] = true;
-				if (s_guess[wh]) {
-					free(s_guess[wh]);
-					s_guess[wh] = null;
-				}
-			break;case POTION:
+			break;
+			case d.POTION:
 				p_know[wh] = true;
-				if (p_guess[wh]) {
-					free(p_guess[wh]);
-					p_guess[wh] = null;
-				}
-			break;case STICK:
+			break;
+			case d.STICK:
 				ws_know[wh] = true;
-				if (ws_guess[wh]) {
-					free(ws_guess[wh]);
-				ws_guess[wh] = null;
-				}
-			break;case RING:
+			break;
+			case d.RING:
 				r_know[wh] = true;
-				if (r_guess[wh]) {
-					free(r_guess[wh]);
-					r_guess[wh] = null;
-				}
 		}
 		if (what == null)
-			msg(inv_name(obj, false));
+			r.UI.msg(inv_name(obj, false));
 	}
-
 
 	/*
 	* create_obj:
@@ -71,16 +69,16 @@ function wizard(r){
 	function create_obj(fscr)
 	//bool fscr;
 	{
-		reg struct linked_list *item;
-		reg struct object *obj;
-		reg int wh, ch, otype;
-		char newitem, newtype, msz, *oname;
-		struct magic_info *mf;
-		bool nogood = true, inhw = false;
+		let item; //reg struct linked_list *item;
+		let obj; //reg struct object *obj;
+		let wh, ch, otype;
+		let newitem, newtype, msz, oname;
+		let mf; //struct magic_info *mf;
+		let nogood = true, inhw = false;
 
 		if (fscr)
 			msg(" ");
-		else if (wizard) {
+		else if (r.wizard) {
 			msg("Create what?%s: ", starlist);
 			ch = readchar();
 			mpos = 0;
@@ -94,12 +92,12 @@ function wizard(r){
 			wclear(hw);
 			wprintw(hw,"Item\tKey\n\n");
 			for (otype = 0; otype < NUMTHINGS; otype++) {
-				if (otype != TYP_AMULET || wizard) {
-					mf = &thnginfo[otype];
+				if (otype != TYP_AMULET || r.wizard) {
+					mf = thnginfo[otype];
 					wprintw(hw,"%s\t %c\n",things[otype].mi_name,mf.mf_show);
 				}
 			}
-			if (wizard)
+			if (r.wizard)
 				waddstr(hw,"monster\t (A-z)");
 			wprintw(hw,"\n\nWhat do you want to create? ");
 			draw(hw);
@@ -137,7 +135,7 @@ function wizard(r){
 			return;
 		}
 		newitem = ch;
-		mf = &thnginfo[otype];
+		mf = thnginfo[otype];
 		oname = things[otype].mi_name;
 		msz = mf.mf_max;
 		nogood = true;
@@ -156,18 +154,23 @@ function wizard(r){
 			}
 		}
 		if (nogood) {
-			struct magic_item *wmi;
-			int ii;
+			let wmi; //struct magic_item *wmi;
+			let ii;
 
 			mpos = 0;
 			inhw = true;
 			switch(newitem) {
-				case POTION:	wmi = &p_magic[0];
-				break;case SCROLL:	wmi = &s_magic[0];
-				break;case RING:		wmi = &r_magic[0];
-				break;case STICK:		wmi = &ws_magic[0];
-				break;case WEAPON:	wmi = &w_magic[0];
-				break;default:		wmi = &a_magic[0];
+				case POTION:	wmi = p_magic[0];
+				break;
+				case SCROLL:	wmi = s_magic[0];
+				break;
+				case RING:		wmi = r_magic[0];
+				break;
+				case STICK:		wmi = ws_magic[0];
+				break;
+				case WEAPON:	wmi = w_magic[0];
+				break;
+				default:		wmi = a_magic[0];
 			}
 			wclear(hw);
 			for (ii = 0 ; ii < msz ; ii++) {
@@ -237,7 +240,7 @@ function wizard(r){
 	*/
 	function getbless()
 	{
-		int bless;
+		let bless;
 
 		msg("Blessing: ");
 		prbuf[0] = '\0';
@@ -258,8 +261,8 @@ function wizard(r){
 	{
 		const look = r.player.misc.look;
 
-		reg int x, y, oktomake = false, appear = 1;
-		struct coord mp;
+		let x, y, oktomake = false, appear = 1;
+		let mp; //struct coord mp;
 
 		oktomake = false;
 		for (x = hero.x - 1 ; x <= hero.x + 1 ; x++) {
@@ -275,7 +278,7 @@ function wizard(r){
 			}
 		}
 		if (oktomake) {
-			new_monster(midx(what), &mp, false);
+			new_monster(midx(what), mp, false);
 			look(false);
 		}
 		return oktomake;
@@ -285,50 +288,62 @@ function wizard(r){
 	* telport:
 	*	Bamf the thing someplace else
 	*/
-	function teleport(spot, th)
-	struct coord spot;
-	struct thing *th;
+	this.teleport = function(spot, th)
+	//struct coord spot;
+	//struct thing *th;
 	{
-		reg int rm, y, x;
-		struct coord oldspot;
-		struct room *rp;
-		bool ishero;
+		const roomin = r.monster.chase.roomin;	
+		const step_ok = r.UI.io.step_ok;
+		const winat = r.UI.winat;
+		const rnd_room = r.dungeon.new_level.rnd_room;
+		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
+		const light = r.player.move.light;
+		const pl_on = r.player.pl_on;
+		const unhold = r.monster.unhold;
 
-		ishero = (th == &player);
+		const rooms = r.dungeon.rooms;
+		const hero = r.player.get_hero();
+
+		let  rm, y, x;
+		let oldspot; //struct coord oldspot;
+		let rp; //struct room *rp;
+		let ishero;
+
+		ishero = (th == r.player.get_player());
 		oldspot = th.t_pos;
 		y = th.t_pos.y;
 		x = th.t_pos.x;
-		mvwaddch(cw, y, x, th.t_oldch); 
+		r.UI.mvwaddch(cw, y, x, th.t_oldch); 
 		if (!ishero)
-			mvwaddch(mw, y, x, ' ');
-		rp = roomin(&spot);
+			r.UI.mvwaddch(mw, y, x, ' ');
+		rp = roomin(spot);
 		if (spot.y < 0 || !step_ok(winat(spot.y, spot.x))) {
-			rp = &rooms[rnd_room()];
-			th.t_pos = *rnd_pos(rp);
+			rp = rooms[rnd_room()];
+			th.t_pos = rnd_pos(rp);
 		}
 		else
 			th.t_pos = spot;
-		rm = rp - &rooms[0];
+		rm = rp;// - &rooms[0];
 		th.t_room = rp;
-		th.t_oldch = mvwinch(cw, th.t_pos.y, th.t_pos.x);
-		light(&oldspot);
+		th.t_oldch = r.UI.mvwinch(cw, th.t_pos.y, th.t_pos.x);
+		light(oldspot);
 		th.t_nomove = 0;
 		if (ishero) {
-			light(&hero);
-			mvwaddch(cw, hero.y, hero.x, PLAYER);
+			light(hero);
+			r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 			/*
 			* turn off ISHELD in case teleportation was done
 			* while fighting a Fungi or Bone Devil.
 			*/
-			if (pl_on(ISHELD))
+			if (pl_on(d.ISHELD))
 				unhold('F');
-			count = 0;
-			running = false;
-			flushinp();			/* flush typeahead */
-			nochange = false;
+			r.count = 0;
+			r.running = false;
+			//flushinp();			/* flush typeahead */
+			r.nochange = false;
 		}
 		else
-			mvwaddch(mw, th.t_pos.y, th.t_pos.x, th.t_type);
+			r.UI.mvwaddch(mw, th.t_pos.y, th.t_pos.x, th.t_type);
 		return rm;
 	}
 
@@ -338,9 +353,9 @@ function wizard(r){
 	*/
 	function passwd()
 	{
-		reg char *sp, c;
-		bool passok;
-		char buf[LINLEN], *xcrypt();
+		let sp, c;
+		let passok;
+		//char buf[LINLEN], *xcrypt();
 
 		msg(wizstr);
 		mpos = 0;
@@ -351,11 +366,11 @@ function wizard(r){
 		else if (c == terminal.c_cc[VERASE] && sp > buf)
 			sp--;
 		else
-			*sp++ = c;
+			sp++// = c;
 		if (sp == buf)
 			passok = false;
 		else {
-			*sp = '\0';
+			sp = '\0';
 			passok = (strcmp(PASSWD, xcrypt(buf, "mT")) == 0);
 		}
 		return passok;

@@ -28,8 +28,7 @@ const w = [
         r + "dungeon/new_level.js",
         r + "dungeon/rooms.js",
         r + "dungeon/passages.js",
-    //    r + "dungeon/trader.js",
-
+        r + "dungeon/trader.js",
     r + "MonsterManager.js",
         r + "monster/chase.js",
         r + "monster/battle.js",
@@ -46,7 +45,7 @@ const w = [
         r + "UI/io.js",
         r + "UI/command.js",
         r + "UI/scene.js",
-    //    r + "UI/wizard.js",
+        r + "UI/wizard.js",
         r + "UI/moveEffect.js",
     r + "DaemonScheduler.js",
     // Rogue Parameters

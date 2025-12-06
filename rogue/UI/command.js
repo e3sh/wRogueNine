@@ -28,6 +28,7 @@ function command(r){
 		const pl_off = r.player.pl_off;
 		const pick_up = r.item.pack_f.pick_up;
 		const waste_time = r.player.misc.waste_time;
+		const price_it = r.dungeon.trader.price_it;
 		
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();
@@ -86,8 +87,13 @@ function command(r){
 			/* If he ran into something to take, let the
 			* hero pick it up if not in a trading post.
 			*/
-			if (r.take != 0 && r.levtype != d.POSTLEV)
-				pick_up(r.take);
+			if (r.take != 0){
+				if (r.levtype != d.POSTLEV)
+					pick_up(r.take);
+				else
+					price_it();
+
+			}
 			if (!r.running)
 				r.door_stop = false;
 		}
@@ -111,7 +117,7 @@ function command(r){
 						search();
 					else if (cur_ring[j].o_which == d.R_TELEPORT)
 						if (r.rnd(100) < 5)
-							teleport(rndspot, player);
+							teleport(r.rndspot, player);
 				}
 			}
 		}
@@ -209,6 +215,10 @@ function command(r){
 		const inventory = r.item.pack_f.inventory;
 		const eat = r.player.misc.eat;
 		const drop = r.item.things_f.drop;
+		const buy_it = r.dungeon.trader.buy_it;
+		const sell_it = r.dungeon.trader.sell_it;
+		const market = r.dungeon.trader.market;
+
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
 		const unctrl =(text)=>{return text;}
@@ -233,32 +243,37 @@ function command(r){
 		if (ki.includes("Numpad5")){
 			//if (typeof(ch) == "string")
 			//ch = ch.toUpperCase();
-			if (winat(hero.y, hero.x) != d.STAIRS)
-				ch = "s";
-			else 
-				ch = r.amulet?"<":">";	
-
-			//r.daemon.rollwand();
+			if (r.levtype != d.POSTLEV || !market()){
+				if (winat(hero.y, hero.x) != d.STAIRS)
+					ch = "s"; //search
+				else 
+					ch = r.amulet?"<":">"; //u_level/d_level	
+			}else{
+				ch = "#"; //buy_it
+			}
 		}
+		//r.daemon.rollwand();
 
 		if (ki.includes("NumpadSubtract")||ki.includes("NumpadAdd")||
 			ki.includes("ArrowUp")||ki.includes("ArrowDown")||
 			ki.includes("KeyI")
 		){
-			ch = "i";
+			ch = "i"; //inventry
 		}
 
 		if (ki.includes("Numpad0")
 		){
-			ch = "e";
+			ch = "e"; //eat/
 		}
 
 		if (ki.includes("KeyD")
 		){
-			ch = "d";
+			if (r.levtype != d.POSTLEV){
+				ch = "d"; //drop
+			}else{
+				ch = "%"; //sell_it
+			}
 		}
-
-
 
 		//r.UI.msg(`${ki.length} ${ch}`);
 		
@@ -455,17 +470,17 @@ function command(r){
 				r.after = false;
 				break;
 			case '#':
-				if (levtype == POSTLEV)		/* buy something */
+				if (r.levtype == d.POSTLEV)		/* buy something */
 					buy_it();
 				r.after = false;
 				break;
 			case '$':
-				if (levtype == POSTLEV)		/* price something */
+				if (r.levtype == d.POSTLEV)		/* price something */
 					price_it();
 				r.after = false;
 				break;
 			case '%':
-				if (levtype == POSTLEV)		/* sell something */
+				if (r.levtype == d.POSTLEV)		/* sell something */
 					sell_it();
 				r.after = false;
 				break;
@@ -488,7 +503,7 @@ function command(r){
 					break;
 				case CTRL('X') :	dispmons();
 					break;
-				case CTRL('T') :	teleport(rndspot, player);
+				case CTRL('T') :	teleport(r.rndspot, player);
 					break;
 				case CTRL('E') :	msg("food left: %d", food_left);
 					break;

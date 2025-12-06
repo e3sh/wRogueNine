@@ -11,10 +11,13 @@ function trader(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+	const mw = d.DSP_MAIN_BG;
+
 	const NOTPRICED = -1;
 
 	let trader;
-	let cutpurch; /* name of item ready to buy */
+	this.market = ()=>{ return open_market()};
 
 	/*
 	* do_post:
@@ -23,7 +26,7 @@ function trader(r){
 	this.do_post = function()
 	{
 		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
-		const draw_room = r.dungeon.rooms.f.draw_room;
+		const draw_room = r.dungeon.rooms_f.draw_room;
 		const new_thing = r.item.things_f.new_thing;
 		const OBJPTR = f.OBJPTR;
 
@@ -65,11 +68,11 @@ function trader(r){
 		}
 		trader = 0;
 		r.UI.wmove(cw,12,0);
-		r.UI.waddstr(cw,"Welcome to Friendly Fiend's Flea Market\n\r");
-		r.UI.waddstr(cw,"=======================================\n\r");
-		r.UI.waddstr(cw,"$: Prices object that you stand upon.\n\r");
-		r.UI.waddstr(cw,"#: Buys the object that you stand upon.\n\r");
-		r.UI.waddstr(cw,"%: Trades in something in your pack for gold.\n\r");
+		r.UI.mvwaddch(cw,12, 0, "Welcome to Friendly Fiend's Flea Market");
+		r.UI.mvwaddch(cw,13, 0, "=======================================");
+		r.UI.mvwaddch(cw,14, 0, "$: Prices object that you stand upon.");
+		r.UI.mvwaddch(cw,15, 0, "#: Buys the object that you stand upon.");
+		r.UI.mvwaddch(cw,16, 0, "%: Trades in something in your pack for gold.");
 		trans_line();
 	}
 
@@ -77,8 +80,14 @@ function trader(r){
 	* price_it:
 	*	Price the object that the hero stands on
 	*/
-	this.price_it = function()
+	this.price_it = ()=>
 	{
+		const find_obj = r.player.misc.find_obj;
+		const OBJPTR = f.OBJPTR;
+		const get_worth = this.get_worth;
+
+		const hero = r.player.get_hero();
+
 		const  bargain = [
 			"great bargain",
 			"quality product",
@@ -93,17 +102,16 @@ function trader(r){
 		if ((item = find_obj(hero.y,hero.x)) == null)
 			return false;
 		obj = OBJPTR(item);
-		if (curprice == NOTPRICED) {
+		if (r.curprice == NOTPRICED) {
 			worth = get_worth(obj);
-			worth += 50 - rnd(100);
+			worth += 50 - r.rnd(100);
 			if (worth < 25)
 				worth = 25;
 			worth *= 3;							/* slightly expensive */
-			curprice = worth;					/* save price */
-			curpurch = obj.o_typname;	/* save item */
+			r.curprice = worth;					/* save price */
+			r.curpurch = obj.o_typname;	/* save item */
 		}
-		r.UI.msg("That %s is a %s for only %d pieces of gold", curpurch,
-		bargain[rnd(3)], curprice);
+		r.UI.msg(`That ${r.curpurch} is a ${bargain[r.rnd(3)]} for only ${r.curprice} pieces of gold`);
 		return true;
 	}
 
@@ -111,15 +119,18 @@ function trader(r){
 	* buy_it:
 	*	Buy the item on which the hero stands
 	*/
-	this.buy_it = function()
+	this.buy_it = ()=>
 	{
+		const price_it = this.price_it;
+		const add_pack = r.item.pack_f.add_pack;
+
 		let  wh;
 
-		if (purse <= 0) {
+		if (r.player.purse <= 0) {
 			r.UI.msg("You have no money.");
 			return;
 		}
-		if (curprice < 0) {		/* if not yet priced */
+		if (r.curprice < 0) {		/* if not yet priced */
 			wh = price_it();
 			if (!wh)			/* nothing to price */
 				return;
@@ -129,14 +140,14 @@ function trader(r){
 				if (isupper(wh))
 					wh = tolower(wh);
 				if (wh == d.ESCAPE || wh == 'n') {
-					msg("");
+					r.UI.msg("");
 					return;
 				}
 			} while(wh != 'y');
 		}
-		mpos = 0;
-		if (curprice > purse) {
-			r.UI.msg("You can't afford to buy that %s !",curpurch);
+		//mpos = 0;
+		if (r.curprice > r.player.purse) {
+			r.UI.msg(`You can't afford to buy that ${r.curpurch} !`);
 			return;
 		}
 		/*
@@ -147,14 +158,14 @@ function trader(r){
 		/*
 		* The hero bought the item here
 		*/
-		mpos = 0;
+		//mpos = 0;
 		wh = add_pack(null,false);	/* try to put it in his pack */
 		if (wh) {					/* he could get it */
-			purse -= curprice;		/* take his money */
+			r.player.purse -= r.curprice;		/* take his money */
 			++trader;				/* another transaction */
 			trans_line();			/* show remaining deals */
-			curprice =d.NOTPRICED;
-			curpurch = '';
+			r.curprice = NOTPRICED;
+			r.curpurch = '';
 		}
 	}
 
@@ -162,8 +173,15 @@ function trader(r){
 	* sell_it:
 	*	Sell an item to the trading post
 	*/
-	this.sell_it = function()
+	this.sell_it = ()=>
 	{
+		const find_obj = r.player.misc.find_obj;
+		const OBJPTR = f.OBJPTR;
+		const get_worth = this.get_worth;
+		const get_item = r.item.pack_f.get_item;
+		const drop = r.item.things_f.drop;
+		const inv_name = r.item.things_f.inv_name;
+				
 		let item; //reg struct linked_list *item;
 		let obj; //reg struct object *obj;
 		let wo, ch;
@@ -176,31 +194,31 @@ function trader(r){
 		obj = OBJPTR(item);
 		wo = get_worth(obj);
 		if (wo <= 0) {
-			mpos = 0;
-			msg("We don't buy those.");
+			//mpos = 0;
+			r.UI.msg("We don't buy those.");
 			return;
 		}
 		if (wo < 25)
 			wo = 25;
-		msg("Your %s is worth %d pieces of gold.", obj.o_typname, wo);
-		msg("Do you want to sell it? ");
-		do {
-			ch = readchar();
-			if (isupper(ch))
-				ch = tolower(ch);
-			if (ch == ESCAPE || ch == 'n') {
-				msg("");
-				return;
-			}
-		} while(ch != 'y');
-		mpos = 0;
+		r.UI.msg(`Your ${obj.o_typname} is worth ${wo} pieces of gold.`);
+		//r.UI.msg("Do you want to sell it? ");
+		//do {
+		//	ch = readchar();
+		//	if (isupper(ch))
+		//		ch = tolower(ch);
+		//	if (ch == ESCAPE || ch == 'n') {
+		//		msg("");
+		//		return;
+		//	}
+		//} while (ch != 'y');
+		//mpos = 0;
 		if (drop(item) == true) {		/* drop this item */	
-			nochange = false;		/* show gold value */
-			purse += wo;			/* give him his money */
+			r.nochange = false;		/* show gold value */
+			r.player.purse += wo;			/* give him his money */
 			++trader;			/* another transaction */
 			wo = obj.o_count;
 			obj.o_count = 1;
-			msg("Sold %s",inv_name(obj,true));
+			r.UI.msg(`Sold ${inv_name(obj,true)}`);
 			obj.o_count = wo;
 			trans_line();			/* show remaining deals */
 		}
@@ -212,8 +230,8 @@ function trader(r){
 	*/
 	function open_market()
 	{
-		if (trader >= MAXPURCH) {
-			msg("The market is closed. The stairs are that-a-way.");
+		if (trader >= d.MAXPURCH) {
+			r.UI.msg("The market is closed. The stairs are that-a-way.");
 			return false;
 		}
 		else
@@ -227,36 +245,45 @@ function trader(r){
 	this.get_worth = function(obj)
 	//struct object *obj;
 	{
+		const o_on = r.o_on;
+		const a_magic = v.a_magic;
+		const w_magic = v.w_magic;
+		const p_magic = v.p_magic;
+		const s_magic = v.s_magic;
+		const r_magic = v.r_magic;
+		const ws_magic = v.ws_magic;
+		const armors = v.armors;
+
 		let worth, wh;
 
 		worth = 0;
 		wh = obj.o_which;
 		switch (obj.o_type) {
-		case FOOD:
+		case d.FOOD:
 			worth = 2;
 		break;
-		case WEAPON:
-			if (wh < MAXWEAPONS) {
+		case d.WEAPON:
+			if (wh < d.MAXWEAPONS) {
 				worth = w_magic[wh].mi_worth;
 				worth *= (2 + (4 * obj.o_hplus + 4 * obj.o_dplus));
 			}
 		break;
-		case ARMOR:
-			if (wh < MAXARMORS) {
+		case d.ARMOR:
+			if (wh < d.MAXARMORS) {
 				worth = a_magic[wh].mi_worth;
 				worth *= (1 + (10 * (armors[wh].a_class - obj.o_ac)));
 			}
 		break;
-		case SCROLL:
-			if (wh < MAXSCROLLS)
+		case d.SCROLL:
+			if (wh < d.MAXSCROLLS)
 				worth = s_magic[wh].mi_worth;
 		break;
-		case POTION:
-			if (wh < MAXPOTIONS)
+		case d.POTION:
+			if (wh < d.MAXPOTIONS)
 				worth = p_magic[wh].mi_worth;
 		break;
-		case RING:
-			if (wh < MAXRINGS) {
+		case d.RING:
+			if (wh < d.MAXRINGS) {
 				worth = r_magic[wh].mi_worth;
 				if (magring(obj)) {
 					if (obj.o_ac > 0)
@@ -266,13 +293,13 @@ function trader(r){
 				}
 			}
 		break;
-		case STICK:
-			if (wh < MAXSTICKS) {
+		case d.STICK:
+			if (wh < d.MAXSTICKS) {
 				worth = ws_magic[wh].mi_worth;
 				worth += 20 * obj.o_charges;
 			}
 		break;
-		case AMULET:
+		case d.AMULET:
 			worth = 1000;
 		break;
 		default:
@@ -280,9 +307,9 @@ function trader(r){
 		}
 		if (worth < 0)
 			worth = 0;
-		if (o_on(obj, ISPROT))		/* 300% more for protected */
+		if (o_on(obj, d.ISPROT))		/* 300% more for protected */
 			worth *= 3;
-		if (o_on(obj, ISBLESS))		/* 50% more for blessed */
+		if (o_on(obj, d.ISBLESS))		/* 50% more for blessed */
 			worth = worth * 3 / 2;
 		return worth;
 	}
@@ -293,8 +320,8 @@ function trader(r){
 	*/
 	function trans_line()
 	{
-		sprintf(prbuf,"You have %d transactions remaining.",MAXPURCH-trader);
-		mvwaddstr(cw, LINES - 4, 0, prbuf);
+		let prbuf = `You have ${d.MAXPURCH-trader} transactions remaining.`;
+		r.UI.mvwaddstr(cw, d.LINES - 4, 0, prbuf);
 	}
 
 	/*
@@ -303,89 +330,111 @@ function trader(r){
 	*/
 	this.do_maze = function()
 	{
+		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
+		const add_mon = r.dungeon.rooms_f.add_mon;
+		const GOLDCALC = ()=>{ return (r.rnd(50 + 10 * r.dungeon.level) + 2) };		
+
 		let tp; //struct coord tp;
 		let i, least;
 		let rp; //reg struct room *rp;
 		let treas;
 
-		
+		const rooms = r.dungeon.rooms;
+		//for (rp = rooms; rp < rooms[d.MAXROOMS]; rp++) {
 
-		for (rp = rooms; rp < &rooms[MAXROOMS]; rp++) {
-			rp.r_goldval = 0;
-			rp.r_nexits = 0;			/* no exits */
-			rp.r_flags = ISGONE;		/* kill all rooms */
+		for (let i in rooms){
+		//for (rp = rooms; rp < r.dungeon.rooms[d.MAXROOMS]; rp++) {
+			rooms[i].r_goldval = 0;
+			rooms[i].r_nexits = 0;			/* no exits */
+			rooms[i].r_flags = d.ISGONE;		/* kill all rooms */
 		}
-		rp = &rooms[0];					/* point to only room */
-		rp.r_flags = ISDARK;			/* mazes always dark */
+		rp = r.dungeon.rooms[0];					/* point to only room */
+		rp.r_flags = d.ISDARK;			/* mazes always dark */
 		rp.r_pos.x = 0;				/* room fills whole screen */
 		rp.r_pos.y = 1;
-		rp.r_max.x = COLS - 1;
-		rp.r_max.y = LINES - 2;
-		rp.r_goldval = 500 + (rnd(10) + 1) * GOLDCALC;
+		rp.r_max.x = d.COLS - 1;
+		rp.r_max.y = d.LINES - 2;
+		rp.r_goldval = 500 + (r.rnd(10) + 1) * GOLDCALC();
 		draw_maze();				/* put maze into window */
-		rp.r_gold = *rnd_pos(rp);
-		mvaddch(rp.r_gold.y, rp.r_gold.x, GOLD);
-		if (rnd(100) < 3) {			/* 3% for treasure maze level */
+		rp.r_gold = rnd_pos(rp);
+		r.UI.mvaddch(rp.r_gold.y, rp.r_gold.x, d.GOLD);
+		if (r.rnd(100) < 3) {			/* 3% for treasure maze level */
 			treas = true;
 			least = 6;
-			rp.r_flags |= ISTREAS;
+			rp.r_flags |= d.ISTREAS;
 		}
 		else {						/* normal maze level */
 			least = 1;
 			treas = false;
 		}
-		for (i = 0; i < level + least; i++)
-			if (treas || rnd(100) < 50)		/* put in some little buggers */
+		for (i = 0; i < r.dungeon.level + least; i++)
+			if (treas || r.rnd(100) < 50)		/* put in some little buggers */
 				add_mon(rp, treas);
+
+		//console.log(bm);
+		//console.log(fm);
 	}
 
-	struct cell {
-		char y_pos;
-		char x_pos;
+	class cell {
+		y_pos;
+		x_pos;
 	};
-	struct bordercells {
-		char num_pos;			/* number of frontier cells next to you */
-		struct cell conn[4];	/* the y,x position of above cell */
-	} mborder;
+	class bordercells {
+		num_pos;			/* number of frontier cells next to you */
+		conn;//struct cell conn[4];	/* the y,x position of above cell */
+		constructor(){
+			this.conn = [];
+			for (let i=0; i<4; i++){
+				this.conn[i] = new cell();
+			}
+		}
+	};
 
-	char *frontier, *bits;
-	char *moffset(), *foffset();
-	int tlines, tcols;
-
+	let mborder = new bordercells();
+	let frontier, bits;//*frontier, *bits;
+	//char *moffset(), *foffset();
+	let tlines, tcols;
+	let bm, fm; //ALLOC buuffer
 	/*
 	* draw_maze:
 	*	Generate and draw the maze on the screen
 	*/
 	function draw_maze()
 	{
-		reg int i, j, more;
-		reg char *ptr;
+	    const ALLOC = (x) =>{const arr = []; for (let i=0; i<x; i++) arr[i]=true; return arr;} // malloc((unsigned int) x)
 
-		tlines = (LINES - 3) / 2;
-		tcols = (COLS - 1) / 2;
-		bits = ALLOC((LINES - 3) * (COLS - 1));
-		frontier = ALLOC(tlines * tcols);
-		ptr = frontier;
+		let  i, j, more;
+		let  ptr;
+
+		tlines = Math.floor((d.LINES - 3) / 2);
+		tcols = Math.floor((d.COLS - 1) / 2);
+		bm = ALLOC((d.LINES - 3) * (d.COLS - 1));
+		fm = ALLOC(tlines * tcols)
+
+		bits = 0;//bits = ALLOC((LINES - 3) * (COLS - 1));
+		frontier = 0;//frontier = ALLOC(tlines * tcols);
+		ptr = 0;//ptr = frontier;
 		while (ptr < (frontier + (tlines * tcols)))
-			*ptr++ = true;
-		for (i = 0; i < LINES - 3; i++) {
-			for (j = 0; j < COLS - 1; j++) {
-				if (i % 2 == 1 && j % 2 == 1)
-					*moffset(i, j) = false;		/* floor */
+			fm[ptr++] = true;  
+		for (i = 0; i < d.LINES - 3; i++) {
+			for (j = 0; j < d.COLS - 1; j++) {
+				if ((i % 2 == 1) && (j % 2 == 1))
+					bm[moffset(i, j)] = false;		/* floor */
 				else
-					*moffset(i, j) = true;		/* wall */
+					bm[moffset(i, j)] = true;		/* wall */
 			}
 		}
 		for (i = 0; i < tlines; i++) {
 			for (j = 0; j < tcols; j++) {
-				do
+				do{
 					more = findcells(i,j);
-				while(more != 0);
+					//console.log(`i${i} j${j}`);
+				}while(more != 0);
 			}
 		}
 		crankout();
-		FREE(frontier);
-		FREE(bits);
+		//FREE(frontier);
+		//FREE(bits);
 	}
 
 	/*
@@ -396,9 +445,10 @@ function trader(r){
 	function moffset(y, x)
 	//int y, x;
 	{
-		char *ptr;
+		let ptr;
 
-		ptr = bits + (y * (COLS - 1)) + x;
+		ptr = bits + (y * (d.COLS - 1)) + x;
+		//console.log(`mo${ptr}`);
 		return ptr;
 	}
 
@@ -410,10 +460,13 @@ function trader(r){
 	function foffset(y, x)
 	//int y, x;
 	{
-		char *ptr;
+		let ptr;
 
 		ptr = frontier + (y * tcols) + x;
+
+		//console.log(`fo${ptr}`);
 		return ptr;
+
 	}
 
 	/*
@@ -423,19 +476,19 @@ function trader(r){
 	function findcells(y,x)
 	//int x, y;
 	{
-		reg int rtpos, i;
+		let rtpos, i;
 
-		*foffset(y, x) = false;
+		fm[foffset(y, x)] = false;
 		mborder.num_pos = 0;
 		if (y < tlines - 1) {				/* look below */
-			if (*foffset(y + 1, x)) {
+			if (fm[foffset(y + 1, x)]) {
 				mborder.conn[mborder.num_pos].y_pos = y + 1;
 				mborder.conn[mborder.num_pos].x_pos = x;
 				mborder.num_pos += 1;
 			}
 		}
 		if (y > 0) {						/* look above */
-			if (*foffset(y - 1, x)) {
+			if (fm[foffset(y - 1, x)]) {
 				mborder.conn[mborder.num_pos].y_pos = y - 1;
 				mborder.conn[mborder.num_pos].x_pos = x;
 				mborder.num_pos += 1;
@@ -443,14 +496,14 @@ function trader(r){
 			}
 		}
 		if (x < tcols - 1) {					/* look right */
-			if (*foffset(y, x + 1)) {
+			if (fm[foffset(y, x + 1)]) {
 				mborder.conn[mborder.num_pos].y_pos = y;
 				mborder.conn[mborder.num_pos].x_pos = x + 1;
 				mborder.num_pos += 1;
 			}
 		}
 		if (x > 0) {						/* look left */
-			if (*foffset(y, x - 1)) {
+			if (fm[foffset(y, x - 1)]) {
 				mborder.conn[mborder.num_pos].y_pos = y;
 				mborder.conn[mborder.num_pos].x_pos = x - 1;
 				mborder.num_pos += 1;
@@ -460,9 +513,11 @@ function trader(r){
 		if (mborder.num_pos == 0)			/* no neighbors available */
 			return 0;
 		else {
-			i = rnd(mborder.num_pos);
+			i = r.rnd(mborder.num_pos);
 			rtpos = mborder.num_pos - 1;
 			rmwall(mborder.conn[i].y_pos, mborder.conn[i].x_pos, y, x);
+			//console.log(`mnp${mborder.num_pos} i:${i} conniy:${mborder.conn[i].y_pos} connix:${mborder.conn[i].x_pos} y:${y} x:${x}`);
+
 			return rtpos;
 		}
 	}
@@ -474,13 +529,16 @@ function trader(r){
 	function rmwall(newy, newx, oldy, oldx)
 	//int newy, newx, oldy, oldx;
 	{
-		reg int xdif,ydif;
+		let xdif,ydif;
 		
 		xdif = newx - oldx;
 		ydif = newy - oldy;
 
-		*moffset((oldy * 2) + ydif + 1, (oldx * 2) + xdif + 1) = false;
+		bm[moffset((oldy * 2) + ydif + 1, (oldx * 2) + xdif + 1)] = false;
 		findcells(newy, newx);
+
+		//console.log(`xdif:${xdif} ydif:${ydif} newx:${newx} newy:${newy} oldx:${oldx} oldy:${oldy}`);
+
 	}
 
 	/*
@@ -489,30 +547,34 @@ function trader(r){
 	*/
 	function crankout()
 	{
-		reg int x, y, i;
+		let x, y, i;
+		let wst;
 
-		for (y = 0; y < LINES - 3; y++) {
-			move(y + 1, 0);
-			for (x = 0; x < COLS - 1; x++) {
-				if (*moffset(y, x)) {				/* here is a wall */
-					if (y == 0 || y == LINES - 4)	/* top or bottom line */
-						addch('-');
-					else if (x == 0 || x == COLS - 2)	/* left | right side */
-						addch('|');
+		r.UI.setDsp(d.DSP_MAIN);
+		for (y = 0; y < d.LINES - 3; y++) {
+			r.UI.move(y + 1, 0);
+			wst = "";
+			for (x = 0; x < d.COLS - 1; x++) {
+				if (bm[moffset(y, x)]) {				/* here is a wall */
+					if (y == 0 || y == d.LINES - 4)	/* top or bottom line */
+						wst += "-";//r.UI.addch('-');
+					else if (x == 0 || x == d.COLS - 2)	/* left | right side */
+						wst += "|";//r.UI.addch('|');
 					else if (y % 2 == 0 && x % 2 == 0) {
-						if (*moffset(y, x - 1) || *moffset(y, x + 1))
-							addch('-');
+						if (bm[moffset(y, x - 1)] || bm[moffset(y, x + 1)])
+							wst += "-";//r.UI.addch('-');
 						else
-							addch('|');
+							wst += "|";//r.UI.addch('|');
 					}
 					else if (y % 2 == 0)
-						addch('-');
+						wst += "-";//r.UI.addch('-');
 					else
-						addch('|');
+						wst += "|";//r.UI.addch('|');
 				}
 				else
-					addch(FLOOR);
+					wst += d.FLOOR;//r.UI.addch(d.FLOOR);
 			}
+			r.UI.addch(wst);
 		}
 	}
 }

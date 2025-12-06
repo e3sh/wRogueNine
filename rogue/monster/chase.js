@@ -220,10 +220,10 @@ this.chase = function(r){
 			return(0);				/* if paralyzed or stuck */
 		if ((trp = trap_at(ch_ret.y, ch_ret.x)) != null) {
 			ch = be_trapped(ch_ret, th);
-			if (ch == d.GONER || nlmove) {
+			if (ch == d.GONER || r.nlmove) {
 				if (ch == d.GONER)
 					remove_monster(th.t_pos, mon);
-				nlmove = false;
+				r.nlmove = false;
 				return((ch == d.GONER) ? -1 : 0);
 			}
 		}

@@ -213,7 +213,7 @@ function scrolls(r){
 				struct room *cur_room;
 
 				cur_room = player.t_room;
-				rm = teleport(rndspot, &player);
+				rm = teleport(r.rndspot, &player);
 				if (cur_room != &rooms[rm])
 					s_know[S_TELEP] = true;
 			}

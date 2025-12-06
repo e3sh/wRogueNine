@@ -13,12 +13,11 @@ function UIManager(r, g){
     this.io = new io(r);
     this.command = new command(r);
     this.scene = new scene(r);
+    this.wizatd = new wizard(r);
 
     const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
     const hw = d.DSP_WINDOW;
-
-
 
     //effect
     const sceneC = g.task.read("scene")
@@ -172,7 +171,8 @@ function UIManager(r, g){
     this.wclear =(win) =>{g.console[ win ].clear()};
     this.wmove =(win, y, x)=>{ g.console[ win ].move(x, y); } 
    	this.waddch =(win, ch)=>{ g.console[ win ].printw(ch);};//	VOID(wmove(win,y,x)==ERR?ERR:waddch(win,ch))
-   	this.mvwaddch =(win,y,x,ch)=>{ g.console[ win ].mvprintw(ch, x, y);};//	VOID(wmove(win,y,x)==ERR?ERR:waddch(win,ch))
+   	this.waddstr = this.waddch;
+     this.mvwaddch =(win,y,x,ch)=>{ g.console[ win ].mvprintw(ch, x, y);};//	VOID(wmove(win,y,x)==ERR?ERR:waddch(win,ch))
     
     //this.mvwgetch =(win)=>{ 
     //    let cx = g.console[win].cursor.x;
@@ -275,16 +275,16 @@ function UIManager(r, g){
         let it;//reg struct thing *it;
         let item;//reg struct linked_list *item;
 
-        for (item = mlist; item != null; item = next(item)) {
-            it = THINGPTR(item);
+        for (item = r.dungeon.mlist; item != null; item = f.next(item)) {
+            it = f.THINGPTR(item);
             y = it.t_pos.y;
             x = it.t_pos.x;
-            mvwaddch(cw, y, x, it.t_type);
-            it.t_flags |= ISFOUND;
+            r.UI.mvwaddch(cw, y, x, it.t_type);
+            it.t_flags |= d.ISFOUND;
             if (it.t_type == 'M')			/* if a mimic */
                 it.t_disguise = 'M';		/* give it away */
         }
-        draw(cw);
+        //draw(cw);
     }
 
     /*

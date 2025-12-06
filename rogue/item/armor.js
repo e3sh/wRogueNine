@@ -17,23 +17,31 @@ function armor(r){
 	*/
 	this.wear = function()
 	{
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const waste_time = r.player.misc.waste_time;
+		const setoflg = r.setoflg; 
+		const a_magic = v.a_magic;
+
+		const cur_armor = r.player.get_cur_armor();
+
 		let item; //reg struct linked_list *item;
 		let obj; //reg struct object *obj;
 
 		if (cur_armor != null) {
-			msg("You are already wearing some.");
-			after = false;
+			r.UI.msg("You are already wearing some.");
+			r.after = false;
 			return;
 		}
 		if ((item = get_item("wear", d.ARMOR)) == null)
 			return;
 		obj = OBJPTR(item);
 		if (obj.o_type != d.ARMOR) {
-			msg("You can't wear that.");
+			r.UI.msg("You can't wear that.");
 			return;
 		}
 		waste_time();
-		msg("Wearing %s.", a_magic[obj.o_which].mi_name);
+		r.UI.msg("Wearing %s.", a_magic[obj.o_which].mi_name);
 		cur_armor = obj;
 		setoflg(obj,d.ISKNOW);
 		r.nochange = false;
@@ -46,16 +54,20 @@ function armor(r){
 	*/
 	this.take_off = function()
 	{
+		const dropcheck = r.item.things_f.dropcheck;
+
+		const cur_armor = r.player.get_cur_armor();
+
 		let obj; //reg struct object *obj;
 
 		if ((obj = cur_armor) == null) {
-			msg("Not wearing any armor.");
+			r.UI.msg("Not wearing any armor.");
 			return;
 		}
 		if (!dropcheck(cur_armor))
 			return;
 		cur_armor = null;
-		msg("Was wearing %c) %s",pack_char(obj),inv_name(obj,true));
+		r.UI.msg("Was wearing %c) %s",pack_char(obj),inv_name(obj,true));
 		r.nochange = false;
 	}
 

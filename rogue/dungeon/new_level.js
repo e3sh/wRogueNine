@@ -27,6 +27,8 @@ function new_level(r){
 		const put_things = this.put_things;
 		const rnd_room = this.rnd_room;
 		const light = ()=>{};
+		const do_post = r.dungeon.trader.do_post;
+		const do_maze = r.dungeon.trader.do_maze;
 
 		let i;
 		let ch;
@@ -86,7 +88,7 @@ function new_level(r){
 				if (r.dungeon.ntraps > d.MAXTRAPS)
 					r.dungeon.ntraps = d.MAXTRAPS;
 
-				maxtrp = r.dungeon.traps[r.dungeon.ntraps];
+				//maxtrp = r.dungeon.traps[r.dungeon.ntraps];
 				//for (trp = &traps[0]; trp < maxtrp; trp++)
 				const again =()=>{
 					switch(r.rnd(d.TYPETRAPS + 1))
@@ -121,10 +123,11 @@ function new_level(r){
 					return ch;
 				}
 
-				for (let i in r.dungeon.traps)
+				//for (let i in r.dungeon.traps)
+				for (let i=0; i< r.dungeon.ntraps; i++)
 				{
 					ch = again();
-					trp = r.dungeon.traps[i];
+					trp = new t.trap();//r.dungeon.traps[i];
 
 					trp.tr_flags = 0;
 					traploc = rnd_pos(r.dungeon.rooms[rnd_room()]);
@@ -135,7 +138,7 @@ function new_level(r){
 					if (ch == d.POOL || ch == d.POST)
 						trp.tr_flags |= d.ISFOUND;
 
-					if (ch== d.TELTRAP && r.rnd(100)<20 && trp<maxtrp-1)
+					if (ch== d.TELTRAP && r.rnd(100)<20)// && trp<maxtrp-1)
 					{
 						let newloc; //struct coord newloc;
 
@@ -148,11 +151,15 @@ function new_level(r){
 						r.UI.mvaddch(newloc.y, newloc.x, d.TELTRAP); 
 					}
 					else
-						trp.tr_goto = rndspot;
+						trp.tr_goto = r.rndspot;
+
+					r.dungeon.traps[i] = trp;
 				}
+				console.log(`trap${ch} ${r.dungeon.traps.length}`);
 			}
 		}
 
+		const stairs = r.dungeon.stairs;
 		let hero = r.player.get_hero();
 		do
 		{
@@ -172,7 +179,6 @@ function new_level(r){
 
 		r.UI.comment("new_level");
 	}
-
 
 	/*
 	* rnd_room:

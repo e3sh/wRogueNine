@@ -32,6 +32,7 @@ function DungeonMap(r){
 	this.new_level = new new_level(r);
 	this.passage = new passage(r);
 	this.rooms_f = new room(r)
+	this.trader = new trader(r);
 
 	r.UI.comment("dungeon");
 

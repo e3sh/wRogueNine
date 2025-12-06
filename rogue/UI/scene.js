@@ -131,12 +131,14 @@ function scene(r){
 		if (ki.includes("Enter")    || ki.includes("NumpadEnter")||
             ki.includes("Numpad0")  || ki.includes("KeyD")
         ){
+            console.log(purpose);
             //selectReturn
             r.player.set_dest(curItem(cur));
             r.UI.io.status();
             r.UI.overlapview(false);
             r.setScene(0);
         }
+       
         //escape
 		if (ki.includes("Numpad4")  || ki.includes("Numpad6")   ||
 			ki.includes("ArrowLeft")|| ki.includes("ArrowRight")||

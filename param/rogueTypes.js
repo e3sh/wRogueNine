@@ -110,7 +110,7 @@ function rogueTypes(r){
         trap: class{
             tr_pos;//: {x:0,y:0},	/* Where trap is */
             tr_goto;//: {x:0,y:0},	/* where trap tranports to (if any) */
-            itr_flags;//: 0,			/* Info about trap */
+            tr_flags;//: 0,			/* Info about trap */
             tr_type;//: "",			/* What kind of trap */
         },
 

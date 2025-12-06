@@ -312,6 +312,8 @@
 	//bool winner;
 	//char *howso;
 	{
+		const get_worth = r.dungeon.trader.get_worth;
+
 		let iname;
 		let cnt, worth, ch;
 		let item; //reg struct linked_list *item;

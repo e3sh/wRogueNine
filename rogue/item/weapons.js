@@ -24,7 +24,7 @@ function weapons(r){
 		const get_item = get_item;
 		const OBJPTR = f.OBJPTR;
 		const dropcheck = r.item.things_f.dropcheck;
-		const is_current = is_current
+		const is_current = r.player.misc.is_current;
 
 		let obj, nowwield; //reg struct object *obj, *nowwield;
 		let item, nitem; //reg struct linked_list *item, *nitem;
@@ -233,6 +233,15 @@ function weapons(r){
 	*/
 	this.wield = function()
 	{
+		const dropcheck = r.item.things_f.dropcheck;
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const is_current =r.player.misc.is_current;
+
+		const inv_name = r.item.things_f.inv_name;
+
+		const cur_weapon = r.player.get_cur_weapon();
+
 		let item;//reg struct linked_list *item;
 		let obj, oweapon; //reg struct object *obj, *oweapon;
 
@@ -246,11 +255,11 @@ function weapons(r){
 			return;
 		obj = OBJPTR(item);
 		if (is_current(obj)) {
-			after = false;
+			r.after = false;
 			return;
 		}
-		msg(`Wielding ${inv_name(obj, true)}`);
-		cur_weapon = obj;
+		r.UI.msg(`Wielding ${inv_name(obj, true)}`);
+		r.player.set_cur_weapon(obj);
 	}
 
 	/*

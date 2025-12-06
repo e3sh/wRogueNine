@@ -59,7 +59,9 @@ function GameManager(g){
     
     this.curprice = -1;     /* current price of item */
 	this.inpool = false;    /* true if hero standing in pool */
-    nlmove = false;		/* true when transported to new level */
+    this.nlmove = false;	/* true when transported to new level */
+
+    this.cutpurch; /* name of item ready to buy */
     
     let entities = [];
     this.entity = entities;
@@ -312,7 +314,7 @@ function GameManager(g){
         initscr();			/* Start up cursor package */
         //setup();
 
-        new_level(d.NORMLEV);
+        new_level(d.NORMLEV);// POSTLEV MAZELEV NORMLEV
 
         /* Start up daemons and fuses */
 
