@@ -54,7 +54,7 @@ function battle(r){
 			r.UI.mvaddch(mp.y, mp.x, d.FLOOR);
 			r.UI.mvwaddch(mw, mp.y, mp.x, ' ');
 			look(false);
-			r.UI.msg("That monster must have been an illusion.");
+			r.UI.msg( ms.FIGHT_1 );
 			return 0;
 		}
 		tp = THINGPTR(item);
@@ -70,7 +70,7 @@ function battle(r){
 		* Let him know it was really a mimic (if it was one).
 		*/
 		if(tp.t_type == 'M' && tp.t_disguise != 'M' && pl_off(d.ISBLIND)) {
-			r.UI.msg("Wait! That's a mimic!");
+			r.UI.msg( ms.FIGHT_2 );
 			tp.t_disguise = 'M';
 			did_hit = thrown;
 		}
@@ -79,7 +79,7 @@ function battle(r){
 
 			did_hit = false;
 			if (pl_on(d.ISBLIND))
-				mname = "it";
+				mname = ms.BATTLE_IT;
 			else
 				mname = monsters[tp.t_indx].m_name;
 			/*
@@ -97,8 +97,8 @@ function battle(r){
 				else
 					hit(null);
 				if (pl_on(d.CANHUH)) {
-					r.UI.msg("Your hands stop glowing red");
-					r.UI.msg(`The ${mname} appears confused.`);
+					r.UI.msg( ms.FIGHT_3 );
+					r.UI.msg( ms.FIGHT_4(mname) );
 					tp.t_flags |= d.ISHUH;
 					player.t_flags &= ~d.CANHUH;
 					/*
@@ -115,7 +115,7 @@ function battle(r){
 					if (r.levtype != d.MAZELEV && tp.t_room != null &&
 					!rf_on(tp.t_room, d.ISTREAS)) {
 						tp.t_flags |= d.ISWOUND;
-						r.UI.msg(`You wounded ${prname(mname,false)}`);
+						r.UI.msg( ms.FIGHT_5(prname(mname,false)) );
 						unhold(tp.t_type);
 					}
 				}
@@ -187,12 +187,12 @@ function battle(r){
 		if (mp.t_type == 'M' && pl_off(d.ISBLIND))
 			mp.t_disguise = 'M';
 		if (pl_on(d.ISBLIND))
-			mname = "it";
+			mname = ms.BATTLE_IT;
 		else
 			mname = monsters[mp.t_indx].m_name;
 		if (roll_em(mp.t_stats, him, null, false)) {
 			if (pl_on(d.ISINVINC)) {
-				r.UI.msg(`${prname(mname,true)} does not harm you.`);
+				r.UI.msg( ms.ATTACK_1(prname(mname,true)) );
 			}
 			else {
 				r.nochange = false;
@@ -207,7 +207,7 @@ function battle(r){
 					switch (mp.t_type) {
 					case 'R':
 						if (hurt_armor(cur_armor)) {
-							r.UI.msg("Your armor weakens.");
+							r.UI.msg( ms.ATTACK_R );
 							cur_armor.o_ac++;
 						}
 
@@ -218,14 +218,14 @@ function battle(r){
 					*/
 						if (pl_off(d.ISBLIND) && player.t_nocmd <= 0) {
 							player.t_nocmd = r.rnd(16) + 25;
-							r.UI.msg("You are transfixed.");
+							r.UI.msg( ms.ATTACK_E );
 						}
 					break;
 					case 'Q':
 						if (!save(d.VS_POISON) && !iswearing(d.R_SUSAB)) {
 							if (him.s_ef.a_dex > d.MINABIL) {
 								chg_abil(d.DEX, -1, true);
-								r.UI.msg("You feel less agile.");
+								r.UI.msg( ms.ATTACK_Q );
 							}
 						}
 					break;
@@ -234,18 +234,18 @@ function battle(r){
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
 								if (r.levcount > 0) {
 									chg_abil(d.STR, -1, true);
-									r.UI.msg("A sting has weakened you");
+									r.UI.msg( ms.ATTACK_A1 );
 								}
 							}
 							else
-								r.UI.msg("Sting has no effect.");
+								r.UI.msg( ms.ATTACK_A2 );
 						}
 					break;
 					case 'W':
 						if (r.rnd(100) < 15 && !iswearing(d.R_SUSAB)) {
 							if (him.s_exp <= 0)
 								death(mp.t_indx);
-							r.UI.msg("You suddenly feel weaker.");
+							r.UI.msg( ms.ATTACK_W );
 							if (--him.s_lvl == 0) {
 								him.s_exp = 0;
 								him.s_lvl = 1;
@@ -271,7 +271,7 @@ function battle(r){
 						if (purse < 0)
 							purse = 0;
 						if (purse != lastpurse)
-							r.UI.msg("Your purse feels lighter.");
+							r.UI.msg( ms.ATTACK_L );
 						lep = find_mons(mp.t_pos.y,mp.t_pos.x);
 						if (lep != null)
 						{
@@ -310,7 +310,7 @@ function battle(r){
 									remove_monster(mp.t_pos, nym);
 									mp = null;
 								}
-								r.UI.msg(`She stole ${inv_name(sobj, true)}!`);
+								r.UI.msg( ms.ATTACK_N(inv_name(sobj, true)) );
 								r.player_set_pack(r.detach(r.player.get_pack(), steal));
 								r.discard(steal);
 								cur_null(sobj);
@@ -321,9 +321,9 @@ function battle(r){
 					break;
 					case 'c':
 						if (!save(d.VS_PETRIFICATION)) {
-							r.UI.msg("Your body begins to solidify.");
-							r.UI.msg("You are turned to stone !!! --More--");
-							wait_for(cw, ' ');
+							r.UI.msg( ms.ATTACK_c1 );
+							r.UI.msg( ms.ATTACK_c2 );
+							//wait_for(cw, ' ');
 							death(mp.t_indx);
 						}
 					break;
@@ -332,7 +332,7 @@ function battle(r){
 							player.t_flags |= d.ISHELD;
 						if (!save(d.VS_POISON)) {
 							if (iswearing(d.R_SUSAB) || iswearing(d.R_SUSTSTR))
-								r.UI.msg("Sting has no effect.");
+								r.UI.msg( ms.ATTACK_d1 );
 							else {
 								let fewer, ostr;
 
@@ -343,26 +343,26 @@ function battle(r){
 									fewer = ostr - herostr();
 									fuse(rchg_str, fewer - 1, 10);
 								}
-								r.UI.msg("You feel weaker now.");
+								r.UI.msg( ms.ATTACK_d2 );
 							}
 						}
 					break;
 					case 'g':
 						if (!save(d.VS_BREATH) && !iswearing(d.R_BREATH)) {
-							r.UI.msg("You feel singed.");
+							r.UI.msg( ms.ATTACK_g );
 							chg_hpt(-r.roll(1,8),false,mp.t_indx);
 						}
 					break;
 					case 'h':
 						if (!save(d.VS_BREATH) && !iswearing(d.R_BREATH)) {
-							r.UI.msg("You are seared.");
+							r.UI.msg( ms.ATTACK_h );
 							chg_hpt(-r.roll(1,4),false,mp.t_indx);
 						}
 					break;
 					case 'p':
 						if (!save(d.VS_POISON) && herostr() > d.MINABIL) {
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
-								r.UI.msg("You are gnawed.");
+								r.UI.msg( ms.ATTACK_p );
 								chg_abil(d.STR,-1,true);
 							}
 						}
@@ -370,15 +370,15 @@ function battle(r){
 					case 'u':
 						if (!save(d.VS_POISON) && herostr() > d.MINABIL) {
 							if (!iswearing(d.R_SUSTSTR) && !iswearing(d.R_SUSAB)) {
-								r.UI.msg("You are bitten.");
+								r.UI.msg( ms.ATTACK_u );
 								chg_abil(d.STR, -1, true);
-								fuse(rchg_str, 1, roll(5,10));
+								fuse(rchg_str, 1, r.roll(5,10));
 							}
 						}
 					break;
 					case 'w':
 						if (!save(d.VS_POISON) && !iswearing(d.R_SUSAB)) {
-							r.UI.msg("You feel devitalized.");
+							r.UI.msg( ms.ATTACK_w );
 							chg_hpt(-1,true,mp.t_indx);
 						}
 					break;
@@ -387,7 +387,7 @@ function battle(r){
 							if (pl_on(d.ISSLOW))
 								lengthen(notslow,r.roll(3,10));
 							else {
-								r.UI.msg("You feel impaired.");
+								r.UI.msg( ms.ATTACK_i );
 								player.t_flags |= d.ISSLOW;
 								fuse(notslow,true,r.roll(5,10));
 							}
@@ -455,7 +455,7 @@ function battle(r){
 			him.s_maxhp += add;
 			if ((him.s_hpt += add) > him.s_maxhp)
 				him.s_hpt = him.s_maxhp;
-			r.UI.msg(`Welcome to level ${lev}`);
+			r.UI.msg( ms.CHECKLVL(lev) );
 		}
 		him.s_lvl = lev;
 		r.player.set_him(him);
@@ -616,12 +616,11 @@ function battle(r){
 
 		tbuf = '';
 		if (who == null)
-			tbuf = "you"; 
+			tbuf = ms.PRNAME_1; 
 		else if (r.player.pl_on(d.ISBLIND))
-			tbuf = "it";
+			tbuf = ms.BATTLE_IT;
 		else {
-			tbuf = "the ";
-			tbuf += who;
+			tbuf = ms.PRNAME_2(who);
 		}
 		if (upper)
 			tbuf = f.toupper(tbuf);
@@ -635,7 +634,7 @@ function battle(r){
 	function hit(er)
 	//char *er;
 	{
-		r.UI.msg(`${prname(er, true)} hit.`);
+		r.UI.msg( ms.HIT(prname(er, true)) );
 	}
 
 
@@ -646,7 +645,7 @@ function battle(r){
 	function miss(er)
 	//char *er;
 	{
-		r.UI.msg(`${prname(er, true)} miss${(er == 0 ? "":"es")}.`);
+		r.UI.msg( ms.MISS(prname(er, true), (er == 0 ? "":"es")) );
 	}
 
 
@@ -705,9 +704,9 @@ function battle(r){
 		const w_magic = v.w_magic;
 
 		if (weap.o_type == d.WEAPON)
-			r.UI.msg(`The ${w_magic[weap.o_which].mi_name} hits the ${mname}.`);
+			r.UI.msg( ms.THUNK_1(w_magic[weap.o_which].mi_name, mname) );
 		else
-			r.UI.msg(`You hit the ${mname}.`);
+			r.UI.msg( ms.THUNK_2(mname) );
 	}
 
 
@@ -722,9 +721,9 @@ function battle(r){
 		const w_magic = v.w_magic;
 
 		if (weap.o_type == d.WEAPON)
-			r.UI.msg(`The ${w_magic[weap.o_which]} misses the ${mname}.`);
+			r.UI.msg( ms.BOUNCE_1(w_magic[weap.o_which], mname) );
 		else
-			r.UI.msg(`You missed the ${mname}.`);
+			r.UI.msg( ms.BOUNCE_2(mname) );
 	}
 
 
@@ -807,11 +806,11 @@ function battle(r){
 		tp = f.THINGPTR(item);
 		here = tp.t_pos;
 		if (pr) {
-			r.UI.addmsg("Defeated ");
+			//r.UI.addmsg("Defeated ");
 			if (pl_on(d.ISBLIND))
-				r.UI.msg("it.");
+				r.UI.msg( ms.KILLED_1);
 			else
-				r.UI.msg(`${monsters[tp.t_indx].m_name}.` );
+				r.UI.msg( ms.KILLED_2(monsters[tp.t_indx].m_name) );
 		}
 		him.s_exp += tp.t_stats.s_exp;
 		r.isfight = false;

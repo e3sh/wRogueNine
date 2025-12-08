@@ -36,7 +36,7 @@ const w = [
         r + "item/rings.js",
         r + "item/things.js",
         r + "item/pack.js",
-    //    r + "item/potions.js",
+        r + "item/potions.js",
         r + "item/weapons.js",
         r + "item/armor.js",
     //    r + "item/scrolls.js",

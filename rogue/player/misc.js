@@ -36,7 +36,7 @@ function misc(r){
 	*/
 	this.waste_time = ()=>
 	{
-		const do_daemons = r.daemon.do_daemon;
+		const do_daemons = r.daemon.do_daemons;
 		const do_fuses = r.daemon.do_fuses;
 		const get_inwhgt = r.player.misc.get_inwhgt;
 		

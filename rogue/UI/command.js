@@ -243,11 +243,12 @@ function command(r){
 		if (ki.includes("Numpad5")){
 			//if (typeof(ch) == "string")
 			//ch = ch.toUpperCase();
+			if (winat(hero.y, hero.x) == d.STAIRS)
+					ch = r.amulet?"<":">"; //u_level/d_level	
+			else 
 			if (r.levtype != d.POSTLEV || !market()){
 				if (winat(hero.y, hero.x) != d.STAIRS)
 					ch = "s"; //search
-				else 
-					ch = r.amulet?"<":">"; //u_level/d_level	
 			}else{
 				ch = "#"; //buy_it
 			}
@@ -577,11 +578,11 @@ function command(r){
 				}
 				break;
 				default:
-					msg(illegal(unctrl(ch)));
+					r.UI.comment(illegal(unctrl(ch)));
 					r.count = 0;
 			}
 			else {
-				msg(illegal(unctrl(ch)));
+				r.UI.comment(illegal(unctrl(ch)));
 				r.count = 0;
 			}
 		}
@@ -686,7 +687,7 @@ function command(r){
 					if (r.rnd(100) < (him.s_lvl * 4 + herowis() * 5)) {
 						r.UI.mvaddch(y, x, d.DOOR);
 						r.count = 0;
-						r.UI.setEffect("door",{x:x,y:y},{x:x,y:y-1},90);
+						r.UI.setEffect("door",{x:x,y:y},{x:x,y:y-1},120);
 					}
 				}
 			}

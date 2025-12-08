@@ -26,7 +26,7 @@ function new_level(r){
 		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
 		const put_things = this.put_things;
 		const rnd_room = this.rnd_room;
-		const light = ()=>{};
+		const light = r.player.move.light;
 		const do_post = r.dungeon.trader.do_post;
 		const do_maze = r.dungeon.trader.do_maze;
 

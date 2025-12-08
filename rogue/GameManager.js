@@ -5,7 +5,8 @@ function GameManager(g){
     const t = rogueTypes();
     const v = {};//globalValiableInit();
 
-    const ms = rogueMessage(this);
+    //const ms = rogueMessage(this);
+    const ms = rogueMessage_jp(this);
 
     //props
 
@@ -315,6 +316,7 @@ function GameManager(g){
         //setup();
 
         new_level(d.NORMLEV);// POSTLEV MAZELEV NORMLEV
+        //new_level(d.POSTLEV);
 
         /* Start up daemons and fuses */
 

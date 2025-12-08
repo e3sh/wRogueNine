@@ -455,7 +455,7 @@ function move(r){
 			case d.MAZETRAP:
 				if (ishero) {
 					r.nlmove = true;
-					level += 1;
+					r.dungeon.level += 1;
 					new_level(d.MAZELEV);
 					r.UI.msg("You are surrounded by twisty passages!");
 				}

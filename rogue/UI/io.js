@@ -92,7 +92,7 @@ function io(r){
 		r.UI.setDsp(d.DSP_STATUS);
 		r.UI.clear();
 		r.UI.mvaddstr(1, 0,
-			`Str: ${stef.a_str}(${(stre.a_str < stmx.a_str)?"*":" "}${stre.a_str})` //%2d(%c%2d)", stef.a_str, ch, stre.a_str);
+			`Str: ${stef.a_str}(${(stre.a_str < stmx.a_str)?"*":""}${stre.a_str})` //%2d(%c%2d)", stef.a_str, ch, stre.a_str);
 		);
 		//pb = &buf[strlen(buf)];
 		//if (stre.a_dex < stmx.a_dex)
@@ -100,7 +100,7 @@ function io(r){
 		//else
 		//	ch = ' ';
 		r.UI.mvaddstr(1, 13,
-			`Dex: ${stef.a_dex}(${(stre.a_dex < stmx.a_dex)?"*":" "}${stre.a_dex})` //%2d(%c%2d)", stef.a_dex, ch, stre.a_dex);
+			`Dex: ${stef.a_dex}(${(stre.a_dex < stmx.a_dex)?"*":""}${stre.a_dex})` //%2d(%c%2d)", stef.a_dex, ch, stre.a_dex);
 		);
 		//pb = &buf[strlen(buf)];
 		//if (stre.a_wis < stmx.a_wis)
@@ -108,7 +108,7 @@ function io(r){
 		//else
 		//	ch = ' ';
 		r.UI.mvaddstr(1, 26,
-			`Wis: ${stef.a_wis}(${(stre.a_wis < stmx.a_wis)?"*":" "}${stre.a_wis})`//%2d(%c%2d)", stef.a_wis, ch, stre.a_wis);
+			`Wis: ${stef.a_wis}(${(stre.a_wis < stmx.a_wis)?"*":""}${stre.a_wis})`//%2d(%c%2d)", stef.a_wis, ch, stre.a_wis);
 		);
 		//pb = &buf[strlen(buf)];
 		//if (stre.a_con < stmx.a_con)
@@ -116,7 +116,7 @@ function io(r){
 		//else
 		//	ch = ' ';
 		r.UI.mvaddstr(1, 39,
-			`Con: ${stef.a_con}(${(stre.a_con < stmx.a_con)?"*":" "}${stre.a_con})`//%2d(%c%2d)", stef.a_con, ch, stre.a_con);
+			`Con: ${stef.a_con}(${(stre.a_con < stmx.a_con)?"*":""}${stre.a_con})`//%2d(%c%2d)", stef.a_con, ch, stre.a_con);
 		);
 		//pb = &buf[strlen(buf)];
 		r.UI.mvaddstr(1, 52,
@@ -136,7 +136,7 @@ function io(r){
 
 		carwght = Math.floor((r.packvol * 100) / d.V_PACK);
 		//pb = &buf[strlen(buf)];
-		r.UI.mvaddstr(0, 65,`Vol: ${carwght}`);//%3d%%", carwght);
+		r.UI.mvaddstr(0, 65,`Vol: ${carwght}%`);//%3d%%", carwght);
 		//mvwaddstr(cw, LINES - 2, 0, buf);
 		//r.UI.mvaddstr(1, 65, `.${hungstr[r.player.hungry_state]}`);
 		//waddstr(cw, hungstr[hungry_state]);
@@ -162,7 +162,7 @@ function io(r){
 		const dest = r.player.get_dest();
 
 		const wname = (cur_weapon != null)? inv_name(cur_weapon, false):"-";
-		const aname = (cur_weapon != null)? inv_name(cur_armor , false):"-";
+		const aname = (cur_armor != null)? inv_name(cur_armor , false):"-";
 		const rlname = (cur_ring[d.LEFT] != null) ? inv_name(cur_ring[d.LEFT] , false):"";
 		const rrname = (cur_ring[d.RIGHT] != null)? inv_name(cur_ring[d.RIGHT], false):"";
 		const selname = (select != null)? `SEL) ${inv_name(select, false)}`:"";

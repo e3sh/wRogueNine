@@ -70,9 +70,9 @@ function trader(r){
 		r.UI.wmove(cw,12,0);
 		r.UI.mvwaddch(cw,12, 0, "Welcome to Friendly Fiend's Flea Market");
 		r.UI.mvwaddch(cw,13, 0, "=======================================");
-		r.UI.mvwaddch(cw,14, 0, "$: Prices object that you stand upon.");
-		r.UI.mvwaddch(cw,15, 0, "#: Buys the object that you stand upon.");
-		r.UI.mvwaddch(cw,16, 0, "%: Trades in something in your pack for gold.");
+		r.UI.mvwaddch(cw,14, 0, "Auto: Prices object that you stand upon.");
+		r.UI.mvwaddch(cw,15, 0, "5(A): Buys the object that you stand upon.");
+		r.UI.mvwaddch(cw,16, 0, "D(Y): Trades in something in your pack for gold.");
 		trans_line();
 	}
 
@@ -89,9 +89,9 @@ function trader(r){
 		const hero = r.player.get_hero();
 
 		const  bargain = [
-			"great bargain",
-			"quality product",
-			"exceptional find",
+			ms.BARGAIN_1,
+			ms.BARGAIN_2,
+			ms.BARGAIN_3,
 		];
 		let item; //reg struct linked_list *item;
 		let obj; //reg struct object *obj;
@@ -111,7 +111,8 @@ function trader(r){
 			r.curprice = worth;					/* save price */
 			r.curpurch = obj.o_typname;	/* save item */
 		}
-		r.UI.msg(`That ${r.curpurch} is a ${bargain[r.rnd(3)]} for only ${r.curprice} pieces of gold`);
+		r.UI.msg( ms.PRICEIT(r.curpurch ,bargain[r.rnd(3)] ,r.curprice) );
+		//r.UI.setEffect(`${r.curprice}`,{x:hero.x,y:hero.y},{x:hero.x,y:hero.y-1},120);
 		return true;
 	}
 
@@ -127,27 +128,27 @@ function trader(r){
 		let  wh;
 
 		if (r.player.purse <= 0) {
-			r.UI.msg("You have no money.");
+			r.UI.msg( ms.BUYIT_1 );
 			return;
 		}
 		if (r.curprice < 0) {		/* if not yet priced */
 			wh = price_it();
 			if (!wh)			/* nothing to price */
 				return;
-			r.UI.msg("Do you want to buy it? ");
-			do {
-				wh = readchar();
-				if (isupper(wh))
-					wh = tolower(wh);
-				if (wh == d.ESCAPE || wh == 'n') {
-					r.UI.msg("");
-					return;
-				}
-			} while(wh != 'y');
+			//r.UI.msg("Do you want to buy it? ");
+			//do {
+			//	wh = readchar();
+			//	if (isupper(wh))
+			//		wh = tolower(wh);
+			//	if (wh == d.ESCAPE || wh == 'n') {
+			//		r.UI.msg("");
+			//		return;
+			//	}
+			//} while(wh != 'y');
 		}
 		//mpos = 0;
 		if (r.curprice > r.player.purse) {
-			r.UI.msg(`You can't afford to buy that ${r.curpurch} !`);
+			r.UI.msg( ms.BUYIT_2(r.curpurch) );
 			return;
 		}
 		/*
@@ -160,7 +161,10 @@ function trader(r){
 		*/
 		//mpos = 0;
 		wh = add_pack(null,false);	/* try to put it in his pack */
-		if (wh) {					/* he could get it */
+		if (wh) {/* he could get it */
+			const hero = r.player.get_hero();
+			r.UI.setEffect("buy",{x:hero.x,y:hero.y},{x:hero.x,y:hero.y-1},120);
+
 			r.player.purse -= r.curprice;		/* take his money */
 			++trader;				/* another transaction */
 			trans_line();			/* show remaining deals */
@@ -195,12 +199,12 @@ function trader(r){
 		wo = get_worth(obj);
 		if (wo <= 0) {
 			//mpos = 0;
-			r.UI.msg("We don't buy those.");
+			r.UI.msg( ms.SELLIT_1 );
 			return;
 		}
 		if (wo < 25)
 			wo = 25;
-		r.UI.msg(`Your ${obj.o_typname} is worth ${wo} pieces of gold.`);
+		r.UI.msg( ms.SELLIT_2(obj.o_typname, wo) );
 		//r.UI.msg("Do you want to sell it? ");
 		//do {
 		//	ch = readchar();
@@ -212,13 +216,16 @@ function trader(r){
 		//	}
 		//} while (ch != 'y');
 		//mpos = 0;
-		if (drop(item) == true) {		/* drop this item */	
+		if (drop(item) == true) {		/* drop this item */
+			const hero = r.player.get_hero();
+			r.UI.setEffect("sold",{x:hero.x,y:hero.y},{x:hero.x,y:hero.y-1},120);
+
 			r.nochange = false;		/* show gold value */
 			r.player.purse += wo;			/* give him his money */
 			++trader;			/* another transaction */
 			wo = obj.o_count;
 			obj.o_count = 1;
-			r.UI.msg(`Sold ${inv_name(obj,true)}`);
+			r.UI.msg( ms.SELLIT_3(inv_name(obj,true)) );
 			obj.o_count = wo;
 			trans_line();			/* show remaining deals */
 		}
@@ -231,7 +238,7 @@ function trader(r){
 	function open_market()
 	{
 		if (trader >= d.MAXPURCH) {
-			r.UI.msg("The market is closed. The stairs are that-a-way.");
+			r.UI.msg( ms.OP_MARKET );
 			return false;
 		}
 		else
@@ -253,6 +260,7 @@ function trader(r){
 		const r_magic = v.r_magic;
 		const ws_magic = v.ws_magic;
 		const armors = v.armors;
+		const magring = r.item.ring_f.magring;
 
 		let worth, wh;
 
@@ -322,6 +330,7 @@ function trader(r){
 	{
 		let prbuf = `You have ${d.MAXPURCH-trader} transactions remaining.`;
 		r.UI.mvwaddstr(cw, d.LINES - 4, 0, prbuf);
+		r.UI.msg(ms.TRANS_LINE(d.MAXPURCH-trader));
 	}
 
 	/*

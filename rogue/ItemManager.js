@@ -120,7 +120,7 @@ function ItemManager(r){
 	this.pack_f = new pack_f(r);
 	this.weapon_f = new weapons(r);
 	this.armor_f = new armor(r);
-	//this.potion_f = new potions(r);
+	this.potion_f = new potions(r);
 	//this.scroll_f = new scrolls(r);
 	this.ring_f = new rings(r);
 	//this.stick_f = new sticks(r);

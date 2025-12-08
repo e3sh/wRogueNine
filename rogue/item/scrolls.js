@@ -11,6 +11,9 @@ function scrolls(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+    const mw = d.DSP_MAIN_BG;
+
 	/*
 	* read_scroll:
 	*	Let the hero read a scroll
@@ -20,154 +23,182 @@ function scrolls(r){
 		const find_mons = r.monster.chase.find_mons;
 		const look = r.player.misc.look;
 		const del_pack = r.item.pack_f.del_pack;
-		
-		reg struct object *obj;
-		reg struct linked_list *item;
-		reg int i, j, wh;
-		reg char ch, nch;
-		struct room *rp;
-		struct linked_list *titem;
-		char buf[LINLEN];
-		bool bless, curse;
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const o_on = r.o_on;
+		const o_off = r.o_off;
+		const chg_abil = r.player.pstats_f.chg_abil;
+		const light = r.player.move.light;
+		const rf_on = r.dungeon.rooms_f.rf_on;
+		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
+		const THINGPTR = f.THINGPTR;
+		const makemons = r.UI.wizard.makemons;
 
-		if ((item = get_item("read", SCROLL)) == null)
+		const s_know = r.item.s_know;
+		const mtlev = r.monster.mtlev();	
+
+		const player = r.player.get_player();
+		const hero = r.player.get_hero();
+		
+		let obj; //reg struct object *obj;
+		let item; //reg struct linked_list *item;
+		let i, j, wh;
+		let ch, nch;
+		let rp; //struct room *rp;
+		let titem; //struct linked_list *titem;
+		let buf ; //[LINLEN];
+		let bless, curse;
+
+		if ((item = get_item("read", d.SCROLL)) == null)
 			return;
 		obj = OBJPTR(item);
-		if (obj.o_type != SCROLL) {
-			msg("Nothing to read.");
-			after = false;
+		if (obj.o_type != d.SCROLL) {
+			r.UI.msg("Nothing to read.");
+			r.after = false;
 			return;
 		}
-		msg("As you read the scroll, it vanishes.");
+		r.UI.msg("As you read the scroll, it vanishes.");
 		wh = obj.o_which;
-		bless = o_on(obj, ISBLESS);
-		curse = o_on(obj, ISCURSED);
+		bless = o_on(obj, d.ISBLESS);
+		curse = o_on(obj, d.ISCURSED);
 		del_pack(item);		/* Get rid of the thing */
 
 		/*
 		* Calculate the effect it has on the hero
 		*/
 		switch(wh) {
-		case S_KNOWALL:
+		case d.S_KNOWALL:
 			if (!curse) {
 				idenpack();				/* identify all the pack */
-				msg("You feel more knowledgable.");
-				chg_abil(WIS,1,true);
-				s_know[S_KNOWALL] = true;
+				r.UI.msg("You feel more knowledgable.");
+				chg_abil(d.WIS,1,true);
+				s_know[d.S_KNOWALL] = true;
 			}
-		break;case S_CONFUSE:
+		break;
+		case d.S_CONFUSE:
 			if (!curse) {
 				/*
 				* Scroll of monster confusion.  Give him that power.
 				*/
-				msg("Your hands begin to glow red.");
-				player.t_flags |= CANHUH;
-				s_know[S_CONFUSE] = true;
+				r.UI.msg("Your hands begin to glow red.");
+				player.t_flags |= d.CANHUH;
+				s_know[d.S_CONFUSE] = true;
 			}
-		break;case S_LIGHT:
+		break;
+		case d.S_LIGHT:
 			rp = player.t_room;
 			if (!curse) {
 				if (rp == null) {
-					s_know[S_LIGHT] = true;
-					msg("The corridor glows and then fades.");
+					s_know[d.S_LIGHT] = true;
+					r.UI.msg("The corridor glows and then fades.");
 				}
 				else {
-					if (rf_on(rp,ISDARK)) {
-						s_know[S_LIGHT] = true;
-						msg("The room is lit.");
-						rp.r_flags &= ~ISDARK;
+					if (rf_on(rp,d.ISDARK)) {
+						s_know[d.S_LIGHT] = true;
+						r.UI.msg("The room is lit.");
+						rp.r_flags &= ~d.ISDARK;
 					}
-					light(&hero);
-					mvwaddch(cw, hero.y, hero.x, PLAYER);
+					light(hero);
+					r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 				}
 			}
-		break;case S_ARMOR:
+		break;
+		case d.S_ARMOR:
 			if (!curse) {
-				if (cur_armor != null && o_off(cur_armor,ISPROT)) {
-					s_know[S_ARMOR] = true;
-					msg("Your armor glows faintly for a moment.");
-					if (o_on(cur_armor,ISCURSED))
+				const cur_armor = r.player.get_cur_armor();
+				const armors = v.armors
+
+				if (cur_armor != null && o_off(cur_armor,d.ISPROT)) {
+					s_know[d.S_ARMOR] = true;
+					r.UI.msg("Your armor glows faintly for a moment.");
+					if (o_on(cur_armor, d.ISCURSED))
 						cur_armor.o_ac = armors[cur_armor.o_which].a_class;
 					else
 						cur_armor.o_ac--;
-					resoflg(cur_armor,ISCURSED);
+					r.resoflg(cur_armor, d.ISCURSED);
+					r.player.set_cur_armor(cur_armor);
 				}
 			}
-		break;case S_HOLD:
+		break;
+		case d.S_HOLD:
 			if (!curse) {
 				/*
 				* Hold monster scroll.  Stop all monsters within 3 spaces
 				* from chasing after the hero.
 				*/
-				reg int x,y;
-				reg struct linked_list *mon;
+				let x,y;
+				let mon; //reg struct linked_list *mon;
 
 				for (x = hero.x - 3; x <= hero.x + 3; x++) {
 					for (y = hero.y - 3; y <= hero.y + 3; y++) {
-						if (y > 0 && x > 0 && isalpha(mvwinch(mw, y, x))) {
+						if (y > 0 && x > 0 && isalpha(r.UI.mvwinch(mw, y, x))) {
 							if ((mon = find_mons(y, x)) != null) {
-								reg struct thing *th;
+								let th; //reg struct thing *th;
 
 								th = THINGPTR(mon);
-								th.t_flags &= ~ISRUN;
-								th.t_flags |= ISHELD;
-								th.t_flags |= ISSTUCK;
+								th.t_flags &= ~d.ISRUN;
+								th.t_flags |= d.ISHELD;
+								th.t_flags |= d.ISSTUCK;
 							}
 						}
 					}
 				}
 			}
-		break;case S_SLEEP:
+		break;
+		case d.S_SLEEP:
 			/*
 			* Scroll which makes you fall asleep
 			*/
 			if (!bless) {
-				s_know[S_SLEEP] = true;
-				msg("You fall asleep.");
-				player.t_nocmd += 4 + rnd(SLEEPTIME);
+				s_know[d.S_SLEEP] = true;
+				r.UI.msg("You fall asleep.");
+				player.t_nocmd += 4 + r.rnd(d.SLEEPTIME);
 			}
-		break;case S_CREATE:
+		break;
+		case d.S_CREATE:
 			if (!bless) {
-				if (makemons(mtlev[rnd(levcount)].m_show))
-					s_know[S_CREATE] = true;
+				if (makemons(mtlev[r.rnd(r.levcount)].m_show))
+					s_know[d.S_CREATE] = true;
 				else
-					msg("You hear a faint cry of anguish in the distance.");
+					r.UI.msg("You hear a faint cry of anguish in the distance.");
 			}
-		break;case S_IDENT:
+		break;
+		case d.S_IDENT:
 			if (!curse) {
-				msg("This scroll is an identify scroll");
-				s_know[S_IDENT] = true;
+				r.UI.msg("This scroll is an identify scroll");
+				s_know[d.S_IDENT] = true;
 				whatis(null);
 			}
-		break;case S_MAP:
+		break;
+		case d.S_MAP:
 			if (curse)
 				break;
-			s_know[S_MAP] = true;
-			addmsg("Oh, now this scroll has a ");
-			if (rnd(100) < 10 || bless) {
-				addmsg("very detailed map on it.");
-				endmsg();
-				displevl();
+			s_know[d.S_MAP] = true;
+			r.UI.addmsg("Oh, now this scroll has a ");
+			if (r.rnd(100) < 10 || bless) {
+				r.UI.addmsg("very detailed map on it.");
+				r.UI.endmsg();
+				r.UI.displevl();
 			}
 			else {
-				addmsg("map on it.");
-				endmsg();
-				overwrite(stdscr, hw);
-				for (i = 1; i < LINES - 2; i++) {
-					for (j = 0; j < COLS; j++) {
+				r.UI.addmsg("map on it.");
+				r.UI.endmsg();
+				//overwrite(stdscr, hw);
+				for (i = 1; i < d.LINES - 2; i++) {
+					for (j = 0; j < d.COLS; j++) {
 						switch (nch = ch = mvwinch(hw, i, j)) {
-							case SECRETDOOR:
-								nch = DOOR;
+							case d.SECRETDOOR:
+								nch = d.DOOR;
 								mvaddch(i, j, nch);
 							case '-':
 							case '|':
-							case DOOR:
-							case PASSAGE:
+							case d.DOOR:
+							case d.PASSAGE:
 							case ' ':
-							case STAIRS:
+							case d.STAIRS:
 								if (mvwinch(mw, i, j) != ' ') {
-									struct thing *it;
-									struct linked_list *blah;
+									let it;// struct thing *it;
+									let blah; //struct linked_list *blah;
 
 									blah = find_mons(i, j);
 									if (blah != null) {
@@ -184,8 +215,8 @@ function scrolls(r){
 							waddch(hw, nch);
 					}
 				}
-				overlay(cw, hw);
-				overwrite(hw, cw);
+				//overlay(cw, hw);
+				//overwrite(hw, cw);
 			}
 		break;case S_GFIND:
 			if (!curse) {

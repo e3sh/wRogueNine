@@ -256,7 +256,7 @@ function wizard(r){
 	* makemons:
 	*	Make a monster
 	*/
-	function makemons(what)
+	this.makemons = function(what)
 	//int what;
 	{
 		const look = r.player.misc.look;

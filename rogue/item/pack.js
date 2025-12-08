@@ -419,8 +419,8 @@ function pack_f(r){
 	//int type;
 	{
 		const npch = r.UI.io.npch;
-		const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
-		const pack_char = this.pack_char;
+		//const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
+		//const pack_char = this.pack_char;
 		const inv_name = r.item.things_f.inv_name;
 
 		const pack = r.player.get_pack(); 
@@ -481,6 +481,7 @@ function pack_f(r){
 				return savepit;		/* return this item */
 			}
 		}
+		
 		if (r.player.get_dest() != null) {
 			for (pit = pack; pit != null; pit = f.next(pit)) {
 				pob = f.OBJPTR(pit);
@@ -590,6 +591,8 @@ function pack_f(r){
 	*/
 	this.idenpack = function()
 	{
+		const whatis = r.UI.wizard.whatis;
+
 		let pc; //reg struct linked_list *pc;
 
 		for (pc = r.player.get_pack() ; pc != null ; pc = f.next(pc))

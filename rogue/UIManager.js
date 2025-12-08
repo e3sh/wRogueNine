@@ -30,20 +30,20 @@ function UIManager(r, g){
         for (let i=0; i<(2*Math.PI); i+=0.3){
             this.setEffect(asch, {x:x,y:y} ,{x: x+Math.cos(i)*2.5, y: y+Math.sin(i)*2.5});
         }
-        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},90);
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},120);
 
     } 
     this.damageEffect = function(asch, x ,y){
         for (let i=0; i<(2*Math.PI); i+=0.3){
             this.setEffect(asch, {x: x+Math.cos(i)*2, y: y+Math.sin(i)*2}, {x:x,y:y});
         }     
-        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y+1},90);
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y+1},120);
     } 
     this.hitEffect = function(asch, x ,y){
         for (let i=0; i<(2*Math.PI); i+=0.3){
             this.setEffect(asch, {x:x,y:y}, {x: x+Math.cos(i)*1.5, y: y+Math.sin(i)*1.5});
         }        
-        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},90);
+        this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},120);
     } 
 
     //dispaly functions

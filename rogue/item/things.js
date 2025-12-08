@@ -97,7 +97,7 @@ function things_f(r){
 			//sprintf(prbuf, "%s %s%s ", nm, tn, pl);
 			pb = `${nm} ${tn}${pl}`;
 			if (p_know[wh] || o_on(obj, d.ISPOST)) {
-				pb = `of ${p_magic[wh].mi_name}`;
+				pb += `of ${p_magic[wh].mi_name}`;
 				knowit = true;
 				if (p_know[wh]) {
 					pb += `(${p_colors[wh]})`;
@@ -424,7 +424,7 @@ function things_f(r){
 				which = Number(pick_one(mi));
 			}
 		}
-		cur.o_typname = things[whi].mi_name;
+		cur.o_typname = things[whi].mi_name;  //console.log(things[whi].mi_name);
 		cur.o_weight = things[whi].mi_wght;
 		//console.log(`whi:${whi} which:${which} type:${type} `);
 		switch (Number(whi)) {
