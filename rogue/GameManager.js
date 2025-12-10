@@ -5,8 +5,8 @@ function GameManager(g){
     const t = rogueTypes();
     const v = {};//globalValiableInit();
 
-    //const ms = rogueMessage(this);
-    const ms = rogueMessage_jp(this);
+    const ms = rogueMessage(this);
+    //const ms = rogueMessage_jp(this);
 
     //props
 
@@ -71,6 +71,8 @@ function GameManager(g){
 
     const r = this;
 
+    this.qs = new quick_storage(r);
+
     /*
     * sceneChange param initialize
     */
@@ -79,6 +81,7 @@ function GameManager(g){
         1: ()=>{r.UI.scene.keywait();},
         2: ()=>{r.UI.scene.inventry();},
         3: ()=>{r.UI.scene.get_item();},
+        4: ()=>{r.UI.scene.create_obj();},
     }
 
     let SceneFunc;// =  setthis.UI.command();/* Command execution */;
@@ -309,11 +312,30 @@ function GameManager(g){
         const armors = r.globalValiable.armors; 
 
         r.player.fruit = ms.FRUIT;
-        r.UI.msg(ms.MAINSTART);
+        //r.UI.msg(ms.MAINSTART);
 
+        r.dungeon.level = 1;
+
+        r.count = 0;			/* # of times to repeat cmd */
+        r.packvol = 0; 
+        
         init_everything();
         initscr();			/* Start up cursor package */
         //setup();
+
+        let firstinv;
+        if (r.qs.check()){
+            firstinv = false;
+            r.UI.msg("continue game start");
+
+            r.qs.load();
+            //load game
+        }else{
+            firstinv = true;
+            r.UI.msg(ms.MAINSTART);
+            //newGame;
+        }
+        //continue;
 
         new_level(d.NORMLEV);// POSTLEV MAZELEV NORMLEV
         //new_level(d.POSTLEV);
@@ -326,74 +348,80 @@ function GameManager(g){
         daemon(runners, true, d.AFTER);
         fuse(swander, true, d.WANDERTIME);
 
-        /* Give the rogue his weaponry */
+        if (firstinv) {
+            /* Give the rogue his weaponry */
+            let alldone;
+            let gwsc = 0;
+            do {
+                wpt = pick_one(w_magic);
+                switch (Number(wpt))
+                {
+                    case d.MACE:	case d.SWORD:	case d.TWOSWORD:
+                    case d.SPEAR:	case d.TRIDENT:	case d.SPETUM:
+                    case d.BARDICHE:	case d.PIKE:	case d.BASWORD:
+                    case d.HALBERD:
+                        alldone = true;
+                    break;
+                    default:
+                        alldone = false;
+                        //alert(wpt);
+                        gwsc++;
+                }
+            } while(!alldone);
+            if (gwsc) r.UI.comment(`first weapon shuffle: ${gwsc}`);
 
-        let alldone;
-        let gwsc = 0;
-        do {
-            wpt = pick_one(w_magic);
-            switch (Number(wpt))
-            {
-                case d.MACE:	case d.SWORD:	case d.TWOSWORD:
-                case d.SPEAR:	case d.TRIDENT:	case d.SPETUM:
-                case d.BARDICHE:	case d.PIKE:	case d.BASWORD:
-                case d.HALBERD:
-                    alldone = true;
-                break;
-                default:
-                    alldone = false;
-                    //alert(wpt);
-                    gwsc++;
-            }
-        } while(!alldone);
-        if (gwsc) r.UI.comment(`first weapon shuffle: ${gwsc}`);
+            item = new_thing(false, d.WEAPON, wpt);
+            obj = OBJPTR(item);
+            obj.o_hplus = rnd(3);
+            obj.o_dplus = rnd(3);
+            obj.o_flags = d.ISKNOW;
+            add_pack(item, true);
+            r.player.set_cur_weapon(obj);
 
-        item = new_thing(false, d.WEAPON, wpt);
-        obj = OBJPTR(item);
-        obj.o_hplus = rnd(3);
-        obj.o_dplus = rnd(3);
-        obj.o_flags = d.ISKNOW;
-        add_pack(item, true);
-        r.player.set_cur_weapon(obj);
+            /* Now a bow */
 
-        /* Now a bow */
+            item = new_thing(false, d.WEAPON, d.BOW);
+            obj = OBJPTR(item);
+            obj.o_hplus = rnd(3);
+            obj.o_dplus = rnd(3);
+            obj.o_flags = d.ISKNOW;
+            add_pack(item, true);
 
-        item = new_thing(false, d.WEAPON, d.BOW);
-        obj = OBJPTR(item);
-        obj.o_hplus = rnd(3);
-        obj.o_dplus = rnd(3);
-        obj.o_flags = d.ISKNOW;
-        add_pack(item, true);
+            /* Now some arrows */
 
-        /* Now some arrows */
+            item = new_thing(false, d.WEAPON, d.ARROW);
+            obj = OBJPTR(item);
+            obj.o_count = 25 + rnd(15);
+            obj.o_hplus = rnd(2);
+            obj.o_dplus = rnd(2);
+            obj.o_flags = d.ISKNOW;
+            add_pack(item, true);
 
-        item = new_thing(false, d.WEAPON, d.ARROW);
-        obj = OBJPTR(item);
-        obj.o_count = 25 + rnd(15);
-        obj.o_hplus = rnd(2);
-        obj.o_dplus = rnd(2);
-        obj.o_flags = d.ISKNOW;
-        add_pack(item, true);
+            /* And his suit of armor */
 
-        /* And his suit of armor */
+            wpt = pick_one(a_magic);
+            item = new_thing(false, d.ARMOR, wpt);
+            obj = OBJPTR(item);
+            obj.o_flags = d.ISKNOW;
+            obj.o_ac = armors[wpt].a_class - rnd(4);
+            r.player.set_cur_armor(obj);
+            add_pack(item, true);
+            
+            /* Give him some food */
 
-        wpt = pick_one(a_magic);
-        item = new_thing(false, d.ARMOR, wpt);
-        obj = OBJPTR(item);
-        obj.o_flags = d.ISKNOW;
-        obj.o_ac = armors[wpt].a_class - rnd(4);
-        r.player.set_cur_armor(obj);
-        add_pack(item, true);
-        
-        /* Give him some food */
-
-        item = new_thing(false, d.FOOD, 0);
-        add_pack(item, true);
+            item = new_thing(false, d.FOOD, 0);
+            add_pack(item, true);
+        }
 
         r.player.set_select(null);
 
         r.playit();
     }
+
+
+
+
+
 
     /*
     ** playit:	The main loop of the program.  Loop while(! the game is over,

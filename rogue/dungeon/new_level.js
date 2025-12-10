@@ -155,7 +155,7 @@ function new_level(r){
 
 					r.dungeon.traps[i] = trp;
 				}
-				console.log(`trap${ch} ${r.dungeon.traps.length}`);
+				r.UI.comment(`trap${ch} ${r.dungeon.traps.length}`);
 			}
 		}
 

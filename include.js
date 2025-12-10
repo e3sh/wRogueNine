@@ -15,9 +15,7 @@ const w = [
     // Rogue 
     r + "GameManager.js",
     r + "manager/global.js",
-    //    r + "manager/rip.js",
-    //    r + "manager/wizard.js",
-    //    r + "manager/qs.js",
+        r + "manager/qs.js",
     r + "PlayerCharacter.js",
         r + "player/encumb.js",
         r + "player/misc.js",

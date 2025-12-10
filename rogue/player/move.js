@@ -410,6 +410,10 @@ function move(r){
 		const pl_on = r.player.pl_on;
 		const getpdex = r.player.pstats.getpdex;
 		const death = r.player.rips.death;
+		const swing = r.monster.battle.swing;
+		const fall = r.item.weapon_f.fall;
+		const save = r.monster.battle.save;
+		const new_thing = r.item.things_f.new_thing;
 
 		const player = r.player.get_player();
 
@@ -512,13 +516,13 @@ function move(r){
 				resist = ac + getpdex(it, false);
 				if (ishero && pl_on(d.ISINVINC))
 					resist = -100;		/* invincible is impossible to hit */
-				if (swing(3 + (level / 4), resist, 1)) {
+				if (swing(3 + (r.dungeon.level / 4), resist, 1)) {
 					if (seeit)
 						r.UI.msg(`${ishero ? "Oh no! " : ""}An arrow shot ${stuckee}.`);
 					if (ishero)
-						chg_hpt(-roll(1,6),false,d.K_ARROW);
+						chg_hpt(-r.roll(1,6),false,d.K_ARROW);
 					else {
-						it.s_hpt -= roll(1,6);
+						it.s_hpt -= r.roll(1,6);
 						if (it.s_hpt < 1) {
 							sayso = false;
 							ch = goner();
@@ -530,7 +534,7 @@ function move(r){
 					let arrow; //struct object *arrow;
 
 					if (seeit)
-						r.UI.msg("An arrow shoots past %s.", stuckee);
+						r.UI.msg(`An arrow shoots past ${stuckee}`);
 					item = new_thing(false, d.WEAPON, d.ARROW);
 					arrow = f.OBJPTR(item);
 					arrow.o_hplus = 3;
@@ -545,7 +549,7 @@ function move(r){
 				let resist, ac;
 				let it;//struct stats *it;
 
-				stuckee[0] = f.tolower(stuckee[0]);
+				stuckee = f.tolower(stuckee);
 				it = th.t_stats;
 				if (ishero && cur_armor != null)
 					ac = cur_armor.o_ac;
@@ -554,7 +558,7 @@ function move(r){
 				resist = ac + getpdex(it, false);
 				if (ishero && pl_on(d.ISINVINC))
 					resist = -100;		/* invincible is impossible to hit */
-				if (swing(3 + (level / 4), resist, 0)) {
+				if (swing(3 + (r.dungeon.level / 4), resist, 0)) {
 					if (seeit)
 						r.UI.msg(`A small dart just hit ${stuckee}`);
 					if (ishero) {
@@ -600,7 +604,7 @@ function move(r){
 					}
 					else if(r.rnd(100) < 6 && pl_off(d.ISINVINC)) {
 						r.UI.msg("Oh no!!! You drown in the pool!!! --More--");
-						wait_for(cw, ' ');
+						//wait_for(cw, ' ');
 						death(d.K_POOL);
 					}
 					else
@@ -817,7 +821,7 @@ function move(r){
 					dest.x = x;
 					if (!diag_ok(who.t_pos, dest))
 						continue;
-					if (ch == d.SCROLL && who != player) {
+					if (ch == d.SCROLL && who != r.player.get_player()) {
 						/*
 						* check for scare monster scrolls
 						*/

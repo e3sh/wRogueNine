@@ -262,7 +262,7 @@ function MonsterManager(r){
 		const iswearing = r.item.ring_f.iswearing;
 		const pl_off = r.player.pl_off;
 		const unconfuse = r.daemon.unconfuse;
-		const save = ()=>{};
+		const save = r.monster.battle.save;
 		const DISTANCE = f.DISTANCE;
 
 		const player = r.player.get_player();

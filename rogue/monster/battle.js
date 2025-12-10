@@ -516,7 +516,7 @@ function battle(r){
 			}
 		}
 
-		let bdice = cp.split("/"); console.log(`cp:${cp} bd:${bdice.length}`);
+		let bdice = cp.split("/"); //r.UI.comment(`damage:${cp} bd:${bdice.length}`);
 		for (let i in bdice){
 		//while(1) {
 			let damage;
@@ -543,7 +543,7 @@ function battle(r){
 
 			ndice = Number(spw[0]);
 			nsides = Number(spw[1]);
-			console.log(`${bdice[i]}/ ndice${ndice} nsides${nsides}`);
+			//console.log(`${bdice[i]}/ d${ndice} s${nsides}`);
 
 			if (def == him) {			/* defender is hero */
 				if (cur_armor != null)
@@ -573,6 +573,7 @@ function battle(r){
 					def.s_hpt -= Math.max(0, damage);
 					r.UI.set_battledmg(Math.max(0, damage));
 				}
+				r.UI.comment(`damage:${damage} ${(def != him)?"->":"<-"} `);
 				did_hit = true;
 			}
 			//if (cp.indexOf('/') == -1)

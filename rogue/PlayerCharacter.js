@@ -74,5 +74,12 @@ function PlayerCharacter(r){
 	this.pstats = new pstats(r);
 	this.rips = new rips(r);
 
+	this.equipcheck = (obj)=>{
+		return ((obj == cur_weapon)||
+			(obj == cur_armor)||
+			(obj == cur_ring[d.LEFT])||
+			(obj == cur_ring[d.RIGHT]))?true:false;
+	}
+
 	r.UI.comment("player");
 }

@@ -218,6 +218,7 @@ function command(r){
 		const buy_it = r.dungeon.trader.buy_it;
 		const sell_it = r.dungeon.trader.sell_it;
 		const market = r.dungeon.trader.market;
+		const create_obj = r.UI.wizard.create_obj;
 
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
@@ -275,6 +276,18 @@ function command(r){
 				ch = "%"; //sell_it
 			}
 		}
+
+		if (ki.includes("KeyC")) {
+
+			r.wizard = true;
+			ch = 'C';
+		}
+
+		//if (ki.includes("KeyS")) {
+
+		//	r.qs.save();
+		//}
+
 
 		//r.UI.msg(`${ki.length} ${ch}`);
 		
@@ -860,6 +873,8 @@ function command(r){
 			}
 			r.dungeon.level++;
 			r.dungeon.new_level.create(d.NORMLEV);
+
+			r.qs.save();
 		}
 	}
 
@@ -872,6 +887,7 @@ function command(r){
 		const winat = r.UI.winat;
 		const msg = r.UI.msg
 		const new_level = r.dungeon.new_level.create;
+		const pl_on = r.player.pl_on;
 	
 		const hero = r.player.get_hero();
 
@@ -882,11 +898,13 @@ function command(r){
 			}
 			else {				/* player not held here */
 				if (r.amulet) {
-					level--;
-					if (level == 0)
+					r.dungeon.level--;
+					if (r.dungeon.level == 0)
 						total_winner();
 					new_level(d.NORMLEV);
 					msg("You feel a wrenching sensation in your gut.");
+
+					r.qs.save();
 					return;
 				}
 			}

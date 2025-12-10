@@ -87,6 +87,8 @@
 		//byebye(0);
 		r.UI.io.status();
 		r.setScene(1);
+
+		if (!r.wizard) r.qs.reset();
 	}
 
 	/*

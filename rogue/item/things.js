@@ -392,7 +392,7 @@ function things_f(r){
 		const extras = this.extras;
 		const init_weapon = r.item.weapon_f.init_weapon;
 		const initarmor = r.item.armor_f.initarmor;
-		const init_ring = (cur)=>{cur.o_type = d.RING; console.log("initring"); return cur;}
+		const init_ring = r.item.ring_f.init_ring;
 		const fix_stick = (cur)=>{cur.o_type = d.STICK; console.log("fixstick"); return cur;}
 
 		let item;//struct linked_list *item;

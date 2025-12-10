@@ -77,6 +77,7 @@ function pstats(r){
 	{
 		const him = r.player.get_him();
 		const max_stats = r.player.get_max_stats();
+		const ringex = r.item.ring_f.ringex;
 
 		let wh, mx, mr;
 		let mst, msr;//struct real *mst, *msr;

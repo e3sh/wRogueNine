@@ -13,6 +13,7 @@ function wizard(r){
 
 	const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
+	const hw = d.DSP_WINDOW;
 
 	//extern struct termios terminal;
 
@@ -66,7 +67,7 @@ function wizard(r){
 	* create_obj:
 	*	Create any object for wizard or scroll (almost)
 	*/
-	function create_obj(fscr)
+	this.create_obj = function(fscr)
 	//bool fscr;
 	{
 		let item; //reg struct linked_list *item;
@@ -76,6 +77,7 @@ function wizard(r){
 		let mf; //struct magic_info *mf;
 		let nogood = true, inhw = false;
 
+		/*
 		if (fscr)
 			msg(" ");
 		else if (r.wizard) {
@@ -120,20 +122,53 @@ function wizard(r){
 				}
 			} while (nogood);
 		}
+		*/
+		r.UI.wclear(hw);
+		r.setScene(4);
+		r.UI.overlapview(true);
+		r.UI.scene.create_obj()
+	}
+
+	this.create_obj_exec = function(fscr, ch, which)
+	//bool fscr;
+	{
+		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
+		const makemons = r.UI.wizard.makemons;
+		const getindex = r.player.misc.getindex;
+		const new_thing = r.item.things_f.new_thing;
+		const OBJPTR = f.OBJPTR;
+		const init_ring = r.item.ring_f.init_ring;
+		const whatis = r.UI.wizard.whatis;
+		const add_pack = r.item.pack_f.add_pack;
+
+		const thnginfo = v.thnginfo;
+		const things = v.things;
+		const armors = v.armors;
+
+		let item; //reg struct linked_list *item;
+		let obj; //reg struct object *obj;
+		//let wh, ch, otype;
+		let newitem, newtype, msz, oname;
+		let mf; //struct magic_info *mf;
+		let nogood = true, inhw = false;
+
+
 		if (isalpha(ch)) {
 			if (inhw)
-				restscr(cw);
+				;//restscr(cw);
 			makemons(ch);		/* make monster & be done with it */
 			return;
 		}
+
 		otype = getindex(ch);
-		if (otype == -1 || (otype == AMULET && !wizard)) {
+		if (otype == -1 || (otype == d.AMULET && r.wizard)) {
 			if (inhw)
-				restscr(cw);
-			mpos = 0;
-			msg("You can't create that !!");
+				;//restscr(cw);
+			//pos = 0;
+			r.UI.msg("You can't create that !!");
 			return;
 		}
+
 		newitem = ch;
 		mf = thnginfo[otype];
 		oname = things[otype].mi_name;
@@ -145,15 +180,16 @@ function wizard(r){
 		}
 		else if (!fscr && wizard) {
 			if (!inhw) {
-				msg("Which %s?%s: ", oname, starlist);
-				ch = readchar();
-				if (ch == ESCAPE)
-					return;
-				if (ch != '*')
+				r.UI.msg(`Which ${oname}${v.starlist}: `);
+				//ch = readchar();
+				//if (ch == ESCAPE)
+				//	return;
+				//if (ch != '*')
 					nogood = false;
 			}
 		}
 		if (nogood) {
+			/*
 			let wmi; //struct magic_item *wmi;
 			let ii;
 
@@ -190,47 +226,49 @@ function wizard(r){
 					return;
 				}
 			} while (!isalpha(ch));
+			*/
 		}
 		if (inhw)			/* restore screen if need be */
-			restscr(cw);
+			;//restscr(cw);
 
-		newtype = tolower(ch) - 'a';
+		//newtype = tolower(ch) - 'a';
+		newtype = which;
 		if (newtype < 0 || newtype >= msz) {	/* if an illegal value */
-			mpos = 0;
-			after = false;
+			//mpos = 0;
+			r.after = false;
 			if (inhw)
-				restscr(cw);
-			msg("There is no such %s", oname);
+				;//restscr(cw);
+			r.UI.msg(`There is no such ${oname}`);
 			return;
 		}
-		mpos = 0;
+		//mpos = 0;
 		item = new_thing(false, newitem, newtype);
 		obj = OBJPTR(item);
 		wh = obj.o_type;
-		if (wh == WEAPON || wh == ARMOR || wh == RING) {
+		if (wh == d.WEAPON || wh == d.ARMOR || wh == d.RING) {
 			if (fscr)					/* users get +3 to -3 */
-				ch = rnd(7) - 3;
+				ch = r.rnd(7) - 3;
 			else {						/* wizard gets to choose */
-				if (wh == RING)
+				if (wh == d.RING)
 					init_ring(obj, true);
 				else
 					ch = getbless();
 			}
-			if (wh == WEAPON)
+			if (wh == d.WEAPON)
 				obj.o_hplus = obj.o_dplus = ch;
-			else if (wh == ARMOR)
+			else if (wh == d.ARMOR)
 				obj.o_ac = armors[obj.o_which].a_class - ch;
 			if (ch < 0)
-				setoflg(obj, ISCURSED);
+				r.setoflg(obj, d.ISCURSED);
 			else
-				resoflg(obj, ISCURSED);
+				r.resoflg(obj, d.ISCURSED);
 		}
-		mpos = 0;
+		//mpos = 0;
 		if (fscr)
 			whatis(item);			/* identify for aquirement scroll */
 		wh = add_pack(item, false);
 		if (wh == false)			/* won't fit in pack */
-			discard(item);
+			r.discard(item);
 	}
 
 
@@ -242,11 +280,11 @@ function wizard(r){
 	{
 		let bless;
 
-		msg("Blessing: ");
-		prbuf[0] = '\0';
-		bless = get_str(prbuf, cw);
-		if (bless == NORM)
-			bless = atoi(prbuf);
+		r.UI.msg("Blessing: ");
+		prbuf = '0';
+		bless = 0; //get_str(prbuf, cw);
+		if (bless == d.NORM)
+			bless = Number(prbuf);
 		else
 			bless = 0;
 		return bless;
@@ -260,15 +298,21 @@ function wizard(r){
 	//int what;
 	{
 		const look = r.player.misc.look;
+		const step_ok = r.UI.io.step_ok;
+		const winat = r.UI.winat;
+		const new_monster = r.monster.new_monster;
+		const midx = r.monster.midx;
+
+		const hero = r.player.get_hero();
 
 		let x, y, oktomake = false, appear = 1;
-		let mp; //struct coord mp;
+		let mp = {}; //struct coord mp;
 
 		oktomake = false;
 		for (x = hero.x - 1 ; x <= hero.x + 1 ; x++) {
 			for (y = hero.y - 1 ; y <= hero.y + 1 ; y++) {
 				if (x != hero.x || y != hero.y) {
-					if (step_ok(winat(y, x)) && rnd(++appear) == 0) {
+					if (step_ok(winat(y, x)) && r.rnd(++appear) == 0) {
 						mp.x = x;
 						mp.y = y;
 						oktomake = true;

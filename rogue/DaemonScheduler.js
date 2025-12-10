@@ -276,7 +276,7 @@ function DaemonScheduler(r){
 		const rollwand = r.daemon.rollwand;
 
 		daemon(rollwand, true, d.BEFORE);
-		console.log("swander");
+		r.UI.comment("swander");
 	}
 
 
@@ -303,7 +303,7 @@ function DaemonScheduler(r){
 			}
 			between = 0;
 		}
-		console.log("rollwand");
+		r.UI.comment("rollwand");
 	}
 
 

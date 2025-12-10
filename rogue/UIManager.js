@@ -13,7 +13,7 @@ function UIManager(r, g){
     this.io = new io(r);
     this.command = new command(r);
     this.scene = new scene(r);
-    this.wizatd = new wizard(r);
+    this.wizard = new wizard(r);
 
     const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;

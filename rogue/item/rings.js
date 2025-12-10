@@ -476,6 +476,8 @@ function rings(r){
 		const setoflg = r.setoflg;
 		const itemvol = r.player.encumb.itemvol;
 
+		const things = v.things;
+
 		let much;
 
 		switch (what.o_which) {
@@ -510,9 +512,11 @@ function rings(r){
 			case d.R_TELEPORT:
 				what.o_ac = 0;
 				setoflg(what,d.ISCURSED);	
-			break;case d.R_GIANT:
+			break;
+			case d.R_GIANT:
 				what.o_ac = 25;		/* lots !! of STR */
-			break;default:
+			break;
+			default:
 				what.o_ac = 1;
 		}
 		what.o_type = d.RING;
@@ -531,7 +535,7 @@ function rings(r){
 	//int rtype;
 	{
 		const isring = this.isring;
-		const cur_ring = r.player.get_ring();
+		const cur_ring = r.player.get_cur_ring();
 
 		let howmuch = 0;
 
