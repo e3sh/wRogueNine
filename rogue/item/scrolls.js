@@ -13,6 +13,7 @@ function scrolls(r){
 
 	const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
+	const hw = d.DSP_MAIN_FG;
 
 	/*
 	* read_scroll:
@@ -33,8 +34,22 @@ function scrolls(r){
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
 		const THINGPTR = f.THINGPTR;
 		const makemons = r.UI.wizard.makemons;
+		const teleport = r.wizard.teleport;
+		const setoflg = r.setoflg;
+		const resoflg = r.resoflg;
+		const aggravate = r.player.misc.aggravate;
+		const genocide = r.monster.genocide;
+		const next = f.next;
+		const new_level = r.dungeon.new_level.create;
+ 		const inv_name = r.item.things_f.inv_name;
+		const chg_hpt = r.player.pstats.chg_hpt;
+		const whatis = r.UI.wizard.whatis;
+
 
 		const s_know = r.item.s_know;
+		const w_magic = v.w_magic;
+		const armors = v.armors;
+
 		const mtlev = r.monster.mtlev();	
 
 		const player = r.player.get_player();
@@ -53,11 +68,11 @@ function scrolls(r){
 			return;
 		obj = OBJPTR(item);
 		if (obj.o_type != d.SCROLL) {
-			r.UI.msg("Nothing to read.");
+			r.UI.msg( ms.READSC_1);
 			r.after = false;
 			return;
 		}
-		r.UI.msg("As you read the scroll, it vanishes.");
+		r.UI.msg(ms.READSC_2);
 		wh = obj.o_which;
 		bless = o_on(obj, d.ISBLESS);
 		curse = o_on(obj, d.ISCURSED);
@@ -70,7 +85,7 @@ function scrolls(r){
 		case d.S_KNOWALL:
 			if (!curse) {
 				idenpack();				/* identify all the pack */
-				r.UI.msg("You feel more knowledgable.");
+				r.UI.msg( ms.READSC_KNOWALL);
 				chg_abil(d.WIS,1,true);
 				s_know[d.S_KNOWALL] = true;
 			}
@@ -80,7 +95,7 @@ function scrolls(r){
 				/*
 				* Scroll of monster confusion.  Give him that power.
 				*/
-				r.UI.msg("Your hands begin to glow red.");
+				r.UI.msg( ms.READSC_CONFUSE);
 				player.t_flags |= d.CANHUH;
 				s_know[d.S_CONFUSE] = true;
 			}
@@ -90,12 +105,12 @@ function scrolls(r){
 			if (!curse) {
 				if (rp == null) {
 					s_know[d.S_LIGHT] = true;
-					r.UI.msg("The corridor glows and then fades.");
+					r.UI.msg(ms.READSC_LIGHT1);
 				}
 				else {
 					if (rf_on(rp,d.ISDARK)) {
 						s_know[d.S_LIGHT] = true;
-						r.UI.msg("The room is lit.");
+						r.UI.msg(ms.READSC_LIGHT2);
 						rp.r_flags &= ~d.ISDARK;
 					}
 					light(hero);
@@ -110,7 +125,7 @@ function scrolls(r){
 
 				if (cur_armor != null && o_off(cur_armor,d.ISPROT)) {
 					s_know[d.S_ARMOR] = true;
-					r.UI.msg("Your armor glows faintly for a moment.");
+					r.UI.msg( ms.READSC_ARMOR);
 					if (o_on(cur_armor, d.ISCURSED))
 						cur_armor.o_ac = armors[cur_armor.o_which].a_class;
 					else
@@ -151,7 +166,7 @@ function scrolls(r){
 			*/
 			if (!bless) {
 				s_know[d.S_SLEEP] = true;
-				r.UI.msg("You fall asleep.");
+				r.UI.msg( ms.READSC_SLEEP);
 				player.t_nocmd += 4 + r.rnd(d.SLEEPTIME);
 			}
 		break;
@@ -160,12 +175,12 @@ function scrolls(r){
 				if (makemons(mtlev[r.rnd(r.levcount)].m_show))
 					s_know[d.S_CREATE] = true;
 				else
-					r.UI.msg("You hear a faint cry of anguish in the distance.");
+					r.UI.msg( ms.READSC_CREATE);
 			}
 		break;
 		case d.S_IDENT:
 			if (!curse) {
-				r.UI.msg("This scroll is an identify scroll");
+				r.UI.msg( ms.READSC_IDENT);
 				s_know[d.S_IDENT] = true;
 				whatis(null);
 			}
@@ -218,208 +233,240 @@ function scrolls(r){
 				//overlay(cw, hw);
 				//overwrite(hw, cw);
 			}
-		break;case S_GFIND:
+		break;
+		case S_GFIND:
 			if (!curse) {
-				int gtotal = 0;
-				struct room *rp;
+				let gtotal = 0;
+				let rp; //struct room *rp;
 
-				wclear(hw);
-				for (rp = rooms; rp < &rooms[MAXROOMS]; rp++) {
+				//wclear(hw);
+				//for (rp = rooms; rp < &rooms[MAXROOMS]; rp++) {
+				for (let i in r.dungeon.rooms){
+					rp = r.dungeon.rooms[i];
 					gtotal += rp.r_goldval;
 					if (rp.r_goldval != 0 &&
-					mvinch(rp.r_gold.y,rp.r_gold.x) == GOLD)
-						mvwaddch(hw,rp.r_gold.y,rp.r_gold.x,GOLD);
+					r.UI.mvinch(rp.r_gold.y,rp.r_gold.x) == d.GOLD)
+						r.UI.mvwaddch(hw,rp.r_gold.y,rp.r_gold.x,d.GOLD);
 				}
 				if (gtotal) {
-					s_know[S_GFIND] = true;
-					msg("You begin to feel greedy and sense gold.");
-					overlay(hw,cw);
+					s_know[d.S_GFIND] = true;
+					r.UI.msg( ms.READSC_GFIND1);
+					//overlay(hw,cw);
 				}
 				else
-					msg("You begin to feel a pull downward.");
+					r.UI.msg( ms.READSC_GFIND2);
 			}
-		break;case S_TELEP:
+		break;
+		case S_TELEP:
 			if (!curse) {
-				int rm;
-				struct room *cur_room;
+				let rm;
+				let cur_room;//struct room *cur_room;
 
 				cur_room = player.t_room;
-				rm = teleport(r.rndspot, &player);
-				if (cur_room != &rooms[rm])
-					s_know[S_TELEP] = true;
+				rm = teleport(r.rndspot, player);
+				if (cur_room != rm) //r.dungeon.rooms[rm])
+					s_know[d.S_TELEP] = true;
 			}
-		break;case S_ENCH:
+		break;
+		case d.S_ENCH:
+			const cur_weapon = r.player.get_cur_weapon();
+
 			if (!curse) {
 				if (cur_weapon == null || (cur_weapon != null &&
-				(o_on(cur_weapon,ISPROT) || cur_weapon.o_type != WEAPON)))
-					msg("You feel a strange sense of loss.");
+				(o_on(cur_weapon,d.ISPROT) || cur_weapon.o_type != d.WEAPON)))
+					r.UI.msg( ms.READSC_ENCH1);
 				else {
-					s_know[S_ENCH] = true;
-					if (o_on(cur_weapon,ISCURSED)) {
-						resoflg(cur_weapon,ISCURSED);
-						cur_weapon.o_hplus = rnd(2);
-						cur_weapon.o_dplus = rnd(2);
+					s_know[d.S_ENCH] = true;
+					if (o_on(cur_weapon,d.ISCURSED)) {
+						resoflg(cur_weapon,d.ISCURSED);
+						cur_weapon.o_hplus = r.rnd(2);
+						cur_weapon.o_dplus = r.rnd(2);
 					}
 					else {		/* weapon was not cursed here */
-						if (rnd(100) < 50)
+						if (r.rnd(100) < 50)
 							cur_weapon.o_hplus += 1;
 						else
 							cur_weapon.o_dplus += 1;
 					}
-					setoflg(cur_weapon, ISKNOW);
-					msg("Your %s glows blue for a moment.",
-					w_magic[cur_weapon.o_which].mi_name);
+					setoflg(cur_weapon, d.ISKNOW);
+					r.UI.msg( ms.READSC_ENCH2(w_magic[cur_weapon.o_which].mi_name));
+
+					r.player.set_cur_weapon(cur_weapon);
 				}
 			}
-		break;case S_SCARE:
+		break;
+		case d.S_SCARE:
 			/*
 			* A monster will refuse to step on a scare monster scroll
 			* if it is dropped.  Thus reading it is a mistake and produces
 			* laughter at the poor rogue's boo boo.
 			*/
-			msg("You hear maniacal laughter in the distance.");
-		break;case S_REMOVE:
+			r.UI.msg( ms.READSC_SCARE);
+		break;
+		case d.S_REMOVE:
 			if (!curse) {
-				if (cur_armor != null && o_off(cur_armor,ISPROT))
-					resoflg(cur_armor,ISCURSED);
-				if (cur_weapon != null && o_off(cur_weapon,ISPROT))
-					resoflg(cur_weapon,ISCURSED);
-				if (cur_ring[LEFT]!=null && o_off(cur_ring[LEFT],ISPROT))
-					resoflg(cur_ring[LEFT],ISCURSED);
-				if (cur_ring[RIGHT]!=null && o_off(cur_ring[RIGHT],ISPROT))
-					resoflg(cur_ring[RIGHT],ISCURSED);
-				msg("You feel as if somebody is watching over you.");
-				s_know[S_REMOVE] = true;
+				const cur_weapon = r.player.get_cur_weapon();
+				const cur_armor = r.player.get_cur_armor();
+				const cur_ring = r.player.get_cur_ring();
+
+				if (cur_armor != null && o_off(cur_armor,d.ISPROT))
+					resoflg(cur_armor,d.ISCURSED);
+				if (cur_weapon != null && o_off(cur_weapon,d.ISPROT))
+					resoflg(cur_weapon,d.ISCURSED);
+				if (cur_ring[d.LEFT]!=null && o_off(cur_ring[d.LEFT],d.ISPROT))
+					resoflg(cur_ring[d.LEFT],d.ISCURSED);
+				if (cur_ring[RIGHT]!=null && o_off(cur_ring[d.RIGHT],d.ISPROT))
+					resoflg(cur_ring[d.RIGHT],d.ISCURSED);
+				r.UI.msg( ms.READSC_REMOVE);
+				s_know[d.S_REMOVE] = true;
+
+				r.player.set_cur_weapon(cur_weapon);
+				r.player.set_cur_armor(cur_armor);
+				r.player.set_cur_ring(cur_ring);
 			}
-		break;case S_AGGR:
+		break;
+		case d.S_AGGR:
 			if (!bless) {
-				if (mlist != null) {
+				if (r.dungeon.mlist != null) {
 					aggravate();
-					msg("You hear a high pitched humming noise.");
-					s_know[S_AGGR] = true;
+					r.UI.msg( ms.READSC_AGGR);
+					s_know[d.S_AGGR] = true;
 				}
 			}
-		break;case S_NOP:
-			msg("This scroll seems to be blank.");
-		break;case S_GENOCIDE:
+		break;
+		case d.S_NOP:
+			r.UI.msg( ms.READSC_NOP);
+		break;
+		case d.S_GENOCIDE:
 			if (!curse) {
-				msg("You have been granted the boon of genocide.");
+				r.UI.msg( ms.READSC_GENOCIDE);
 				genocide();
-				s_know[S_GENOCIDE] = true;
+				s_know[d.S_GENOCIDE] = true;
 			}
-		break;case S_DCURSE:
+		break;
+		case d.S_DCURSE:
 			if (!bless) {
-				struct linked_list *ll;
-				struct object *lb;
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
 
-				msg("Your pack shudders.");
-				for (ll = pack ; ll != null ; ll = next(ll)) {
+				r.UI.msg( ms.READSC_DCURSE);
+				for (ll = r.player.get_pack() ; ll != null ; ll = next(ll)) {
 					lb = OBJPTR(ll);
-					if (o_off(lb,ISPROT)) {
-						resoflg(lb, ISBLESS);
-						setoflg(lb, ISCURSED);
+					if (o_off(lb,d.ISPROT)) {
+						resoflg(lb, d.ISBLESS);
+						setoflg(lb, d.ISCURSED);
 					}
 				}
 			}
-		break;case S_DLEVEL:
+		break;
+		case S_DLEVEL:
 			if (!bless) {
-				int much = rnd(9) - 4;
+				let much = r.rnd(9) - 4;
 
 				if (much != 0) {
-					level += much;
-					if (level < 1)
-						level = 1;
-					mpos = 0;
-					new_level(NORMLEV);		/* change levels */
-					msg("You are whisked away to another region.");
-					s_know[S_DLEVEL] = true;
+					r.dungeon.level += much;
+					if (r.dungeon.level < 1)
+						r.dungeon.level = 1;
+					//mpos = 0;
+					new_level(d.NORMLEV);		/* change levels */
+					r.UI.msg( ms.READSC_DLEVEL);
+					s_know[d.S_DLEVEL] = true;
 				}
 			}
-		break;case S_PROTECT:
+		break;
+		case d.S_PROTECT:
 			if (!curse) {
-				struct linked_list *ll;
-				struct object *lb;
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
 
-				msg("You are granted the power of protection.");
+				r.UI.msg(ms.READSC_PROTECT1);
 				if ((ll = get_item("protect",0)) != null) {
 					lb = OBJPTR(ll);
-					setoflg(lb,ISPROT);
-					mpos = 0;
-					msg("Protected %s.",inv_name(lb,true));
+					setoflg(lb,d.ISPROT);
+					//mpos = 0;
+					r.UI.msg(ms.READSC_PROTECT2(inv_name(lb,true)));
 				}
-				s_know[S_PROTECT] = true;
+				s_know[d.S_PROTECT] = true;
 			}
-		break;case S_ALLENCH:
+		break;
+		case d.S_ALLENCH:
 			if (!curse) {
-				struct linked_list *ll;
-				struct object *lb;
-				int howmuch, ac, good;
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
+				let howmuch, ac, good;
 
-				msg("You are granted the power of enchantment.");
+				r.UI.msg( READSC_ALLENCH1);
 				good = true;
 				if ((ll = get_item("enchant",0)) != null) {
 					lb = OBJPTR(ll);
-					resoflg(lb,ISCURSED);
-					resoflg(lb,ISPROT);
-					howmuch = rnd(3) + 1;
+					resoflg(lb,d.ISCURSED);
+					resoflg(lb,d.ISPROT);
+					howmuch = r.rnd(3) + 1;
 					switch(lb.o_type) {
-						case RING:
+						case d.RING:
 							if (lb.o_ac < 0)
 								lb.o_ac = 0;
 							lb.o_ac += howmuch;
-						break;case ARMOR:
+						break;
+						case d.ARMOR:
 							ac = armors[lb.o_which].a_class;
 							if (lb.o_ac > ac)
 								lb.o_ac = ac;
 							lb.o_ac -= howmuch;
-						break;case STICK:
+						break;
+						case d.STICK:
 							lb.o_charges += howmuch + 10;
-						break;case WEAPON:
+						break;
+						case d.WEAPON:
 							if (lb.o_dplus < 0)
 								lb.o_dplus = 0;
 							if (lb.o_hplus < 0)
 								lb.o_hplus = 0;
 							lb.o_hplus += howmuch;
 							lb.o_dplus += howmuch;
-						break;default:
-							msg("You are injured as the scroll flashes & bursts into flames !!!");
-							chg_hpt(-roll(6,6),false,K_SCROLL);
+						break;
+						default:
+							r.UI.msg(ms. READSC_ALLENCH2);
+							chg_hpt(-r.roll(6,6),false,d.K_SCROLL);
 							good = false;
 					}
 					if (good) {
-						mpos = 0;
-						msg("Enchanted %s.",inv_name(lb,true));
+						//mpos = 0;
+						r.UI.msg(ms.READSC_ALLENCH3(inv_name(lb,true)));
 					}
 				}
-				s_know[S_ALLENCH] = true;
+				s_know[d.S_ALLENCH] = true;
 			}
-		break;case S_BLESS:
+		break;
+		case d.S_BLESS:
 			if (!curse) {
-				struct linked_list *ll;
-				struct object *lb;
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
 
-				msg("Your pack glistens brightly.");
-				for (ll = pack ; ll != null ; ll = next(ll)) {
+				r.UI.msg(ms.READSC_BLESS);
+				for (ll = r.player.get_pack() ; ll != null ; ll = next(ll)) {
 					whatis(ll);
 					lb = OBJPTR(ll);
-					resoflg(lb,ISCURSED);
-					setoflg(lb,ISBLESS);
+					resoflg(lb,d.ISCURSED);
+					setoflg(lb,d.ISBLESS);
 				}
 			}
-		break;case S_MAKEIT:
+		break;
+		case d.S_MAKEIT:
 			if (!curse) {
-				msg("You have been endowed with the power of creation.");
-				s_know[S_MAKEIT] = true;
-				create_obj(true);
+				r.UI.msg(ms.READSC_MAKEIT);
+				s_know[d.S_MAKEIT] = true;
+				r.UI.wizard.create_obj(true);
 			}
-		break;case S_BAN: {
-			int howdeep;
-			char *ptr;
+		break;
+		case d.S_BAN: {
+			let howdeep;
+			let ptr;
 
 			if (bless) {
-				if (level > 6) {
-					howdeep = 1 + rnd(5);
-					ptr = "elevated to the upper";
+				if (r.dungeon.level > 6) {
+					howdeep = 1 + r.rnd(5);
+					ptr = ms.READSC_BAN1;
 				}
 				else {
 					howdeep = -1;
@@ -427,66 +474,74 @@ function scrolls(r){
 				}
 			}
 			else {
-				howdeep = level + 10 + rnd(20) + (curse * 20);
-				ptr = "banished to the lower";
+				howdeep = r.dungeon.level + 10 + r.rnd(20) + (curse * 20);
+				ptr = ms.READSC_BAN2;
 			}
-			if ((!bless && level < howdeep) || bless) {
-				level = howdeep;
-				new_level(NORMLEV);
-				mpos = 0;
-				msg("You are %s regions.", ptr);
-				s_know[S_BAN] = true;
+			if ((!bless && r.dungeon.level < howdeep) || bless) {
+				r.dungeon.level = howdeep;
+				new_level(d.NORMLEV);
+				//mpos = 0;
+				r.UI.msg(ms.READSC_BAN3(ptr));
+				s_know[d.S_BAN] = true;
 			}
 		}
-		break;case S_CWAND:
+		break;
+		case d.S_CWAND:
 			if (!curse) {
-				struct linked_list *ll;
-				struct object *lb;
-				bool wands = false;
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
+				let wands = false;
 
-				for (ll = pack ; ll != null ; ll = next(ll)) {
+				for (ll = r.player.get_pack() ; ll != null ; ll = next(ll)) {
 					lb = OBJPTR(ll);
-					if (lb.o_type == STICK) {
+					if (lb.o_type == d.STICK) {
 						whatis(ll);
-						setoflg(lb, ISKNOW);
-						resoflg(lb, ISCURSED);
-						lb.o_charges += rnd(11) + 5;
+						setoflg(lb, d.ISKNOW);
+						resoflg(lb, d.ISCURSED);
+						lb.o_charges += r.rnd(11) + 5;
 						wands = true;
 					}
 				}
 				if (wands) {
-					msg("Your sticks gleam.");
+					r.UI.msg(ms.READSC_CWAND);
 					s_know[wh] = true;
 				}
 			}
-		break;case S_LOCTRAP: {
-			struct trap *trp;
+		break;
+		case d.S_LOCTRAP: {
+			let trp; //struct trap *trp;
 
 			if (ntraps > 0) {
-				for (trp = &traps[0]; trp < &traps[ntraps]; trp++)
-					trp.tr_flags |= ISFOUND;
+				//for (trp = &traps[0]; trp < &traps[ntraps]; trp++)
+				for (let i in r.dungeon.traps)
+					r.dungeon.traps[i].tr_flags |= d.ISFOUND;
 				look(false);
-				msg("You now recognize pitfalls.");
-				s_know[S_LOCTRAP] = true;
+				r.UI.msg(ms.READSC_LOCTRAP);
+				s_know[d.S_LOCTRAP] = true;
 			}
 		}
-		break;default:
-			msg("What a puzzling scroll!");
+		break;
+		default:
+			r.UI.msg(ms.READSC_DEFAULT);
 			return;
 		}
 		look(true);
-		nochange = false;
-		if (s_know[wh] && s_guess[wh]) {
-			free(s_guess[wh]);
-			s_guess[wh] = null;
-		}
-		else if (!s_know[wh] && s_guess[wh] == null) {
-			strcpy(buf, s_names[wh]);
-			msg(callit);
-			if (get_str(buf, cw) == NORM) {
-				s_guess[wh] = new(strlen(buf) + 1);
-				strcpy(s_guess[wh], buf);
-			}
-		}
+		r.nochange = false;
+
+		r.player.set_player( player);
+		r.player.set_hero( hero);
+
+		//if (s_know[wh] && s_guess[wh]) {
+		//	free(s_guess[wh]);
+		//	s_guess[wh] = null;
+		//}
+		//else if (!s_know[wh] && s_guess[wh] == null) {
+		//	strcpy(buf, s_names[wh]);
+		//	msg(callit);
+		//	if (get_str(buf, cw) == NORM) {
+		//		s_guess[wh] = new(strlen(buf) + 1);
+		//		strcpy(s_guess[wh], buf);
+		//	}
+		//}
 	}
 }

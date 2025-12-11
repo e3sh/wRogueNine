@@ -61,7 +61,7 @@ function move(r){
 		const mvinch = r.UI.mvinch;
 		const rf_on = r.dungeon.rooms_f.rf_on;
 		const light = this.light;
-		const teleport = ()=>{};
+		const teleport = r.UI.wizard.teleport;
 		const THINGPTR = f.THINGPTR;
 		const next = f.next;
 		const runto = r.monster.chase.runto;
@@ -76,9 +76,12 @@ function move(r){
 		r.curprice = -1;
 		r.inpool = false;
 
+		r.delta.x = dx;
+		r.delta.y = dy;
+
 		if (player.t_nomove > 0) {
 			player.t_nomove -= 1;
-			msg("You are still stuck in the bear trap.");
+			msg(ms.DO_MOVE_1);
 			return;
 		}
 		/*
@@ -164,7 +167,7 @@ function move(r){
 			r.after = r.running = false;
 		ch = winat(nh.y, nh.x); 
 		if (pl_on(d.ISHELD) && ch != 'F' && ch != 'd') {
-			msg("You are being held.");
+			msg(ms.DO_MOVE_2);
 			return;
 		}
 		if (pl_off(d.ISETHER)) {
@@ -195,7 +198,7 @@ function move(r){
 							r.UI.mvaddch(nh.y, nh.x, d.FLOOR);
 							//teleport(rndspot, player);
 							light(nh);
-							msg("The spatial warp disappears !");
+							msg(ms.DO_MOVE_3);
 							return;
 						}
 				}
@@ -414,6 +417,7 @@ function move(r){
 		const fall = r.item.weapon_f.fall;
 		const save = r.monster.battle.save;
 		const new_thing = r.item.things_f.new_thing;
+		const save_throw = r.monster.battle.save_throw;
 
 		const player = r.player.get_player();
 
@@ -426,11 +430,11 @@ function move(r){
 			return;
 		ishero = (th == player);
 		if (ishero) {
-			stuckee = "You";
+			stuckee = ms.BE_TRAP_PL;
 			r.count = r.running = false;
 		}
 		else {
-			stuckee = `The ${monsters[th.t_indx].m_name}`;
+			stuckee = ms.BE_TRAP_EN(monsters[th.t_indx].m_name);
 		}
 		seeit = cansee(tc.y, tc.x);
 		if (seeit)
@@ -443,7 +447,7 @@ function move(r){
 
 			r.nlmove = true;
 			if (seeit && sayso)
-				r.UI.msg(`${stuckee} fell into a trap!`);
+				r.UI.msg(ms.BE_TRAP_GONER(stuckee));
 			return d.GONER;
 		}
 
@@ -461,7 +465,7 @@ function move(r){
 					r.nlmove = true;
 					r.dungeon.level += 1;
 					new_level(d.MAZELEV);
-					r.UI.msg("You are surrounded by twisty passages!");
+					r.UI.msg(ms.BE_TRAP_MAZE);
 				}
 				else
 					ch = goner();
@@ -472,7 +476,7 @@ function move(r){
 			break;
 			case d.TRAPDOOR:
 				if (ishero) {
-					level += 1;
+					r.dungeon.level += 1;
 					new_level(d.NORMLEV);
 				}
 				else {		/* monsters get lost */
@@ -481,24 +485,24 @@ function move(r){
 				}
 				r.nlmove = true;
 				if (seeit && sayso)
-					r.UI.msg(`${stuckee} fell into a trap!`);
+					r.UI.msg(ms.BE_TRAP_GONER(stuckee));
 			break;
 			case d.BEARTRAP:
 				th.t_nomove += d.BEARTIME;
 				if (seeit) {
-					r.UI.msg(`${stuckee + (ishero ? " are" : " is")} caught in a bear trap.`);
+					r.UI.msg(ms.BE_TRAP_BEAR(stuckee, (ishero ? " are" : " is")));
 				}
 			break;
 			case d.SLEEPTRAP:
 				if (ishero && pl_on(d.ISINVINC))
-					r.UI.msg("You feel momentarily dizzy.");
+					r.UI.msg(ms.BE_TRAP_SLEEP1);
 				else {
 					if (ishero)
 						th.t_nocmd += d.SLEEPTIME;
 					else
 						th.t_nomove += d.SLEEPTIME;
 					if (seeit)
-						r.UI.msg(`${stuckee} fall${ishero ? "":"s"} asleep in a strange white mist.`);
+						r.UI.msg(ms.BE_TRAP_SLEEP2(stuckee,` fall${ishero ? "":"s"}`));
 					}
 			break;
 			case d.ARROWTRAP: {
@@ -518,7 +522,7 @@ function move(r){
 					resist = -100;		/* invincible is impossible to hit */
 				if (swing(3 + (r.dungeon.level / 4), resist, 1)) {
 					if (seeit)
-						r.UI.msg(`${ishero ? "Oh no! " : ""}An arrow shot ${stuckee}.`);
+						r.UI.msg(ms.BE_TRAP_ARROW1(ishero ? "Oh no! " : "", stuckee));
 					if (ishero)
 						chg_hpt(-r.roll(1,6),false,d.K_ARROW);
 					else {
@@ -534,7 +538,7 @@ function move(r){
 					let arrow; //struct object *arrow;
 
 					if (seeit)
-						r.UI.msg(`An arrow shoots past ${stuckee}`);
+						r.UI.msg(ms.BE_TRAP_ARROW2(stuckee));
 					item = new_thing(false, d.WEAPON, d.ARROW);
 					arrow = f.OBJPTR(item);
 					arrow.o_hplus = 3;
@@ -548,6 +552,7 @@ function move(r){
 			case d.DARTTRAP: {
 				let resist, ac;
 				let it;//struct stats *it;
+				const cur_armor = r.player.get_cur_armor(); 
 
 				stuckee = f.tolower(stuckee);
 				it = th.t_stats;
@@ -560,7 +565,7 @@ function move(r){
 					resist = -100;		/* invincible is impossible to hit */
 				if (swing(3 + (r.dungeon.level / 4), resist, 0)) {
 					if (seeit)
-						r.UI.msg(`A small dart just hit ${stuckee}`);
+						r.UI.msg(ms.BE_TRAP_DART1(stuckee));
 					if (ishero) {
 						if (!save(d.VS_POISON))
 							chg_abil(d.CON,-1,true);
@@ -579,13 +584,13 @@ function move(r){
 					}
 				}
 				else if (seeit)
-					r.UI.msg(`A small dart whizzes by ${stuckee}.`);
+					r.UI.msg(ms.BE_TRAP_DART2(stuckee));
 			}
 			break;
 			case d.POOL:
 				if (!ishero && r.rnd(100) < 10) {
 					if (seeit)
-						r.UI.msg(`The ${stuckee} drowns !!`);
+						r.UI.msg(ms.BE_TRAP_POOL1(stuckee));
 					ch = goner();
 				}
 				if ((trp.tr_flags & d.ISGONE) && r.rnd(100) < 10) {
@@ -595,15 +600,15 @@ function move(r){
 					else if(r.rnd(100) < 15 && r.dungeon.level > 2) {
 						r.dungeon.level -= r.rnd(2) + 1;
 						new_level(d.NORMLEV);
-						r.UI.msg("You here a faint groan from below.");
+						r.UI.msg(ms.BE_TRAP_POOL2);
 					}
 					else if(r.rnd(100) < 40) {
 						r.dungeon.level += rnd(4);
 						new_level(d.NORMLEV);
-						r.UI.msg("You find yourself in strange surroundings.");
+						r.UI.msg(ms.BE_TRAP_POOL3);
 					}
 					else if(r.rnd(100) < 6 && pl_off(d.ISINVINC)) {
-						r.UI.msg("Oh no!!! You drown in the pool!!! --More--");
+						r.UI.msg(ms.BE_TRAP_POOL4);
 						//wait_for(cw, ' ');
 						death(d.K_POOL);
 					}
@@ -611,6 +616,7 @@ function move(r){
 						r.nlmove = false;
 			}
 		}
+		r.UI.setEffect("trap",{x:tc.x,y:tc.y},{x:tc.x,y:tc.y-1},120);
 		//flushinp();		/* flush typeahead */
 		return ch;
 	}

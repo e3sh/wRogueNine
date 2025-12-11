@@ -139,7 +139,7 @@ function command(r){
 		}
 		etxt.push("");
 		etxt.push(`food_left:${r.player.food_left}    `);
-		etxt.push(`player x:${hero.x} y:${hero.y}    `);
+		etxt.push(`player x:${hero.x} y:${hero.y} ${r.wizard?"w":""}   `);
 		//etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
 		etxt.push("");
 		let wml = wlo = pak = 0;

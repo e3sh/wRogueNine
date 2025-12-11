@@ -792,7 +792,7 @@ function battle(r){
 		const light = r.player.move.light;
 		const remove_monster = this.remove_monster;
 		const fall = r.item.weapon_f.fall;
-		const GOLDCALC = f.GOLDCALC;
+		const GOLDCALC = ()=>{ return (r.rnd(50 + 10 * r.dungeon.level) + 2) };
 		const pl_on = r.player.pl_on;
 
 		const hero = r.player.get_hero();

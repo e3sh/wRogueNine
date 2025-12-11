@@ -21,7 +21,7 @@ function PlayerCharacter(r){
 	let him = player.t_stats;	//struct stats *him;	/* pointer to hero stats */
 
 	this.purse		= 0;	/* How much gold the rogue has */
-	this.food_left	= d.HUNGERTIME	/* Amount of food stomach */
+	this.food_left	= d.HUNGERTIME;	/* Amount of food stomach */
 	this.hungry_state = d.F_OKAY;	/* How hungry is he */
 	this.foodlev	= 1;	/* how fast he eats food */
 	this.ringfood	= 0;	/* rings affect on food consumption */	

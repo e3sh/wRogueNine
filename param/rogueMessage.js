@@ -17,8 +17,9 @@ function rogueMessage(r){
         NOTINVINC: "You no longer feel invincible.",
 
         //gameManager
-        FRUIT:"juicy-fruit",
-        MAINSTART:"Hello player, One moment while I open the door to the dungeon...",
+        FRUIT: "juicy-fruit",
+        MAINSTART: "Hello player, One moment while I open the door to the dungeon...",
+        RESTART: "We will resume from where we left off last time.", 
 
         //item
         WGHTCHK_1: "Your pack is too heavy for you.",  
@@ -88,6 +89,111 @@ function rogueMessage(r){
         OP_MARKET: "The market is closed. The stairs are that-a-way.",
 
         TRANS_LINE: (num)=>{return `You have ${num} transactions remaining.`},
+
+        //monster manager
+        WAKEMON: "The umber hulk's gaze has confused you.",
+
+        //move
+        DO_MOVE_1: "You are still stuck in the bear trap.",
+        DO_MOVE_2: "You are being held.",
+        DO_MOVE_3: "The spatial warp disappears !",
+
+        BE_TRAP_PL: "You", 
+        BE_TRAP_EN: (name)=>{return `The ${name}` },
+
+        BE_TRAP_GONER: (name)=>{return `${name} fell into a trap!`},
+
+        BE_TRAP_MAZE: "You are surrounded by twisty passages!",
+
+        BE_TRAP_BEAR:  (name, asis)=>{return `${name}${asis} caught in a bear trap.`},
+
+        BE_TRAP_SLEEP1: "You feel momentarily dizzy.",
+        BE_TRAP_SLEEP2: (name, asis)=>{return `${name}${asis} asleep in a strange white mist.`},
+
+        BE_TRAP_ARROW1: (how, name)=>{return `${how}An arrow shot ${name}.`},
+        BE_TRAP_ARROW2: (name)=>{return `An arrow shoots past ${name}`},
+
+        BE_TRAP_DART1: (name)=>{return `A small dart just hit ${name}`},
+        BE_TRAP_DART2: (name)=>{return `A small dart whizzes by ${name}.`},
+
+        BE_TRAP_POOL1: (name)=>{return `The ${name} drowns !!`},
+        BE_TRAP_POOL2: "You here a faint groan from below.",
+        BE_TRAP_POOL3: "You find yourself in strange surroundings.",
+        BE_TRAP_POOL4: "Oh no!!! You drown in the pool!!! --More--",
+
+        //potion
+        QUAFF_1: "That's undrinkable!",
+        QUAFF_CONF1: "You remain level-headed.",
+        QUAFF_CONF2: "Wait, what's going on here. Huh? What? Who?",
+        QUAFF_POISON1: "You feel very sick now.",
+        QUAFF_POISON2: "You feel momentarily sick.",
+        QUAFF_HEALING: "You begin to feel better.",
+        QUAFF_STR: "You feel stronger, now.  What bulging muscles!",
+        QUAFF_MFIND1: "You begin to sense the presence of monsters--More--",
+        QUAFF_MFIND2: "You have a strange feeling for a moment, then it passes.",
+        QUAFF_TFIND1: "You begin to sense the presence of magic.",
+        QUAFF_TFIND2: "You have a strange feeling for a moment, then it passes.",
+        QUAFF_PARALY1: "You feel numb for a moment.",
+        QUAFF_PARALY2: "You can't move.",
+        QUAFF_SEEINV: (fruit)=>{return `This potion tastes like ${fruit} juice.` },
+        QUAFF_RAISE: "You suddenly feel much more skillful.",
+        QUAFF_XHEAL: "You begin to feel much better.",
+        QUAFF_HASTE: "You feel yourself moving much faster.",
+        QUAFF_INVINC: "You feel invincible.",
+        QUAFF_SMART: "You feel more perceptive.",
+        QUAFF_RESTORE: "Hey, this tastes great. You feel warm all over.",
+        QUAFF_BLIND1: "The light dims for a moment.",
+        QUAFF_BLIND2: "A cloak of darkness falls around you.",
+        QUAFF_ETH: "You feel more vaporous.",
+        QUAFF_NOP: "This potion tastes extremely dull.",
+        QUAFF_DEX: "You feel much more agile.",
+        QUAFF_REGEN: "You feel yourself improved.",
+        QUAFF_DECREP1: "You feel momentarily woozy.",
+        QUAFF_DECREP2: "You feel crippled.",
+        QUAFF_SUPHEAD: "You feel invigorated.",
+        QUAFF_DEFAULT: "What an odd tasting potion!",
+
+        //scroll
+        READSC_1: "Nothing to read.",
+        READSC_2: "As you read the scroll, it vanishes.",
+        READSC_KNOWALL: "You feel more knowledgable.",
+        READSC_CONFUSE: "Your hands begin to glow red.",
+        READSC_LIGHT1: "The corridor glows and then fades.",
+        READSC_LIGHT2: "The room is lit.",
+        READSC_ARMOR: "Your armor glows faintly for a moment.",
+        READSC_SLEEP: "You fall asleep.",
+        READSC_CREATE: "You hear a faint cry of anguish in the distance.",
+        READSC_IDENT: "This scroll is an identify scroll",
+        READSC_GFIND1: "You begin to feel greedy and sense gold.",
+        READSC_GFIND2: "You begin to feel a pull downward.",
+        READSC_ENCH1: "You feel a strange sense of loss.",
+        READSC_ENCH2: (name)=>{return `Your ${name} glows blue for a moment.`},
+        READSC_SCARE: "You hear maniacal laughter in the distance.",
+        READSC_REMOVE: "You feel as if somebody is watching over you.",
+        READSC_AGGR: "You hear a high pitched humming noise.",
+        READSC_NOP: "This scroll seems to be blank.",
+        READSC_GENOCIDE: "You have been granted the boon of genocide.",
+        READSC_DCURSE: "Your pack shudders.",
+        READSC_DLEVEL: "You are whisked away to another region.",
+        READSC_PROTECT1: "You are granted the power of protection.",
+        READSC_PROTECT2: (name)=>{return `Protected ${name}`},
+        READSC_ALLENCH1: "You are granted the power of enchantment.",
+        READSC_ALLENCH2: "You are injured as the scroll flashes & bursts into flames !!!",
+        READSC_ALLENCH3: (name)=>{return `Enchanted ${name}`},
+        READSC_BLESS: "Your pack glistens brightly.",
+        READSC_MAKEIT: "You have been endowed with the power of creation.",
+        READSC_BAN1: "elevated to the upper", 
+        READSC_BAN2: "banished to the lower",
+        READSC_BAN3: (name)=> {return `You are ${name} regions.`},
+        READSC_CWAND: "Your sticks gleam.",
+        READSC_LOCTRAP: "You now recognize pitfalls.",
+        READSC_DEFAULT: "What a puzzling scroll!",
+
+        //eat
+        EAT_1: "That's Inedible!",
+        EAT_2: (fruit)=> {return `My, that was a yummy ${fruit}.`},
+        EAT_3: "Yuk, this food tastes like ARA.",
+        EAT_4: "Yum, that tasted good.",
 
     }
     return ms;

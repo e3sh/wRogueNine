@@ -38,7 +38,7 @@ function things_f(r){
 		const vowelstr = r.player.misc.vowelstr;
 		const num = r.item.weapon_f.num
 		const o_on = r.o_on;
-		const charge_str =()=>{return 0};//r.item.sticks.charge_str
+		const charge_str = r.item.stick_f.charge_str
 		const ring_num = r.item.ring_f.ring_num;
 
 		const s_names = r.item.s_names;
@@ -393,7 +393,7 @@ function things_f(r){
 		const init_weapon = r.item.weapon_f.init_weapon;
 		const initarmor = r.item.armor_f.initarmor;
 		const init_ring = r.item.ring_f.init_ring;
-		const fix_stick = (cur)=>{cur.o_type = d.STICK; console.log("fixstick"); return cur;}
+		const fix_stick = r.item.stick_f.fix_stick;
 
 		let item;//struct linked_list *item;
 		let mi; //struct magic_item *mi;

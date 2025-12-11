@@ -179,7 +179,7 @@ function misc(r){
 		for (x = hero.x - 1; x <= ex; x += 1) {
 			if (x >= 0 && x <= d.COLS - 1) {
 				for (y = hero.y - 1; y <= ey; y += 1) {
-					if (y <= 0 || y >= d.LINES - 2)
+					if (y <= 0 || y >= d.LINES )//- 2)
 						continue;
 					if (isalpha(mvwinch(mw, y, x))) {
 						let it; //reg struct linked_list *it;
@@ -334,7 +334,7 @@ function misc(r){
 			return;
 		obj = f.OBJPTR(item);
 		if (obj.o_type != d.FOOD) {
-			r.UI.msg("That's Inedible!");
+			r.UI.msg(ms.EAT_1);
 			r.after = false;
 			return;
 		}
@@ -344,19 +344,19 @@ function misc(r){
 		else if (o_on(obj, d.ISBLESS))
 			cursed -= 1;
 		if (obj.o_which == d.FRUITFOOD) {
-			r.UI.msg(`My, that was a yummy ${ms.FRUIT}.`);
+			r.UI.msg(ms.EAT_2(ms.FRUIT));
 			goodfood = 100;
 		}
 		else {
 			if (r.rnd(100) > 80 || o_on(obj, d.ISCURSED)) {
-				r.UI.msg("Yuk, this food tastes like ARA.");
+				r.UI.msg(ms.EAT_3);
 				goodfood = 300;
 				him.s_exp += 1;
 				check_level();
 				r.player.set_him(him);
 			}
 			else {
-				r.UI.msg("Yum, that tasted good.");
+				r.UI.msg(ms.EAT_4);
 				goodfood = 200;
 			}
 		}

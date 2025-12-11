@@ -318,5 +318,43 @@ function UIManager(r, g){
             return false;
         return true;
     }
-   
+
+    //
+    this.get_delta =(delta)=>{
+        const up = String.fromCharCode(24);
+        const dw = String.fromCharCode(25);
+        const lf = String.fromCharCode(27);
+        const ri = String.fromCharCode(26);
+        const sp = " ";
+
+        let resd = {};
+        switch (Number(delta))
+        {
+            case 7: resd.y = -1; resd.x = -1; break;
+            case 8: resd.y = -1; resd.x =  0; break;
+            case 9: resd.y = -1; resd.x =  1; break;
+            case 4: resd.y =  0; resd.x = -1; break;
+            case 6: resd.y =  0; resd.x =  1; break;
+            case 1: resd.y =  1; resd.x = -1; break;
+            case 2: resd.y =  1; resd.x =  0; break;
+            case 3: resd.y =  1; resd.x =  1; break;
+            default:  return {x:0, y:0, t:" + "}; 
+        }
+
+        resd.t = `${(resd.x <0)?lf:sp}${(resd.y <0)?up:dw}${(resd.x >0)?ri:sp}`;
+
+        return resd;
+    }
+
+    this.get_deltaText =(vx,vy)=>{
+
+        const up = String.fromCharCode(24);
+        const dw = String.fromCharCode(25);
+        const lf = String.fromCharCode(27);
+        const ri = String.fromCharCode(26);
+        const sp = " ";
+
+        return `${(vx <0)?lf:sp}${(vy==0)?"-":(vy <0)?up:dw}${(vx >0)?ri:sp}`;
+    }
+
 }

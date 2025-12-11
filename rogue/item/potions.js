@@ -72,7 +72,7 @@ function potions(r){
 			return;
 		obj = OBJPTR(item);
 		if (obj.o_type != d.POTION) {
-			r.UI.msg("That's undrinkable!");
+			r.UI.msg(ms.QUAFF_1);
 			r.after = false;
 			return;
 		}
@@ -88,11 +88,11 @@ function potions(r){
 		case d.P_CONFUSE:
 			if (!bless) {
 				if (pl_on(d.ISINVINC))
-					r.UI.msg("You remain level-headed.");
+					r.UI.msg(ms.QUAFF_CONF1);
 				else {
 					chg_abil(d.WIS,-1,true);		/* confuse his mind */
 					if (pl_off(d.ISHUH)) {
-						r.UI.msg("Wait, what's going on here. Huh? What? Who?");
+						r.UI.msg(ms.QUAFF_CONF2);
 						if (pl_on(d.ISHUH))
 							lengthen(unconfuse,r.rnd(8)+d.HUHDURATION);
 						else
@@ -109,17 +109,17 @@ function potions(r){
 				!iswearing(d.R_SUSAB)) {
 					chg_abil(d.CON,-1,true);		
 					chg_abil(d.STR,-(r.rnd(3)+1),true);
-					r.UI.msg("You feel very sick now.");
+					r.UI.msg(ms.QUAFF_POISON1);
 				}
 				else
-					r.UI.msg("You feel momentarily sick.");
+					r.UI.msg(ms.QUAFF_POISON2);
 				p_know[d.P_POISON] = true;
 			}
 		break;
 		case d.P_HEALING:
 			if (!curse) {
 				heal_self(4, true);
-				r.UI.msg("You begin to feel better.");
+				r.UI.msg(ms.QUAFF_HEALING);
 				if (!iswearing(d.R_SLOW))
 					notslow(false);
 				sight(false);
@@ -128,7 +128,7 @@ function potions(r){
 		break;
 		case d.P_STRENGTH:
 			if (!curse) {
-				r.UI.msg("You feel stronger, now.  What bulging muscles!");
+				r.UI.msg(ms.QUAFF_STR);
 				chg_abil(d.STR,1,true);
 				p_know[d.P_STRENGTH] = true;
 			}
@@ -140,13 +140,13 @@ function potions(r){
 			if (r.dungeon.mlist != null && !curse) {
 				dispmons();
 				//mpos = 0;
-				r.UI.msg("You begin to sense the presence of monsters--More--");
+				r.UI.msg(ms.QUAFF_MFIND1);
 				p_know[d.P_MFIND] = true;
 				//wait_for(cw,' ');
 				//msg("");		/* clear line */
 			}
 			else
-				r.UI.msg("You have a strange feeling for a moment, then it passes.");
+				r.UI.msg(ms.QUAFF_MFIND2);
 		break;
 		case d.P_TFIND:
 			/*
@@ -179,20 +179,20 @@ function potions(r){
 					}
 				}
 				if (show) {
-					r.UI.msg("You begin to sense the presence of magic.");
+					r.UI.msg(ms.QUAFF_TFIND1);
 					//overlay(hw,cw);
 					p_know[P_TFIND] = true;
 					break;
 				}
 			}
-			r.UI.msg("You have a strange feeling for a moment, then it passes.");
+			r.UI.msg(ms.QUAFF_TFIND2);
 		break;
 		case d.P_PARALYZE:
 			if (!bless) {
 				if (pl_on(d.ISINVINC))
-					r.UI.msg("You feel numb for a moment.");
+					r.UI.msg(ms.QUAFF_PARALY1);
 				else {
-					r.UI.msg("You can't move.");
+					r.UI.msg(ms.QUAFF_PARALY2);
 					player.t_nocmd = d.HOLDTIME;
 				}
 				p_know[d.P_PARALYZE] = true;
@@ -202,7 +202,7 @@ function potions(r){
 			if (!curse) {
 				let invlen = r.roll(40,20);
 
-				r.UI.msg(`This potion tastes like ${ms.FRUIT} juice.`);
+				r.UI.msg(ms.QUAFF_SEEINV(ms.FRUIT));
 				if (pl_off(d.CANSEE)) {
 					player.t_flags |= d.CANSEE;
 					fuse(unsee, true, invlen);
@@ -215,7 +215,7 @@ function potions(r){
 		break;
 		case d.P_RAISE:
 			if (!curse) {
-				r.UI.msg("You suddenly feel much more skillful.");
+				r.UI.msg(ms.QUAFF_RAISE);
 				p_know[d.P_RAISE] = true;
 				chg_abil(d.DEX,1,true);
 				chg_abil(d.WIS,1,true);
@@ -228,7 +228,7 @@ function potions(r){
 				heal_self(8, true);
 				if (r.rnd(100) < 50)
 					chg_abil(d.CON,1,true);
-				r.UI.msg("You begin to feel much better.");
+				r.UI.msg(ms.QUAFF_XHEAL);
 				p_know[d.P_XHEAL] = true;
 				if (!iswearing(d.R_SLOW))
 					notslow(false);
@@ -240,7 +240,7 @@ function potions(r){
 		case d.P_HASTE:
 			if (!curse) {
 				add_haste(true);
-				r.UI.msg("You feel yourself moving much faster.");
+				r.UI.msg(ms.QUAFF_HASTE);
 				p_know[d.P_HASTE] = true;
 			}
 		break;
@@ -248,7 +248,7 @@ function potions(r){
 			if (!curse) {
 				let time = r.rnd(400) + 350;
 
-				r.UI.msg("You feel invincible.");
+				r.UI.msg(ms.QUAFF_INVINC);
 				if (player.t_flags & d.ISINVINC)
 					lengthen(notinvinc,time);
 				else
@@ -259,14 +259,14 @@ function potions(r){
 		break;
 		case d.P_SMART:
 			if (!curse) {
-				r.UI.msg("You feel more perceptive.");
+				r.UI.msg( ms.QUAFF_SMART);
 				p_know[P_SMART] = true;
 				chg_abil(d.WIS,1,true);
 			}
 		break;
 		case d.P_RESTORE:
 			if (!curse) {
-				r.UI.msg("Hey, this tastes great. You feel warm all over.");
+				r.UI.msg( ms.QUAFF_RESTORE);
 				him.s_re = max_stats.s_re;
 				him.s_ef = max_stats.s_re;
 				ringabil();				/* add in rings */
@@ -280,10 +280,10 @@ function potions(r){
 		case d.P_BLIND:
 			if (!bless) {
 				if (pl_on(d.ISINVINC))
-					r.UI.msg("The light dims for a moment.");
+					r.UI.msg( ms.QUAFF_BLIND1);
 				else {
 					chg_abil(d.WIS,-1,true);
-					r.UI.msg("A cloak of darkness falls around you.");
+					r.UI.msg( ms.QUAFF_BLIND2);
 					if (pl_off(d.ISBLIND)) {
 						player.t_flags |= d.ISBLIND;
 						fuse(sight, true, r.rnd(400) + 450);
@@ -297,7 +297,7 @@ function potions(r){
 			if (!curse) {
 				let ethlen = r.roll(40,20);
 
-				r.UI.msg("You feel more vaporous.");
+				r.UI.msg( ms.QUAFF_ETH);
 				if (pl_on(d.ISETHER))
 					lengthen(noteth,ethlen);
 				else
@@ -307,13 +307,13 @@ function potions(r){
 			}
 		break;
 		case d.P_NOP:
-			r.UI.msg("This potion tastes extremely dull.");
+			r.UI.msg( ms.QUAFF_NOP);
 		break;
 		case d.P_DEX:
 			if (!curse) {
 				chg_abil(d.DEX,1,true);		/* increase dexterity */
 				p_know[d.P_DEX] = true;
-				r.UI.msg("You feel much more agile.");
+				r.UI.msg( ms.QUAFF_DEX);
 			}
 		break;
 		case d.P_REGEN:
@@ -325,7 +325,7 @@ function potions(r){
 				else
 					fuse(notregen, true, reglen);
 				player.t_flags |= d.ISREGEN;
-				r.UI.msg("You feel yourself improved.");
+				r.UI.msg( ms.QUAFF_REGEN);
 				p_know[d.P_REGEN] = true;
 			}
 		break;
@@ -336,11 +336,11 @@ function potions(r){
 			if (wh == d.P_DECREP) {
 				if (!bless) {
 					if (iswearing(d.R_SUSAB) || pl_on(d.ISINVINC)) {
-						r.UI.msg("You feel momentarily woozy.");
+						r.UI.msg( ms.QUAFF_DECREP1);
 						howmuch = 0;
 					}
 					else {
-						r.UI.msg("You feel crippled.");
+						r.UI.msg( ms.QUAFF_DECREP2);
 						howmuch = -howmuch;
 						if (!iswearing(d.R_SUSTSTR))
 							chg_abil(d.STR,howmuch,true);
@@ -352,7 +352,7 @@ function potions(r){
 			else {			/* potion of superhero */
 				if (curse)
 					howmuch = 0;
-				r.UI.msg("You feel invigorated.");
+				r.UI.msg(ms.QUAFF_SUPHEAD);
 				chg_abil(d.STR,howmuch,true);
 			}
 			chg_abil(d.CON,howmuch,true);
@@ -362,7 +362,7 @@ function potions(r){
 		}
 		break;
 		default:
-			r.UI.msg("What an odd tasting potion!");
+			r.UI.msg( ms.QUAFF_DEFAULT);
 			return;
 		}
 		r.nochange = false;

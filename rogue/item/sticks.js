@@ -12,6 +12,10 @@ function sticks(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+    const mw = d.DSP_MAIN_BG;
+	const hw = d.DSP_MAIN_FG;
+
 	/*
 	* fix_stick:
 	*	Init a stick for the hero
@@ -19,35 +23,38 @@ function sticks(r){
 	this.fix_stick = function(cur)
 	//struct object *cur;
 	{
-		struct rod *rd;
+		const ws_stuff = r.item.ws_stuff;
 
-		cur.o_type = STICK;
-		cur.o_charges = 4 + rnd(5);
-		strcpy(cur.o_hurldmg, "1d1");
-		rd = &ws_stuff[cur.o_which];
+		let rd; //struct rod *rd;
+
+		cur.o_type = d.STICK;
+		cur.o_charges = 4 + r.rnd(5);
+		cur.o_hurldmg = "1d1";
+		rd = ws_stuff[cur.o_which];
 		cur.o_weight = rd.ws_wght;
 		cur.o_vol = rd.ws_vol;
-		if (strcmp(rd.ws_type, "staff") == 0) {
-			strcpy(cur.o_damage, "2d3");
-			cur.o_charges += rnd(5) + 3;
+		if (rd.ws_type == "staff") {
+			cur.o_damage = "2d3";
+			cur.o_charges += r.rnd(5) + 3;
 		}
 		else {
-			strcpy(cur.o_damage, "1d1");
+			cur.o_damage = "1d1";
 		}
 		switch (cur.o_which) {
-			case WS_HIT:
-				if(rnd(100) < 15) {
+			case d.WS_HIT:
+				if(r.rnd(100) < 15) {
 					cur.o_hplus = 9;
 					cur.o_dplus = 9;
-					strcpy(cur.o_damage,"3d8");
+					cur.o_damage = "3d8";
 				}
 				else {
 					cur.o_hplus = 3;
 					cur.o_dplus = 3;
-					strcpy(cur.o_damage,"1d8");
+					cur.o_damage = "1d8";
 				}
-			break;case WS_LIGHT:
-				cur.o_charges += 7 + rnd(9);
+			break;
+			case d.WS_LIGHT:
+				cur.o_charges += 7 + r.rnd(9);
 		}
 	}
 
@@ -61,135 +68,176 @@ function sticks(r){
 		const find_mons = r.monster.chase.find_mons;
 		const runto = r.monster.chase.runto;
 		const del_pack = r.item.pack_f.del_pack;
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const o_on = r.o_on;
+		const heal_self = r.player.pstats.heal_self;
+		const unconfuse = r.daemon.unconfuse;
+		const notslow = r.daemon.notslow; 
+		const sight = r.daemon.sight;
+		const chg_hpt = r.player.pstats.chg_hpt;
+		const cordok = r.UI.cordok;
+		const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
+		const THINGPTR = f.THINGPTR;
+		const killed = r.monster.battle.killed;
+		const step_ok = r.UI.io.step_ok;
+		const winat = r.UI.winat;
+		const unhold = r.monster.unhold;
+		const rnd_mon = r.monster.rnd_mon;
+		const new_monster = r.monster.new_monster;
+		const rnd_pos = r.dungeon.rooms_f.rnd_pos;
+		const do_motion = r.item.weapon_f.do_motion;
+		const save_throw = r.monster.battle.save_throw;
+		const hit_monster = r.item.weapon_f.hit_monster;
+		const fight = r.monster.battle.fight;
+		const show = r.player.move.show;
+		const check_level = r.monster.battle.check_level;
 
-		reg struct linked_list *item;
-		reg struct object *obj;
-		reg struct thing *tp;
-		reg int y, x, wh;
-		struct room *rp;
-		bool bless, curse;
-		int better = 0;
+		const ws_know = r.item.ws_know;
+		const monsters = v.monsters;
+		const ws_stuff = r.item.ws_stuff;
 
-		if ((item = get_item("zap with", STICK)) == null)
+		const player = r.player.get_player();
+		const him = r.player.get_him();
+		const hero = r.player.get_hero();
+
+		let item; //reg struct linked_list *item;
+		let obj; //reg struct object *obj;
+		let tp; //reg struct thing *tp;
+		let y, x, wh;
+		let rp; //struct room *rp;
+		let bless, curse;
+		let better = 0;
+
+		if ((item = get_item("zap with", d.STICK)) == null)
 			return;
 		obj = OBJPTR(item);
 		wh = obj.o_which;
-		bless = o_on(obj, ISBLESS);
-		curse = o_on(obj, ISCURSED);
-		if (obj.o_type != STICK) {
-			msg("You can't zap with that!");
-			after = false;
+		bless = o_on(obj, d.ISBLESS);
+		curse = o_on(obj, d.ISCURSED);
+		if (obj.o_type != d.STICK) {
+			r.UI.msg("You can't zap with that!");
+			r.after = false;
 			return;
 		}
 		if (obj.o_charges == 0) {
-			msg("Nothing happens.");
+			r.UI.msg("Nothing happens.");
 			return;
 		}
 		if (!gotdir)
-		do {
-			delta.y = rnd(3) - 1;
-			delta.x = rnd(3) - 1;
-		} while (delta.y == 0 && delta.x == 0);
+			do {
+				r.delta.y = r.rnd(3) - 1;
+				r.delta.x = r.rnd(3) - 1;
+			} while (r.delta.y == 0 && r.delta.x == 0);
 		rp = player.t_room;
 		if (bless)
 			better = 3;
 		else if (curse)
 			better = -3;
 		switch (wh) {
-		case WS_SAPLIFE:
+		case d.WS_SAPLIFE:
 			if (!bless) {
 				if (him.s_hpt > 1)
 				him.s_hpt /= 2;	/* zap half his hit points */
 			}
-		break;case WS_CURE:
+		break;
+		case d.WS_CURE:
 			if (!curse) {
-				ws_know[WS_CURE] = true;
+				ws_know[d.WS_CURE] = true;
 				heal_self(6, false);
 				unconfuse(false);
 				notslow(false);
 				sight(false);
 			}
-		break;case WS_PYRO:
+		break;
+		case d.WS_PYRO:
 			if (!bless) {
-				msg("The rod explodes !!!");
-				chg_hpt(-roll(6,6), false, K_ROD);
-				ws_know[WS_PYRO] = true;
+				r.UI.msg("The rod explodes !!!");
+				chg_hpt(-r.roll(6,6), false, d.K_ROD);
+				ws_know[d.WS_PYRO] = true;
 				del_pack(item);		/* throw it away */
 			}
-		break;case WS_HUNGER:
+		break;
+		case d.WS_HUNGER:
 			if (!bless) {
-				struct linked_list *ip;
-				struct object *lb;
+				let ip; //struct linked_list *ip;
+				let lb; //struct object *lb;
 
-				food_left /= 3;
-				if ((ip = pack) != null) {
+				r.player.food_left /= 3;
+				if ((ip = r.player.get_pack()) != null) {
 					lb = OBJPTR(ip);
-					if (lb.o_type == FOOD) {
-						if ((lb.o_count -= roll(1,4)) < 1)
+					if (lb.o_type == d.FOOD) {
+						if ((lb.o_count -= r.roll(1,4)) < 1)
 							del_pack(ip);
 					}
 				}
 			}
-		break;case WS_PARZ:
-		case WS_MREG:
-		case WS_MDEG:
-		case WS_ANNIH: {
-			struct linked_list *mitem;
-			struct thing *it;
-			reg int i,j;
+		break;
+		case d.WS_PARZ:
+		case d.WS_MREG:
+		case d.WS_MDEG:
+		case d.WS_ANNIH: {
+			let mitem; //struct linked_list *mitem;
+			let it; //struct thing *it;
+			let i,j;
 
 			for (i = hero.y - 3; i <= hero.y + 3; i++) {
 				for (j = hero.x - 3; j <= hero.x + 3; j++) {
 					if (!cordok(i, j))
 						continue;
-					if (isalpha(mvwinch(mw,i,j))) {
+					if (isalpha(r.UI.mvwinch(mw,i,j))) {
 						mitem = find_mons(i, j);
 						if (mitem == null)
 							continue;
 						it = THINGPTR(mitem);
 						switch(wh) {
-							case WS_ANNIH:
+							case d.WS_ANNIH:
 								if (!curse)
 									killed(mitem,false);
-							break;case WS_MREG:
+							break;
+							case d.WS_MREG:
 								if (!bless)
 									it.t_stats.s_hpt *= 2;
-							break;case WS_MDEG:
+							break;
+							case d.WS_MDEG:
 								if (!curse) {
 									it.t_stats.s_hpt /= 2;
 									if (it.t_stats.s_hpt < 2)
 										killed(mitem,false);
 								}
-							break;case WS_PARZ:
+							break;
+							case d.WS_PARZ:
 								if (!curse) {
-									it.t_flags |= ISPARA;
-									it.t_flags &= ~ISRUN;
+									it.t_flags |= d.ISPARA;
+									it.t_flags &= ~d.ISRUN;
 								}
 							}
 						}
 					}
 				}
 			}
-		break;case WS_LIGHT:
+		break;
+		case d.WS_LIGHT:
 			if (!curse) {
-				ws_know[WS_LIGHT] = true;
+				ws_know[d.WS_LIGHT] = true;
 				if (rp == null)
-					msg("The corridor glows and then fades.");
+					r.UI.msg("The corridor glows and then fades.");
 				else {
-					msg("The room is lit.");
-					rp.r_flags &= ~ISDARK;
-					light(&hero);
-					mvwaddch(cw, hero.y, hero.x, PLAYER);
+					r.UI.msg("The room is lit.");
+					rp.r_flags &= ~d.ISDARK;
+					light(hero);
+					r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 				}
 			}
-		break;case WS_DRAIN:
+		break;
+		case d.WS_DRAIN:
 			/*
 			* Take away 1/2 of hero's hit points, then take it away
 			* evenly from the monsters in the room (or next to hero
 			* if he is in a passage)
 			*/
 			if (him.s_hpt < 2) {
-				msg("You are too weak to use it.");
+				r.UI.msg("You are too weak to use it.");
 				return;
 			}
 			else if (!curse) {
@@ -205,158 +253,178 @@ function sticks(r){
 		case WS_CANCEL:
 		case WS_MINVIS:
 		{
-			reg char monster, oldch;
+			let monster, oldch;
 
 			y = hero.y;
 			x = hero.x;
 			do {
-				y += delta.y;
-				x += delta.x;
+				y += r.delta.y;
+				x += r.delta.x;
 			} while (step_ok(winat(y, x)));
-			if (isalpha(monster = mvwinch(mw, y, x))) {
-				int omonst;
+			if (isalpha(monster = r.UI.mvwinch(mw, y, x))) {
+				let omonst;
 
-				if (wh != WS_MINVIS)
+				if (wh != d.WS_MINVIS)
 					unhold(monster);
 				item = find_mons(y, x);
 				if (item == null)
 					break;
 				tp = THINGPTR(item);
 				omonst = tp.t_indx;
-				if (wh == WS_POLYM && !curse) {
+				if (wh == d.WS_POLYM && !curse) {
 					r.dungeon.mlist = r.detach(r.dungeon.mlist, item);
 					r.discard(item);
 					oldch = tp.t_oldch;
 					delta.y = y;
 					delta.x = x;
 					monster = rnd_mon(false, true);
-					item = new_monster(monster, &delta, false);
-					if (!(tp.t_flags & ISRUN))
-						runto(&delta, &hero);
-					if (isalpha(mvwinch(cw, y, x)))
-						mvwaddch(cw, y, x, monsters[monster].m_show);
+					item = new_monster(monster, r.delta, false);
+					if (!(tp.t_flags & d.ISRUN))
+						runto(delta, hero);
+					if (isalpha(r.UI.mvwinch(cw, y, x)))
+						r.UI.mvwaddch(cw, y, x, monsters[monster].m_show);
 					tp.t_oldch = oldch;
-					ws_know[WS_POLYM] |= (monster != omonst);
+					ws_know[d.WS_POLYM] |= (monster != omonst);
 				}
-				else if (wh == WS_MINVIS && !bless) {
+				else if (wh == d.WS_MINVIS && !bless) {
 					tp.t_flags |= ISINVIS;
-					mvwaddch(cw,y,x,tp.t_oldch);	/* hide em */
-					runto(&tp.t_pos, &hero);
+					r.UI.mvwaddch(cw,y,x,tp.t_oldch);	/* hide em */
+					runto(tp.t_pos, hero);
 				}
-				else if (wh == WS_CANCEL && !curse) {
-					tp.t_flags |= ISCANC;
-					tp.t_flags &= ~ISINVIS;
+				else if (wh == d.WS_CANCEL && !curse) {
+					tp.t_flags |= d.ISCANC;
+					tp.t_flags &= ~d.ISINVIS;
 				}
 				else {
-					if (wh == WS_TELAWAY) {
+					if (wh == d.WS_TELAWAY) {
 						if (curse)
 							break;
-						tp.t_pos = *rnd_pos(&rooms[rnd_room()]);
+						tp.t_pos = rnd_pos(r.dungeon.rooms[rnd_room()]);
 					}
 					else {					/* WS_TELTO */
 						if (bless)
 							break;
-						tp.t_pos.y = hero.y + delta.y;
-						tp.t_pos.x = hero.x + delta.x;
+						tp.t_pos.y = hero.y + r.delta.y;
+						tp.t_pos.x = hero.x + r.delta.x;
 					}
-					if (isalpha(mvwinch(cw, y, x)))
-						mvwaddch(cw, y, x, tp.t_oldch);
-					tp.t_dest = &hero;
-					tp.t_flags |= ISRUN;
-					mvwaddch(mw, y, x, ' ');
-					mvwaddch(mw, tp.t_pos.y, tp.t_pos.x, monster);
-					tp.t_oldch = mvwinch(cw,tp.t_pos.y,tp.t_pos.x);
+					if (isalpha(r.UI.mvwinch(cw, y, x)))
+						r.UI.mvwaddch(cw, y, x, tp.t_oldch);
+					tp.t_dest = hero;
+					tp.t_flags |= d.ISRUN;
+					r.UI.mvwaddch(mw, y, x, ' ');
+					r.UI.mvwaddch(mw, tp.t_pos.y, tp.t_pos.x, monster);
+					tp.t_oldch = r.UI.mvwinch(cw,tp.t_pos.y,tp.t_pos.x);
 				}
 			}
 		}
-		break;case WS_MISSILE:
+		break;
+		case d.WS_MISSILE:
 		{
-			struct coord *whe;
-			static struct object bolt = {
-				{0, 0}, "", "6d6", "", '*', 0, 0, 1000, 0, 0, 0, 0, 0, 0,
-			};
+			let whe; //struct coord *whe;
+			//static struct object bolt = {
+			//	{0, 0}, "", "6d6", "", '*', 0, 0, 1000, 0, 0, 0, 0, 0, 0,
+			//};
+       		const bolt = {
+				o_pos	:{x:0,y:0},		/* Where it lives on the screen */
+				o_damage:"",		/* Damage if used like sword */
+				o_hurldmg:"6d6",	/* Damage if thrown */
+				o_typname:"",		/* name this thing is called */
+				o_type	:'*',				/* What kind of object it is */
+				o_count	: 0,			/* Count for plural objects */
+				o_which	: 0,			/* Which object of a type it is */
+				o_hplus	: 1000,			/* Plusses to hit */
+				o_dplus	: 0,			/* Plusses to damage */
+				o_ac	: 0,				/* Armor class or charges */
+				o_flags	: 0,			/* Information about objects */
+				o_group	: 0,			/* Group number for this object */
+				o_weight: 0,			/* weight of this object */
+				o_vol	: 0,				/* volume of this object */
+				o_launch:"",			/* What you need to launch it */
+        	}
 
 			if (curse)
-				strcpy(bolt.o_hurldmg,"3d3");
+				bolt.o_hurldmg = "3d3";
 			else if (bless)
-				strcpy(bolt.o_hurldmg,"9d9");
-			ws_know[WS_MISSILE] = true;
-			do_motion(&bolt, delta.y, delta.x);
-			whe = &bolt.o_pos;
-			if (isalpha(mvwinch(mw, whe.y, whe.x))) {
-				struct linked_list *it;
+				bolt.o_hurldmg = "9d9";
+			ws_know[d.WS_MISSILE] = true;
+			do_motion(bolt, r.delta.y, r.delta.x);
+			whe = bolt.o_pos;
+			if (isalpha(r.UI.mvwinch(mw, whe.y, whe.x))) {
+				let it; //struct linked_list *it;
 
-				runto(whe, &hero);
+				runto(whe, hero);
 				it = find_mons(whe.y, whe.x);
 				if (it != null) {
-					if (!save_throw(VS_MAGIC + better, THINGPTR(it))) {
-						hit_monster(whe, &bolt);
+					if (!save_throw(d.VS_MAGIC + better, THINGPTR(it))) {
+						hit_monster(whe, bolt);
 						break;
 					}
 				}
 			}
-			msg("Missle vanishes.");
+			r.UI.msg("Missle vanishes.");
 		}
-		break;case WS_NOP:
-			msg("Your %s flickers momentarily and then fades",
-				ws_stuff[wh].ws_type);
-		break;case WS_HIT: {
-			char ch;
+		break;
+		case d.WS_NOP:
+			r.UI.msg(`Your ${ws_stuff[wh].ws_type} flickers momentarily and then fades`);
+		break;
+		case d.WS_HIT: {
+			let ch;
 
-			delta.y += hero.y;
-			delta.x += hero.x;
-			ch = winat(delta.y, delta.x);
+			r.delta.y += hero.y;
+			r.delta.x += hero.x;
+			ch = winat(r.delta.y, r.delta.x);
 			if (curse) {				/* decrease for cursed */
-				strcpy(obj.o_damage,"1d1");
+				obj.o_damage = "1d1";
 				obj.o_hplus = obj.o_dplus = 0;
 			}
 			else if (bless) {			/* increase for blessed */
-				strcpy(obj.o_damage,"5d8");
+				obj.o_damage = "5d8";
 				obj.o_hplus = obj.o_dplus = 12;
 			}
 			if (isalpha(ch))
-				fight(&delta, obj, false);
+				fight(r.delta, obj, false);
 		}
-		break;case WS_HASTE_M:
-		case WS_CONFMON:
-		case WS_SLOW_M:
-		case WS_MOREMON: {
-			reg int m1,m2;
-			struct coord mp;
-			struct linked_list *titem;
+		break;
+		case d.WS_HASTE_M:
+		case d.WS_CONFMON:
+		case d.WS_SLOW_M:
+		case d.WS_MOREMON: {
+			let m1,m2;
+			let mp; //struct coord mp;
+			let titem; //struct linked_list *titem;
 
 			y = hero.y;
 			x = hero.x;
 			do {
-				y += delta.y;
-				x += delta.x;
+				y += r.delta.y;
+				x += r.delta.x;
 			} while (step_ok(winat(y, x)));
-			if (isalpha(mvwinch(mw, y, x))) {
+			if (isalpha(r.UI.mvwinch(mw, y, x))) {
 				item = find_mons(y, x);
 				if (item == null)
 					break;
 				tp = THINGPTR(item);
-				if (wh == WS_HASTE_M && !bless) {			/* haste it */
-					if (on(*tp, ISSLOW))
-						tp.t_flags &= ~ISSLOW;
+				if (wh == d.WS_HASTE_M && !bless) {			/* haste it */
+					if (on(tp, d.ISSLOW))
+						tp.t_flags &= ~d.ISSLOW;
 					else
-						tp.t_flags |= ISHASTE;
+						tp.t_flags |= d.ISHASTE;
 				}
-				else if (wh == WS_CONFMON && !curse) {		/* confuse it */
-					tp.t_flags |= ISHUH;
-					if (pl_on(ISHELD) && tp.t_type == 'd')
-						player.t_flags &= ~ISHELD;
+				else if (wh == d.WS_CONFMON && !curse) {		/* confuse it */
+					tp.t_flags |= d.ISHUH;
+					if (pl_on(d.ISHELD) && tp.t_type == 'd')
+						player.t_flags &= ~d.ISHELD;
 				}
-				else if (wh == WS_SLOW_M && !curse) {		/* slow it */
-					if (on(*tp, ISHASTE))
-						tp.t_flags &= ~ISHASTE;
+				else if (wh == d.WS_SLOW_M && !curse) {		/* slow it */
+					if (on(tp, d.ISHASTE))
+						tp.t_flags &= ~d.ISHASTE;
 					else
-						tp.t_flags |= ISSLOW;
+						tp.t_flags |= d.ISSLOW;
 					tp.t_turn = true;
 				}
 				else if (!bless) {	/* WS_MOREMON: multiply it */
-					char ch;
-					struct thing *th;
+					let ch;
+					let th; //struct thing *th;
 
 					for (m1 = tp.t_pos.x-1; m1 <= tp.t_pos.x+1; m1++) {
 						for(m2 = tp.t_pos.y-1; m2 <= tp.t_pos.y+1; m2++) {
@@ -366,52 +434,74 @@ function sticks(r){
 							if (step_ok(ch)) {
 								mp.x = m1;			/* create it */
 								mp.y = m2;
-								titem = new_monster(tp.t_indx, &mp, false);
+								titem = new_monster(tp.t_indx, mp, false);
 								th = THINGPTR(titem);
-								th.t_flags |= ISMEAN;
-								runto(&mp, &hero);
+								th.t_flags |= d.ISMEAN;
+								runto(mp, hero);
 							}
 						}
 					}
 				}
 				delta.y = y;
 				delta.x = x;
-				runto(&delta, &hero);
+				runto(delta, hero);
 			}
 		}
-		break;case WS_ELECT:
-		case WS_FIRE:
-		case WS_COLD: {
-			reg char dirch, ch, *name;
-			reg bool bounced, used;
-			int boingcnt, boltlen;
-			struct coord pos;
-			struct coord spotpos[BOLT_LENGTH * 2];
-			static struct object bolt =	{
-				{0, 0}, "", "6d6", "", '*', 0, 0, 1000, 0, 0, 0, 0, 0, 0,
-			};
+		break;
+		case d.WS_ELECT:
+		case d.WS_FIRE:
+		case d.WS_COLD: {
+			
+			let dirch, ch, name;
+			let bounced, used;
+			let boingcnt, boltlen;
+			let pos; //struct coord pos;
+			let spotpos = [];//struct coord spotpos[BOLT_LENGTH * 2];
+			
+			//static struct object bolt =	{
+			//	{0, 0}, "", "6d6", "", '*', 0, 0, 1000, 0, 0, 0, 0, 0, 0,
+			//};
+      		const bolt = {
+				o_pos	:{x:0,y:0},		/* Where it lives on the screen */
+				o_damage:"",		/* Damage if used like sword */
+				o_hurldmg:"6d6",	/* Damage if thrown */
+				o_typname:"",		/* name this thing is called */
+				o_type	:'*',				/* What kind of object it is */
+				o_count	: 0,			/* Count for plural objects */
+				o_which	: 0,			/* Which object of a type it is */
+				o_hplus	: 1000,			/* Plusses to hit */
+				o_dplus	: 0,			/* Plusses to damage */
+				o_ac	: 0,				/* Armor class or charges */
+				o_flags	: 0,			/* Information about objects */
+				o_group	: 0,			/* Group number for this object */
+				o_weight: 0,			/* weight of this object */
+				o_vol	: 0,				/* volume of this object */
+				o_launch:"",			/* What you need to launch it */
+        	}
 
-			boltlen = BOLT_LENGTH;
+			boltlen = d.BOLT_LENGTH;
 			if (curse) {
-				strcpy(bolt.o_hurldmg,"3d3");
+				bolt.o_hurldmg = "3d3";
 				boltlen -= 3;
 			}
 			else if (bless) {
-				strcpy(bolt.o_hurldmg,"9d9");
+				bolt.o_hurldmg = "9d9";
 				boltlen += 3;
 			}
-			switch (delta.y + delta.x) {
+			switch (r.delta.y + r.delta.x) {
 				case 0: dirch = '/';
-				break;case 1: case -1: dirch = (delta.y == 0 ? '-' : '|');
-				break;case 2: case -2: dirch = '\\';
+				break;
+				case 1: case -1: dirch = (delta.y == 0 ? '-' : '|');
+				break;
+				case 2: case -2: dirch = '\\';
 			}
 			pos = hero;
 			bounced = false;
 			boingcnt = 0;
 			used = false;
-			if (wh == WS_ELECT)
+			if (wh == d.WS_ELECT)
 				name = "bolt";
-			else if (wh == WS_FIRE)
+			else if (wh == d.WS_FIRE)
 				name = "flame";
 			else
 				name = "ice";
@@ -419,61 +509,62 @@ function sticks(r){
 				ch = winat(pos.y, pos.x);
 				spotpos[y] = pos;
 				switch (ch) {
-					case SECRETDOOR:
+					case d.SECRETDOOR:
 					case '|':
 					case '-':
 					case ' ':
 						bounced = true;
 						if (++boingcnt > 6) 
 							used = true;	/* only so many bounces */
-						delta.y = -delta.y;
-						delta.x = -delta.x;
+						r.delta.y = -r.delta.y;
+						r.delta.x = -r.delta.x;
 						y--;
-						msg("The bolt bounces");
+						r.UI.msg("The bolt bounces");
 						break;
 					default:
 						if (isalpha(ch)) {
-							struct linked_list *it;
+							let it; //struct linked_list *it;
 
 							it = find_mons(pos.y, pos.x);
-							runto(&pos, &hero);
+							runto(pos, hero);
 							if (it != null) {
-								if (!save_throw(VS_MAGIC+better,THINGPTR(it))) {
+								if (!save_throw(d.VS_MAGIC+better,THINGPTR(it))) {
 									bolt.o_pos = pos;
-									hit_monster(&pos, &bolt);
+									hit_monster(pos, bolt);
 									used = true;
 								}
 								else if(ch != 'M' || show(pos.y,pos.x)=='M') {
-									msg("%s misses", name);
+									r.UI.msg(`${name} misses`);
 								}
 							}
 						}
 						else if(bounced && pos.y==hero.y && pos.x==hero.x) {
 							bounced = false;
-							if (!save(VS_MAGIC + better)) {
-								msg("The %s hits you.", name);
-								chg_hpt(-roll(6, 6),false,K_BOLT);
+							if (!save(d.VS_MAGIC + better)) {
+								r.UI.msg(`The ${name} hits you.`);
+								chg_hpt(-r.roll(6, 6),false,d.K_BOLT);
 								used = true;
 							}
 							else
-								msg("The %s whizzes by you.", name);
+								r.UI.msg(`The ${name} whizzes by you.`);
 						}
-						mvwaddch(cw, pos.y, pos.x, dirch);
+						r.UI.mvwaddch(cw, pos.y, pos.x, dirch);
 						draw(cw);
 					}
 					pos.y += delta.y;
 					pos.x += delta.x;
 				}
 				for (x = 0; x < y; x++)
-					mvwaddch(cw, spotpos[x].y, spotpos[x].x,
+					r.UI.mvwaddch(cw, spotpos[x].y, spotpos[x].x,
 					show(spotpos[x].y, spotpos[x].x));
 				ws_know[wh] = true;
 			}
-		break;case WS_ANTIM: {
-			reg int m1, m2, x1, y1;
-			struct linked_list *ll;
-			struct thing *lt;
-			int ch, radius;
+		break;
+		case d.WS_ANTIM: {
+			let m1, m2, x1, y1;
+			let ll; //struct linked_list *ll;
+			let lt; //struct thing *lt;
+			let ch, radius;
 
 			y1 = hero.y;
 			x1 = hero.x;
@@ -481,7 +572,7 @@ function sticks(r){
 				y1 += delta.y;
 				x1 += delta.x;
 				ch = winat(y1, x1);
-			} while (ch == PASSAGE || ch == FLOOR);
+			} while (ch == d.PASSAGE || ch == d.FLOOR);
 			if (curse)
 				radius = 2;
 			else if (bless)
@@ -500,7 +591,7 @@ function sticks(r){
 					ll = find_obj(m2,m1);
 					if (ll != null) {
 						r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj ,ll);
-						discard(ll);
+						r.discard(ll);
 					}
 					ll = find_mons(m2,m1);
 					if (ll != null) {
@@ -513,33 +604,41 @@ function sticks(r){
 						*/
 						lt.t_pack = r.free_list(lt.t_pack);
 						r.dungeon.mlist = r.detach(r.dungeon.mlist,ll);
-						discard(ll);
-						mvwaddch(mw,m2,m1,' ');
+						r.discard(ll);
+						r.UI.mvwaddch(mw,m2,m1,' ');
 					}
-					mvaddch(m2,m1,' ');
-					mvwaddch(cw,m2,m1,' ');
+					r.UI.mvaddch(m2,m1,' ');
+					r.UI.mvwaddch(cw,m2,m1,' ');
 				}
 			}
-			touchwin(cw);
-			touchwin(mw);
+			//touchwin(cw);
+			//touchwin(mw);
 			check_level();
 		}
-		break;default:
-			msg("What a bizarre schtick!");
+		break;
+		default:
+			r.UI.msg("What a bizarre schtick!");
 		}
 		obj.o_charges--;
+
+		r.player.set_player( player);
+		r.player.set_him( him);
 	}
 
 	/*
 	* drain:
 	*	Do drain hit points from player stick
 	*/
-	this.drain = function(ymin, ymax, xmin, xmax)
+	function drain(ymin, ymax, xmin, xmax)
 	//int ymin, ymax, xmin, xmax;
 	{
-		reg int i, j, cnt;
-		reg struct thing *ick;
-		reg struct linked_list *item;
+		const cansee = r.monster.chase.cansee;
+
+		const him = r.player.get_him();
+
+		let i, j, cnt;
+		let ick; //reg struct thing *ick;
+		let item ;//reg struct linked_list *item;
 
 		/*
 		* First count how many things we need to spread the hit points among
@@ -547,10 +646,10 @@ function sticks(r){
 		cnt = 0;
 		for (i = ymin; i <= ymax; i++)
 			for (j = xmin; j <= xmax; j++)
-				if (isalpha(mvwinch(mw, i, j)))
+				if (isalpha(r.UI.mvwinch(mw, i, j)))
 					cnt++;
 		if (cnt == 0) {
-			msg("You have a tingling feeling.");
+			r.UI.msg("You have a tingling feeling.");
 			return;
 		}
 		cnt = him.s_hpt / cnt;
@@ -560,13 +659,13 @@ function sticks(r){
 		*/
 		for (i = ymin; i <= ymax; i++) {
 			for (j = xmin; j <= xmax; j++) {
-				if(isalpha(mvwinch(mw, i, j))) {
+				if(isalpha(r.UI.mvwinch(mw, i, j))) {
 					item = find_mons(i, j);
 					if (item == null)
 						continue;
 					ick = THINGPTR(item);
 					if ((ick.t_stats.s_hpt -= cnt) < 1)
-						killed(item,cansee(i,j) && !(ick.t_flags & ISINVIS));
+						killed(item,cansee(i,j) && !(ick.t_flags & d.ISINVIS));
 				}
 			}
 		}
@@ -580,11 +679,13 @@ function sticks(r){
 	this.charge_str = function(obj)
 	//struct object *obj;
 	{
-		static char buf[20];
+		const o_on = r.o_on;
 
-		buf[0] = '\0';
-		if (o_on(obj,ISKNOW) || o_on(obj,ISPOST))
-			sprintf(buf, " [%d]", obj.o_charges);
+		let buf; //static char buf[20];
+
+		buf = '';
+		if (o_on(obj,d.ISKNOW) || o_on(obj,d.ISPOST))
+			buf = `[${obj.o_charges}]`;
 		return buf;
 	}
 }

@@ -5,8 +5,8 @@ function GameManager(g){
     const t = rogueTypes();
     const v = {};//globalValiableInit();
 
-    const ms = rogueMessage(this);
-    //const ms = rogueMessage_jp(this);
+    //const ms = rogueMessage(this);
+    const ms = rogueMessage_jp(this);
 
     //props
 
@@ -326,13 +326,16 @@ function GameManager(g){
         let firstinv;
         if (r.qs.check()){
             firstinv = false;
-            r.UI.msg("continue game start");
+            r.UI.msg(ms.RESTART);
 
             r.qs.load();
             //load game
         }else{
             firstinv = true;
             r.UI.msg(ms.MAINSTART);
+
+            r.player.food_left = d.HUNGERTIME;
+            r.player.hungry_state = d.F_OKAY;
             //newGame;
         }
         //continue;

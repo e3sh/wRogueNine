@@ -42,6 +42,7 @@ function quick_storage(r){
             ws: ws_know,
             ring: r_know,
             food_left: r.player.food_left,
+	        hung_st: r.player.hungry_state,
             purse: r.player.purse,
             maxstats: r.player.get_max_stats()
         }
@@ -107,6 +108,8 @@ function quick_storage(r){
 
             r.dungeon.level = param.level;
             r.player.food_left = param.food_left;
+            r.player.hungry_state = param.hung_st;
+
             r.player.purse = param.purse;
 
             r.player.set_player(pobj);

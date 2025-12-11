@@ -140,7 +140,7 @@ function MonsterManager(r){
 		* deeper the hero goes.
 		*/
 		if (r.dungeon.level > d.AMLEVEL)
-			st.s_lvl += ((level - d.AMLEVEL) / 4);
+			st.s_lvl += ((r.dungeon.level - d.AMLEVEL) / 4);
 
 		/*
 		* If monster in treasure room, then tougher.
@@ -188,9 +188,9 @@ function MonsterManager(r){
 			let mch;
 
 			if (tp.t_pack != null)
-				mch = (OBJPTR(tp.t_pack)).o_type;
+				mch = (f.OBJPTR(tp.t_pack)).o_type;
 			else {
-				switch (rnd(level >= d.AMLEVEL ? 9 : 8)) {
+				switch (r.rnd(r.dungeon.level >= d.AMLEVEL ? 9 : 8)) {
 					case 0: mch = d.GOLD;
 					break;case 1: mch = d.POTION;
 					break;case 2: mch = d.SCROLL;
@@ -296,7 +296,7 @@ function MonsterManager(r){
 			|| DISTANCE(y, x, hero.y, hero.x) < 3) {
 				if (off(tp,d.ISFOUND) && !save(d.VS_PETRIFICATION)
 				&& !iswearing(d.R_SUSAB) && pl_off(d.ISINVINC)) {
-					msg("The umber hulk's gaze has confused you.");
+					msg(ms.WAKEMON);
 					if (pl_on(d.ISHUH))
 						lengthen(unconfuse,r.rnd(20)+d.HUHDURATION);
 					else
@@ -336,8 +336,8 @@ function MonsterManager(r){
 		let mm; //struct monster *mm;
 		let i, ii, c;
 
-		if (levcount == 0) {
-			mpos = 0;
+		if (r.levcount == 0) {
+			//mpos = 0;
 			msg("You cannot genocide Asmodeus !!");
 			return;
 		}
@@ -389,6 +389,8 @@ function MonsterManager(r){
 	this.unhold = (whichmon)=>
 	//char whichmon;
 	{
+		const midx = r.monster.midx;
+
 		switch (whichmon) {
 			case 'F':
 				this.fung_hit = 0;
