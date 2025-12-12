@@ -28,7 +28,7 @@ function scrolls(r){
 		const OBJPTR = f.OBJPTR;
 		const o_on = r.o_on;
 		const o_off = r.o_off;
-		const chg_abil = r.player.pstats_f.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 		const light = r.player.move.light;
 		const rf_on = r.dungeon.rooms_f.rf_on;
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
@@ -50,7 +50,7 @@ function scrolls(r){
 		const w_magic = v.w_magic;
 		const armors = v.armors;
 
-		const mtlev = r.monster.mtlev();	
+		const mtlev = r.monster.get_mtlev();	
 
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();

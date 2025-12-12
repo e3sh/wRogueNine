@@ -213,13 +213,25 @@ function command(r){
 		const winat = r.UI.winat;
 		const msg = r.UI.msg;
 		const inventory = r.item.pack_f.inventory;
-		const eat = r.player.misc.eat;
 		const drop = r.item.things_f.drop;
 		const buy_it = r.dungeon.trader.buy_it;
 		const sell_it = r.dungeon.trader.sell_it;
 		const market = r.dungeon.trader.market;
 		const create_obj = r.UI.wizard.create_obj;
-
+		const decode_cmd = r.item.decode_cmd;
+		const decode_drop = r.item.decode_drop;
+		const get_dir = r.player.misc.get_dir;
+		const quaff = r.item.potion_f.quaff;
+		const read_scroll = r.item.scroll_f.read_scroll;
+		const eat = r.player.misc.eat;
+		const ring_off = r.item.ring_f.ring_off;
+		const ring_on = r.item.ring_f.ring_on;
+		const take_off = r.item.armor_f.take_off;
+		const wear = r.item.armor_f.wear;
+		const wield = r.item.weapon_f.wield;
+		const do_zap = r.item.stick_f.do_zap;
+		const missile = r.item.weapon_f.missile;
+		const dip_it = r.player.move.dip_it;
 
 		const illegal = (text)=>{return `${v.illegal} ${text}`};
 		const unctrl =(text)=>{return text;}
@@ -265,16 +277,20 @@ function command(r){
 
 		if (ki.includes("Numpad0")
 		){
-			ch = "e"; //eat/
+			ch = decode_cmd(false);
+
+			//ch = "e"; //eat/
 		}
 
 		if (ki.includes("KeyD")
 		){
-			if (r.levtype != d.POSTLEV){
-				ch = "d"; //drop
-			}else{
-				ch = "%"; //sell_it
-			}
+			ch = decode_drop(false);
+
+			//if (r.levtype != d.POSTLEV){
+			//	ch = "d"; //drop
+			//}else{
+			//	ch = "%"; //sell_it
+			//}
 		}
 
 		if (ki.includes("KeyC")) {
@@ -382,7 +398,7 @@ function command(r){
 				if (!get_dir())
 					r.after = false;
 				else
-					missile(delta.y, delta.x);
+					missile(r.delta.y, r.delta.x);
 				break;
 			case 'Q' : r.after = false; quit(-1);
 				break;

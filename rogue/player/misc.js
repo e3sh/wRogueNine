@@ -12,18 +12,9 @@ function misc(r){
 		
     const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
-
-	const do_daemons = r.daemon.do_daemon;
-	const do_fuses = r.daemon.do_fuses;
-	const pl_on =(what)=> { return (player.t_flags & what); }
-
-	const get_item =()=>{};//item.pack.get_item
-	const msg = r.UI.msg;
-	const o_on = r.o_on;
-	const rnd = r.rnd;
-
+	
+	//const pl_on =(what)=> { return (player.t_flags & what); }
 	const tolower = (text)=>{return text.toLowerCase();};
-	const readchar = ()=>{};//r.UI.
 	const extras = r.item.things_f.extras;
 	
 	let inwhgt = false;
@@ -431,44 +422,47 @@ function misc(r){
 	*/
 	this.get_dir = function()
 	{
+		const pl_on = r.player.pl_on;
+
 		let prompt; //reg char *prompt;
 		let gotit; //reg bool gotit;
 
 		prompt = "Direction: ";
 		do {
+
 			gotit = true;
-			switch (readchar()) {
-				case 'h': case'H': delta.y =  0; delta.x = -1;
-					break;
-				case 'j': case'J': delta.y =  1; delta.x =  0;
-					break;
-				case 'k': case'K': delta.y = -1; delta.x =  0;
-					break;
-				case 'l': case'L': delta.y =  0; delta.x =  1;
-					break;
-				case 'y': case'Y': delta.y = -1; delta.x = -1;
-					break;
-				case 'u': case'U': delta.y = -1; delta.x =  1;
-					break;
-				case 'b': case'B': delta.y =  1; delta.x = -1;
-					break;
-				case 'n': case'N': delta.y =  1; delta.x =  1;
-					break;
-				case d.ESCAPE: return false;
-					break;
-				default:
-					mpos = 0;
-					msg(prompt);
-					gotit = false;
-			}
+			//switch (readchar()) {
+			//	case 'h': case'H': delta.y =  0; delta.x = -1;
+			//		break;
+			//	case 'j': case'J': delta.y =  1; delta.x =  0;
+			//		break;
+			//	case 'k': case'K': delta.y = -1; delta.x =  0;
+			//		break;
+			//	case 'l': case'L': delta.y =  0; delta.x =  1;
+			//		break;
+			//	case 'y': case'Y': delta.y = -1; delta.x = -1;
+			//		break;
+			//	case 'u': case'U': delta.y = -1; delta.x =  1;
+			//		break;
+			//	case 'b': case'B': delta.y =  1; delta.x = -1;
+			//		break;
+			//	case 'n': case'N': delta.y =  1; delta.x =  1;
+			//		break;
+			//	case d.ESCAPE: return false;
+			//		break;
+			//	default:
+			//		mpos = 0;
+			//		msg(prompt);
+			//		gotit = false;
+			//}
 		} while(!gotit);
-		if (pl_on(d.ISHUH) && rnd(100) > 80) {
+		if (pl_on(d.ISHUH) && r.rnd(100) > 80) {
 			do {
-				delta.y = rnd(3) - 1;
-				delta.x = rnd(3) - 1;
-			} while (delta.y == 0 && delta.x == 0);
+				r.delta.y = r.rnd(3) - 1;
+				r.delta.x = r.rnd(3) - 1;
+			} while (r.delta.y == 0 && r.delta.x == 0);
 		}
-		mpos = 0;
+		//mpos = 0;
 		return true;
 	}
 

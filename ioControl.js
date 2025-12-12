@@ -1,6 +1,24 @@
 // ----------------------------------------------------------------------
 // GameTask
 class ioControl extends GameTask {
+
+	watchdogTimer;
+
+	resetWatchdog() {
+		const TIMEOUT_MS = 5000; // 5秒
+
+		if (!Boolean(this.watchdogTimer)) console.log("Watchdog Start");
+		clearTimeout(this.watchdogTimer); // 既存タイマーをクリア
+		this.watchdogTimer = setTimeout(this.onTimeout, TIMEOUT_MS); // 新しいタイマーを設定
+	}
+
+	onTimeout() {
+		console.error("Watchdog TimeOut.");// Restart Application.");
+		console.trace();
+		debugger;
+		// 実際のアプリケーションでは、ここで再起動処理（例: location.reload()）を呼び出す
+		// location.reload();
+	}
 	
 	constructor(id){
 		super(id);
@@ -109,6 +127,9 @@ class ioControl extends GameTask {
 				MSG.y+= 16;
 			else 
 				MSG.y = 416;
+
+			//Hungup debug用
+			//this.resetWatchdog();
 		}
 
 		//-----------------------------------------------------------------------------

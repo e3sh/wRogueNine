@@ -307,6 +307,8 @@ function GameManager(g){
         const OBJPTR = f.OBJPTR;
         const rnd = r.rnd;
 
+        const setoflg = r.setoflg;
+
         const w_magic = r.globalValiable.w_magic; 
         const a_magic = r.globalValiable.a_magic; 
         const armors = r.globalValiable.armors; 
@@ -377,7 +379,7 @@ function GameManager(g){
             obj = OBJPTR(item);
             obj.o_hplus = rnd(3);
             obj.o_dplus = rnd(3);
-            obj.o_flags = d.ISKNOW;
+            setoflg(obj,d.ISKNOW);
             add_pack(item, true);
             r.player.set_cur_weapon(obj);
 
@@ -387,7 +389,7 @@ function GameManager(g){
             obj = OBJPTR(item);
             obj.o_hplus = rnd(3);
             obj.o_dplus = rnd(3);
-            obj.o_flags = d.ISKNOW;
+            setoflg(obj,d.ISKNOW);;
             add_pack(item, true);
 
             /* Now some arrows */
@@ -397,7 +399,7 @@ function GameManager(g){
             obj.o_count = 25 + rnd(15);
             obj.o_hplus = rnd(2);
             obj.o_dplus = rnd(2);
-            obj.o_flags = d.ISKNOW;
+            setoflg(obj,d.ISKNOW);
             add_pack(item, true);
 
             /* And his suit of armor */
@@ -405,7 +407,7 @@ function GameManager(g){
             wpt = pick_one(a_magic);
             item = new_thing(false, d.ARMOR, wpt);
             obj = OBJPTR(item);
-            obj.o_flags = d.ISKNOW;
+            setoflg(obj,d.ISKNOW);
             obj.o_ac = armors[wpt].a_class - rnd(4);
             r.player.set_cur_armor(obj);
             add_pack(item, true);
@@ -420,11 +422,6 @@ function GameManager(g){
 
         r.playit();
     }
-
-
-
-
-
 
     /*
     ** playit:	The main loop of the program.  Loop while(! the game is over,

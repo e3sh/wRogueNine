@@ -156,13 +156,13 @@ function ItemManager(r){
 		const o_on = r.o_on;
 
 		let res = "";
-		if (o_on(obj. d.ISCURSD)) res += "/CURSED";
-		if (o_on(obj. d.ISKNOW))  res += "/KNOW";
-		if (o_on(obj. d.ISPOST))  res += "/POST";
-		if (o_on(obj. d.ISPROT))  res += "/PROT";
-		if (o_on(obj. d.ISBLESS)) res += "/BLESS";
-		if (o_on(obj. d.ISMISL))  res += "/MISL";
-		if (o_on(obj. d.ISMANY))  res += "/MANY";
+		if (o_on(obj, d.ISCURSED)) res += "/CURSED";
+		if (o_on(obj, d.ISKNOW))  res += "/KNOW";
+		if (o_on(obj, d.ISPOST))  res += "/POST";
+		if (o_on(obj, d.ISPROT))  res += "/PROT";
+		if (o_on(obj, d.ISBLESS)) res += "/BLESS";
+		if (o_on(obj, d.ISMISL))  res += "/MISL";
+		if (o_on(obj, d.ISMANY))  res += "/MANY";
 		
 		//-----1:ISCURSED:
 		//-----2:ISKNOW :
@@ -437,5 +437,114 @@ function ItemManager(r){
 				dicetot += best[i];
 		}
 		return(dicetot);
+	}
+
+	this.decode_cmd = function(direct){
+
+		const quaff = r.item.potion_f.quaff;
+		const read_scroll = r.item.scroll_f.read_scroll;
+		const eat = r.player.misc.eat;
+		const iswearing = r.item.ring_f.iswearing;
+		const ring_off = r.item.ring_f.ring_off;
+		const ring_on = r.item.ring_f.ring_on;
+		const take_off = r.item.armor_f.take_off;
+		const wear = r.item.armor_f.wear;
+		const wield = r.item.weapon_f.wield;
+		const do_zap = r.item.stick_f.do_zap;
+
+		const si = r.player.get_select();
+
+		let ch;
+
+		if (si == null) {
+			r.UI.msg("No inventory selected.");
+			return;
+		}
+		
+		switch(si.o_type){
+			case d.POTION:
+				ch = "q";
+				if (direct) quaff();
+				break;
+			case d.SCROLL:
+				ch = "r";	
+				if (direct) read_scroll();
+				break;
+			case d.FOOD:
+				ch = "e";		
+				if (direct) eat();
+				break;
+			case d.RING:
+				if (iswearing(si)) {
+					ch = "R";
+					if (direct) ring_off();
+				}else{
+					ch = "P";
+					if (direct) ring_on();
+				}
+				break;
+			case d.ARMOR:
+				if (r.player.get_cur_armor() != null){
+					ch = "T";
+					if (direct) take_off();
+				}else{
+					ch = "W";
+					if (direct) wear();
+				}
+				break;
+			case d.WEAPON:
+				ch = "w";
+				if (direct) wield();
+				break;
+			case d.STICK:
+				ch = "z";		
+				if (direct) do_zap();
+				break;
+			default:
+				ch = "s";
+				r.UI.msg("This item cannot be used.");
+				break;
+		}
+		return ch;
+	}
+
+	this.decode_drop = function(direct){
+		
+		const o_on = r.o_on;
+		const missile = r.item.weapon_f.missile;
+		const trap_at = r.player.move.trap_at;
+		const drop = r.item.things_f.drop;
+		const dip_it = r.player.move.dip_it;
+		const sell_it = r.dungeon.trader.sell_it;
+		
+		const hero = r.player.get_hero();
+		const obj = r.player.get_select();
+
+		let ch;
+
+		if (obj == null) {
+			r.UI.msg("No inventory selected.");
+			return;
+		}
+
+		if (r.levtype != d.POSTLEV){
+			console.log(obj.o_type == d.WEAPON);
+			console.log(obj.o_flags);
+
+			if (obj.o_type == d.WEAPON && o_on(obj, d.ISMISL)){
+				ch = "t"; if (direct) missile();
+			}else{
+				let tp = trap_at(hero.y,hero.x);
+				if (tp == null || r.inpool == false || (tp.tr_flags & d.ISGONE)){
+					ch = "d"; if (direct) drop();
+				}else{
+					ch = "D"; if (direct) dip_it();
+				}
+			}
+		}else{
+			ch = "%"; if (direct) sell_it();
+		}
+		console.log(ch);
+		return ch;
 	}
 }

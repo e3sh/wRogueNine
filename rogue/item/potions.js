@@ -28,7 +28,7 @@ function potions(r){
 		const del_pack = r.item.pack_f.del_pack;
 		const pl_on = r.player.pl_on;
 		const pl_off = r.player.pl_off;
-		const chg_abil = r.player.pstats_f.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 		const p_know = r.item.p_know; 
 		const lengthen = r.daemon.lengthen;
 		const fuse = r.daemon.fuse;

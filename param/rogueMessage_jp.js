@@ -194,6 +194,30 @@ function rogueMessage_jp(r){
         EAT_2: (fruit)=> {return `なんておいしい${fruit}だ。`},
         EAT_3: "うわっ、この食べ物、変わった味だな。",
         EAT_4: "うーん、美味しかった。",
+        
+        //dip_it
+        DIPIT_1: "武器を解除できません。",
+        DIPIT_2: "鎧は浸す前に脱がなければならない。",
+        DIPIT_3: "それを浸す前に指輪を外さなければなりません。",
+        DIPIT_WEP: (name)=>{return `${name}が一瞬光る。`},
+        DIPIT_ARM: (name)=>{return `${name}が一瞬光る。`},
+        DIPIT_STI: (made, type)=>{return `${made} ${type} が一瞬光る。`},
+        DIPIT_SCR: (name)=>{return `「${name}」の巻物が解き放たれる。`},
+        DIPIT_POT: (name)=>{return `${name}のポーションが一瞬泡立つ。`},
+        DIPIT_RIN: (name)=>{return `${name}の指輪が一瞬、振動する。`},
+        DIPIT_DEF: "プールの表面がしばらくの間、泡を立てている。",
+
+        //weapon
+        FALL_1: (name)=>{return `${name} は地面にぶつかると消えてしまった。`},
+        FALL_2: (name)=>{return `${name}は地面にぶつかるやいなや消え去った。`},
+        WIELD: (name)=>{return `${name}を振るう`}, 
+
+        //armor
+        WEAR_1: "もうすでに着ています。",
+        WEAR_2: "それは身につけられない。",
+        WEAR_3: (name)=>{return `${name}を着用しています。`},
+        TAKEOFF_1: "防具を一切着用していない。",
+        TAKEOFF_2: (ch, name)=>{return `${ch}) ${name} を着用していました`},
 
 
 

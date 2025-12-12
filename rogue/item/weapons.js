@@ -12,19 +12,28 @@ function weapons(r){
 	const ms = r.messages;
 
 	const cw = d.DSP_MAIN_FG;
+	const mw = d.DSP_MAIN_BG;
 	const hw = d.DSP_WINDOW;
 
 	/*
 	* missile:
 	*	Fire a missile in a given direction
 	*/
-	this.missile = function(ydelta, xdelta)
+	this.missile = (ydelta, xdelta)=>
 	//int ydelta, xdelta;
 	{
-		const get_item = get_item;
+		const get_item = r.item.pack_f.get_item;
 		const OBJPTR = f.OBJPTR;
 		const dropcheck = r.item.things_f.dropcheck;
 		const is_current = r.player.misc.is_current;
+		const itemvol = r.player.encumb.itemvol;
+		const new_item = r.new_item;
+		const updpack = r.player.encumb.updpack;
+		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
+		const hit_monster = r.item.weapon_f.hit_monster;
+		const fall = r.item.weapon_f.fall;
+
+		const hero = r.player.get_hero();
 
 		let obj, nowwield; //reg struct object *obj, *nowwield;
 		let item, nitem; //reg struct linked_list *item, *nitem;
@@ -32,7 +41,7 @@ function weapons(r){
 		/*
 		* Get which thing we are hurling
 		*/
-		nowwield = cur_weapon;		/* must save current weap */
+		nowwield = r.player.get_cur_weapon();		/* must save current weap */
 		if ((item = get_item("throw", d.WEAPON)) == null)
 			return;
 		obj = OBJPTR(item);
@@ -41,18 +50,18 @@ function weapons(r){
 		if (obj == nowwield || obj.o_type != d.WEAPON) {
 			let c;
 
-			msg("Do you want to throw that %s? (y or n)",obj.o_typname);
-			do {
-				c = readchar();
-				if (isupper(c))
-					c = tolower(c);
-				if (c == ESCAPE || c == 'n') {
-					msg("");
-					cur_weapon = nowwield;
-					after = false;		/* ooops, a mistake */
-					return;
-				}
-			} while (c != 'y');	/* keep looking for good ans */
+			//msg("Do you want to throw that %s? (y or n)",obj.o_typname);
+			//do {
+			//	c = readchar();
+			//	if (isupper(c))
+			//		c = tolower(c);
+			//	if (c == ESCAPE || c == 'n') {
+			//		msg("");
+			//		cur_weapon = nowwield;
+			//		r.after = false;		/* ooops, a mistake */
+			//		return;
+			//	}
+			//} while (c != 'y');	/* keep looking for good ans */
 		}
 		/*
 		* Get rid of the thing.  If it is a non-multiple item object, or
@@ -65,19 +74,19 @@ function weapons(r){
 		else {
 			obj.o_count--;
 			obj.o_vol = itemvol(obj);
-			nitem = new_item(sizeof *obj);
+			nitem = new_item(obj);
 			obj = OBJPTR(nitem);
-			obj = (OBJPTR(item));
+			//obj = (OBJPTR(item));
 			obj.o_count = 1;
 			obj.o_vol = itemvol(obj);
 			item = nitem;
 		}
 		updpack();						/* new pack weight */
-		do_motion(obj, ydelta, xdelta);
-		if (!isalpha(mvwinch(mw, obj.o_pos.y, obj.o_pos.x))
+		this.do_motion(obj, ydelta, xdelta);
+		if (!isalpha(r.UI.mvwinch(mw, obj.o_pos.y, obj.o_pos.x))
 		|| !hit_monster(obj.o_pos, obj))
 			fall(item, true);
-		mvwaddch(cw, hero.y, hero.x, d.PLAYER);
+		r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 	}
 
 	/*
@@ -88,15 +97,23 @@ function weapons(r){
 	//struct object *obj;
 	//int ydelta, xdelta;
 	{
+		const ce = f.ce;
+		const cansee = r.monster.chase.cansee;
+		const show = r.player.move.show;
+		const winat = r.UI.winat;
+		const step_ok = r.UI.io.step_ok;
+
 		let ch, y, x;
 
-		obj.o_pos = hero;
+		const hero = r.player.get_hero();
+
+		obj.o_pos = {x: hero.x, y:hero.y};
 		while (1) {
 			y = obj.o_pos.y;
 			x = obj.o_pos.x;
-			if (!ce(obj.o_pos, hero) && cansee(unc(obj.o_pos)) &&
-			mvwinch(cw, y, x) != ' ')
-				mvwaddch(cw, y, x, show(y, x));
+			if (!ce(obj.o_pos, hero) && cansee(obj.o_pos.y, obj.o_pos.x) &&
+			r.UI.mvwinch(cw, y, x) != ' ')
+				r.UI.mvwaddch(cw, y, x, show(y, x));
 			/*
 			* Get the new position
 			*/
@@ -106,14 +123,15 @@ function weapons(r){
 			x = obj.o_pos.x;
 			ch = winat(y, x);
 			if (step_ok(ch) && ch != d.DOOR) {
-				if (cansee(unc(obj.o_pos)) && mvwinch(cw, y, x) != ' ') {
-					mvwaddch(cw, y, x, obj.o_type);
-					draw(cw);
+				if (cansee(obj.o_pos.y, obj.o_pos.x) && r.UI.mvwinch(cw, y, x) != ' ') {
+					r.UI.mvwaddch(cw, y, x, obj.o_type);
+					//draw(cw);
 				}
 				continue;
 			}
 			break;
 		}
+		r.UI.setEffect(obj.o_type, {x:hero.x,y:hero.y}, {x:obj.o_pos.x,y:obj.o_pos.y}, 90);
 	}
 
 	/*
@@ -153,9 +171,9 @@ function weapons(r){
 
 		if (pr)
 			if (obj.o_type == d.WEAPON) /* BUGFIX: Identification trick */
-				r.UI.msg(`Your ${w_magic[obj.o_which].mi_name} vanishes as it hits the ground.`);
+				r.UI.msg(ms.FALL_1(w_magic[obj.o_which].mi_name));
 			else
-				r.UI.msg(`${inv_name(obj,true)} vanishes as it hits the ground.`);
+				r.UI.msg(ms.FALL_2(inv_name(obj,true)));
 
 		r.discard(item);
 	}
@@ -205,6 +223,8 @@ function weapons(r){
 	//struct coord *mp;
 	//struct object *obj;
 	{
+		const fight = r.monster.battle.fight;
+
 		return fight(mp, obj, true);
 	}
 
@@ -247,10 +267,10 @@ function weapons(r){
 
 		oweapon = cur_weapon;
 		if (!dropcheck(cur_weapon)) {
-			cur_weapon = oweapon;
+			r.player.set_cur_weapon(oweapon);
 			return;
 		}
-		cur_weapon = oweapon;
+		r.player.set_cur_weapon(oweapon);
 		if ((item = get_item("wield", d.WEAPON)) == null)
 			return;
 		obj = OBJPTR(item);
@@ -258,7 +278,7 @@ function weapons(r){
 			r.after = false;
 			return;
 		}
-		r.UI.msg(`Wielding ${inv_name(obj, true)}`);
+		r.UI.msg(ms.WIELD(inv_name(obj, true)));
 		r.player.set_cur_weapon(obj);
 	}
 

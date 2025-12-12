@@ -56,7 +56,7 @@ function move(r){
 		const illeg_ch = r.UI.io.illeg_ch;
 		const roomin = r.monster.chase.roomin;
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
-		const fight = r.monster.battle.fight
+		const fight = r.monster.battle.fight;
 		const mvwaddch = r.UI.mvwaddch;
 		const mvinch = r.UI.mvinch;
 		const rf_on = r.dungeon.rooms_f.rf_on;
@@ -625,9 +625,33 @@ function move(r){
 	* dip_it:
 	*	Dip an object into a magic pool
 	*/
-	this.dip_it = function()
+	this.dip_it = ()=>
 	{
-		const p_know = r.item.p_know; 
+		const trap_at = this.trap_at;
+		const get_item = r.item.pack_f.get_item;
+		const OBJPTR = f.OBJPTR;
+		const o_on = r.o_on;
+		const o_off = r.o_off;
+		const setoflg = r.setoflg;
+		const resoflg = r.resoflg;
+
+		const s_know = r.item.s_know;	
+		const p_know = r.item.p_know;	
+		const r_know = r.item.r_know;	
+		const ws_know = r.item.ws_know;
+		
+		const s_names = r.item.s_names;
+		const p_colors = r.item.p_colors;
+		const r_stones = r.item.r_stones;
+		const ws_stuff = r.item.ws_stuff;
+
+		const armors = v.armors;
+
+		const cur_weapon = r.player.get_cur_weapon();
+		const cur_armor = r.player.get_cur_armor();
+		const cur_ring = r.player.get_cur_ring();
+
+
 
 		let what; //reg struct linked_list *what;
 		let ob; //reg struct object *ob;
@@ -635,13 +659,13 @@ function move(r){
 		let wh;
 
 		tp = trap_at(hero.y,hero.x);
-		if (tp == null || inpool == false || (tp.tr_flags & d.ISGONE))
+		if (tp == null || r.inpool == false || (tp.tr_flags & d.ISGONE))
 			return;
 
 		if ((what = get_item("dip",0)) == null)
 			return;
 		ob = OBJPTR(what);
-		mpos = 0;
+		//mpos = 0;
 		/*
 		* If hero is trying to dip an object OTHER than his
 		* current weapon, make sure that he could drop his
@@ -649,19 +673,19 @@ function move(r){
 		*/
 		if (ob != cur_weapon) {
 			if (cur_weapon != null && o_on(cur_weapon, d.ISCURSED)) {
-				msg("You are unable to release your weapon.");
-				after = false;
+				r.UI.msg(ms.DIPIT_1);
+				r.after = false;
 				return;
 			}
 		}
 		if (ob == cur_armor) {
-			msg("You have to take off your armor before you can dip it.");
-			after = false;
+			r.UI.msg(ms.DIPIT_2);
+			r.after = false;
 			return;
 		}
 		else if (ob == cur_ring[d.LEFT] || ob == cur_ring[d.RIGHT]) {
-			msg("You have to take that ring off before you can dip it.");
-			after = false;
+			r.UI.msg(ms.DIPIT_3);
+			r.after = false;
 			return;
 		}
 		wh = ob.o_which;
@@ -670,21 +694,21 @@ function move(r){
 			setoflg(ob,d.ISKNOW);
 			switch(ob.o_type) {
 			case d.WEAPON:
-				if(rnd(100) < 20) {		/* enchant weapon here */
+				if(r.rnd(100) < 20) {		/* enchant weapon here */
 					if (o_off(ob,d.ISCURSED)) {
 						ob.o_hplus += 1;
 						ob.o_dplus += 1;
 					}
 					else {		/* weapon was prev cursed here */
-						ob.o_hplus = rnd(2);
-						ob.o_dplus = rnd(2);
+						ob.o_hplus = r.rnd(2);
+						ob.o_dplus = r.rnd(2);
 					}
 					resoflg(ob,d.ISCURSED);
 				}
-				else if(rnd(100) < 10) {	/* curse weapon here */
+				else if(r.rnd(100) < 10) {	/* curse weapon here */
 					if (o_off(ob,d.ISCURSED)) {
-						ob.o_hplus = -(rnd(2)+1);
-						ob.o_dplus = -(rnd(2)+1);
+						ob.o_hplus = -(r.rnd(2)+1);
+						ob.o_dplus = -(r.rnd(2)+1);
 					}
 					else {			/* if already cursed */
 						ob.o_hplus--;
@@ -692,74 +716,75 @@ function move(r){
 					}
 					setoflg(ob,d.ISCURSED);
 				}			
-				msg("The %s glows for a moment.",w_magic[wh].mi_name);
+				r.UI.msg(ms.DIPIT_WEP(w_magic[wh].mi_name));
 			break;
 			case d.ARMOR:
-				if (rnd(100) < 30) {			/* enchant armor */
+				if (r.rnd(100) < 30) {			/* enchant armor */
 					if(o_off(ob,d.ISCURSED))
-						ob.o_ac -= rnd(2) + 1;
+						ob.o_ac -= r.rnd(2) + 1;
 					else
-						ob.o_ac = -rnd(3)+ armors[wh].a_class;
+						ob.o_ac = -r.rnd(3)+ armors[wh].a_class;
 					resoflg(ob,d.ISCURSED);
 				}
-				else if(rnd(100) < 15){			/* curse armor */
+				else if(r.rnd(100) < 15){			/* curse armor */
 					if (o_off(ob,d.ISCURSED))
-						ob.o_ac = rnd(3)+ armors[wh].a_class;
+						ob.o_ac = r.rnd(3)+ armors[wh].a_class;
 					else
-						ob.o_ac += rnd(2) + 1;
+						ob.o_ac += r.rnd(2) + 1;
 					setoflg(ob,d.ISCURSED);
 				}
-				msg("The %s glows for a moment.",a_magic[wh].mi_name);
+				r.UI.msg(ms.DIPIT_ARM(a_magic[wh].mi_name));
 			break;
 			case d.STICK: {
 				let i;
 				let rd;//struct rod *rd;
 
-				i = rnd(8) + 1;
-				if(rnd(100) < 25)		/* add charges */
+				i = r.rnd(8) + 1;
+				if(r.rnd(100) < 25)		/* add charges */
 					ob.o_charges += i;
-				else if(rnd(100) < 10) {	/* remove charges */
+				else if(r.rnd(100) < 10) {	/* remove charges */
 					if ((ob.o_charges -= i) < 0)
 						ob.o_charges = 0;
 				}
 				ws_know[wh] = true;
 				rd = ws_stuff[wh];
-				msg("The %s %s glows for a moment.",rd.ws_made,rd.ws_type);
+				r.UI.msg(ms.DIPIT_STI(rd.ws_made, rd.ws_type));
 			}
 			break;
 			case d.SCROLL:
 				s_know[wh] = true;
-				msg("The '%s' scroll unfurls.",s_names[wh]);
+				r.UI.msg(ms.DIPIT_SCR(s_names[wh]));
 			break;
 			case d.POTION:
 				p_know[wh] = true;
-				msg("The %s potion bubbles for a moment.",p_colors[wh]);
+				r.UI.msg( ms.DIPIT_POT(p_colors[wh]));
 			break;
 			case d.RING:
 				r_know[wh] = true;
 				if (magring(ob)) {
 					if(rnd(100) < 25) {	 		/* enchant ring */
 						if (o_off(ob,d.ISCURSED))
-							ob.o_ac += rnd(2) + 1;
+							ob.o_ac += r.rnd(2) + 1;
 						else
-							ob.o_ac = rnd(2) + 1;
+							ob.o_ac = r.rnd(2) + 1;
 						resoflg(ob,d.ISCURSED);
 					}
-					else if(rnd(100) < 10) {	 /* curse ring */
+					else if(r.rnd(100) < 10) {	 /* curse ring */
 						if (o_off(ob,d.ISCURSED))
-							ob.o_ac = -(rnd(2) + 1);
+							ob.o_ac = -(r.rnd(2) + 1);
 						else
-							ob.o_ac -= (rnd(2) + 1);
+							ob.o_ac -= (r.rnd(2) + 1);
 						setoflg(ob,d.ISCURSED);
 					}
 				}
-				msg("The %s ring vibrates for a moment.",r_stones[wh]);
+				r.UI.msg(ms.DIPIT_RIN(r_stones[wh]));
 			break;
 			default:
-				msg("The pool bubbles for a moment.");
+				r.UI.msg(ms.ms.DIPIT_DEF);
 			}
 		}
-		cur_weapon = ob;	/* hero has to weild item to dip it */
+		//cur_weapon = ob;	/* hero has to weild item to dip it */
+		r.player.set_cur_weapon(ob);
 	}
 
 

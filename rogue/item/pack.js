@@ -418,6 +418,24 @@ function pack_f(r){
 	//char *purpose;
 	//int type;
 	{
+		//pp
+		//quaff pot
+		//sell  0
+		//wear  arm
+		//put on ring
+		//read scroll 
+		//protect 0
+		//enchant 0
+		//zap with stick
+		//drop 0  
+		//throw wea
+		//wield wea
+		//eat food
+		//dip 0
+		//charge stick
+		//call 0
+		//identify 0
+
 		const npch = r.UI.io.npch;
 		//const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
 		//const pack_char = this.pack_char;
@@ -482,18 +500,30 @@ function pack_f(r){
 			}
 		}
 		
-		if (r.player.get_dest() != null) {
-			for (pit = pack; pit != null; pit = f.next(pit)) {
-				pob = f.OBJPTR(pit);
-				if (pob == r.player.get_dest()) {
-					r.player.set_dest(null);
-					console.log("getitem_dest")
-					return pit;
+		if (purpose != "protect" && purpose != "enchant"){
+			if (r.player.get_select() != null) {
+				for (pit = pack; pit != null; pit = f.next(pit)) {
+					pob = f.OBJPTR(pit);
+					if (pob == r.player.get_select()) {
+						console.log("getitem_select")
+						return pit;
+					}
 				}
 			}
-		}
+		} else {
 
-		//for (;;) {
+			if (r.player.get_dest() != null) {
+				for (pit = pack; pit != null; pit = f.next(pit)) {
+					pob = f.OBJPTR(pit);
+					if (pob == r.player.get_dest()) {
+						r.player.set_dest(null);
+						console.log("getitem_dest")
+						return pit;
+					}
+				}
+			}
+
+			//for (;;) {
 			r.UI.msg(`${purpose} what?`);// (* for list): ",purpose);
 
 			//ch = readchar();
@@ -505,44 +535,44 @@ function pack_f(r){
 			//}
 			//if (false){
 			//if (ch == '*') {
-				r.UI.wclear(hw);
+			r.UI.wclear(hw);
 
-				pit = pack;		/* point to pack */
-				cnt = 0;
-				for (ch='a'; pit != null; pit=f.next(pit), ch=npch(ch)) {
-					pob = f.OBJPTR(pit);
-					if (type == 0 || type == pob.o_type) {
-						buf.push(`${ch}) ${inv_name(pob, false)}`);
-						//wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
-						cnt++;
-						//if (++cnt > LINES - 2 && next(pit) != null) {
-						//	cnt = 0;
-						//	dbotline(hw, morestr);
-						//	wclear(hw);
-						//}
-					}
+			pit = pack;		/* point to pack */
+			cnt = 0;
+			for (ch='a'; pit != null; pit=f.next(pit), ch=npch(ch)) {
+				pob = f.OBJPTR(pit);
+				if (type == 0 || type == pob.o_type) {
+					buf.push(`${ch}) ${inv_name(pob, false)}`);
+					//wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
+					cnt++;
+					//if (++cnt > LINES - 2 && next(pit) != null) {
+					//	cnt = 0;
+					//	dbotline(hw, morestr);
+					//	wclear(hw);
+					//}
 				}
-				buf.push(`${purpose} what?`);
-				//wmove(hw, LINES - 1,0);
-				//wprintw(hw,"%s what? ",purpose);
-				r.UI.setDsp(hw);
-				for (let i in buf){
-					r.UI.mvaddch(i ,0, buf[i]);
-				}
-				//draw(hw);		/* write screen */
-				//anr = false;
-				//do {
-				//	ch = readchar();
-				//	if (isalpha(ch) || ch == ESCAPE)
-				//		anr = true; 
-				//} while(!anr);		/* do till we got it right */
-				//restscr(cw);		/* redraw orig screen */
-				//if (ch == ESCAPE) {
-				//	after = false;
-				//	msg("");		/* clear top line */
-				//	return null;	/* all done if abort */
-				//}
-				/* ch has item to get from pack */
+			}
+			buf.push(`${purpose} what?`);
+			//wmove(hw, LINES - 1,0);
+			//wprintw(hw,"%s what? ",purpose);
+			r.UI.setDsp(hw);
+			for (let i in buf){
+				r.UI.mvaddch(i ,0, buf[i]);
+			}
+			//draw(hw);		/* write screen */
+			//anr = false;
+			//do {
+			//	ch = readchar();
+			//	if (isalpha(ch) || ch == ESCAPE)
+			//		anr = true; 
+			//} while(!anr);		/* do till we got it right */
+			//restscr(cw);		/* redraw orig screen */
+			//if (ch == ESCAPE) {
+			//	after = false;
+			//	msg("");		/* clear top line */
+			//	return null;	/* all done if abort */
+			//}
+			/* ch has item to get from pack */
 			//}
 			//for (obj=pack,och='a';obj!=null;obj=f.next(obj),och=npch(och))
 			//	if (ch == och)
@@ -557,12 +587,13 @@ function pack_f(r){
 			//}
 			//else 
 			//	return obj;
-		//}
-		r.UI.setDsp(d.DSP_MAIN);
+			//}
+			r.UI.setDsp(d.DSP_MAIN);
 
-		r.UI.scene.set_gi_param(purpose, type);
-		r.setScene(3); 
-		r.UI.overlapview(true);
+			r.UI.scene.set_gi_param(purpose, type);
+			r.setScene(3); 
+			r.UI.overlapview(true);
+		}
 	}
 
 	/*

@@ -205,6 +205,7 @@ function things_f(r){
 			else if (o_on(obj, d.ISBLESS))
 				pb += " [+]";
 		}
+		if (r.wizard) pb += ` ${r.item.item_flagcheck(obj)}`;
 		if (!drop)
 			pb += ".";
 		return pb;

@@ -195,6 +195,31 @@ function rogueMessage(r){
         EAT_3: "Yuk, this food tastes like ARA.",
         EAT_4: "Yum, that tasted good.",
 
+        //dip_it
+        DIPIT_1: "You are unable to release your weapon.",
+        DIPIT_2: "You have to take off your armor before you can dip it.",
+        DIPIT_3: "You have to take that ring off before you can dip it.",
+        DIPIT_WEP: (name)=>{return `The ${name} glows for a moment.`},
+        DIPIT_ARM: (name)=>{return `The ${name} glows for a moment.`},
+        DIPIT_STI: (made, type)=>{return `The ${made} ${type} glows for a moment.`},
+        DIPIT_SCR: (name)=>{return `The '${name}' scroll unfurls.`},
+        DIPIT_POT: (name)=>{return `The ${name} potion bubbles for a moment.`},
+        DIPIT_RIN: (name)=>{return `The ${name} ring vibrates for a moment.`},
+        DIPIT_DEF: "The pool bubbles for a moment.",
+
+        //weapon
+        FALL_1: (name)=>{return `Your ${name} vanishes as it hits the ground.`},
+        FALL_2: (name)=>{return `${name} vanishes as it hits the ground.`},
+        WIELD: (name)=>{return `Wielding ${name}`}, 
+
+        //armor
+        WEAR_1: "You are already wearing some.",
+        WEAR_2: "You can't wear that.",
+        WEAR_3: (name)=>{return `Wearing ${name}.`},
+        TAKEOFF_1: "Not wearing any armor.",
+        TAKEOFF_2: (ch, name)=>{return `Was wearing ${ch}) ${name}`},
+
+
     }
     return ms;
    

@@ -84,12 +84,18 @@ function scene(r){
             r.UI.scene.setcur(cur);
         }
 		if (ki.includes("Numpad0")){
-            console.log("UseItem")
+            console.log("UseItem");
+            r.player.set_select(curItem(cur));
+            r.item.decode_cmd(true);
+
             r.UI.overlapview(false);
             r.setScene(0);
         }
         if (ki.includes("KeyD")){
-            console.log("Drop/ThrowItem")
+            console.log("Drop/ThrowItem");
+            //r.player.set_select(curItem(cur));
+            //r.item.decode_drop(true);
+            //r.player.set_select(null);
             r.UI.overlapview(false);
             r.setScene(0);
         }

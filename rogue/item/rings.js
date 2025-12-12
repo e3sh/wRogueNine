@@ -22,15 +22,16 @@ function rings(r){
 		const o_on = r.o_on;
 		const player = r.player.get_player();
 		const him = r.player.get_him();
-		const chg_abil = r.player.pstats_f.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 		const light = r.player.move.light;
 		const hero = r.player.get_hero();
 		const is_current =r.player.misc.is_current;
-		const gethand = this.gethand;
+		//const gethand = this.gethand;
 		const setoflg = r.setoflg;
-		const add_haste = r.player.pstats_f.add_haste;
+		const add_haste = r.player.pstats.add_haste;
+		const inv_name = r.item.things_f.inv_name;
 
-		const cur_ring = r.player_get_cur_ring();
+		const cur_ring = r.player.get_cur_ring();
 
 		const r_know = r.item.r_know;
 		const r_guess = r.item.r_guess;
@@ -63,8 +64,9 @@ function rings(r){
 		if (is_current(obj))
 			return;
 		if (cur_ring[d.LEFT] == null && cur_ring[d.RIGHT] == null) {
-			if ((ring = gethand(false)) < 0)
-				return;
+			ring = d.LEFT;
+			//if ((ring = gethand(false)) < 0)
+			//	return;
 		}
 		else if (cur_ring[d.LEFT] == null)
 			ring = d.LEFT;
@@ -107,7 +109,7 @@ function rings(r){
 					chg_abil(d.DEX,obj.o_ac,d.FROMRING);
 				break;
 				case d.R_CONST:
-					chg_abil(CON,obj.o_ac,d.FROMRING);
+					chg_abil(d.CON,obj.o_ac,d.FROMRING);
 				break;
 				case d.R_SEEINVIS:
 					player.t_flags |= d.CANSEE;
@@ -138,7 +140,7 @@ function rings(r){
 					if ((rop = player.t_room) != null) {
 						rop.r_flags &= ~dISDARK;
 						light(hero);
-						r.UI.mvwaddch(cw, hero.y, hero.x, PLAYER);
+						r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 					}
 				}
 			}
@@ -216,7 +218,7 @@ function rings(r){
 		const player = r.player.get_player();
 		const him = r.player.get_him();
 		const ringabil = this.ringabil;
-		const chg_abil = r.player.pstats_f.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 		const light = r.player.move.light;
 		const hero = r.player.get_hero();
 		const unsee = r.daemon.unsee;
@@ -391,6 +393,7 @@ function rings(r){
 	this.ring_num = (what)=>
 	//struct object *what;
 	{
+		const o_on = r.o_on;
 		const magring = this.magring;
 		const num = r.item.weapon_f.num;
 		let number;
@@ -436,7 +439,7 @@ function rings(r){
 	*/
 	this.ringabil = function()
 	{
-		const chg_abil = r.player.pstats_f.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 		const cur_ring = r.player.get_cur_ring();
 
 		let rptr; //reg struct object *rptr;
@@ -471,7 +474,7 @@ function rings(r){
 	//struct object *what;
 	//bool fromwiz;			/* true when from wizards */
 	{
-		const getbless = ()=>{return 0;}// UI.wizard
+		const getbless = ()=>{return 0;};// UI.wizard
 		const rnd = r.rnd;
 		const setoflg = r.setoflg;
 		const itemvol = r.player.encumb.itemvol;
