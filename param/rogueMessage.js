@@ -164,6 +164,9 @@ function rogueMessage(r){
         READSC_SLEEP: "You fall asleep.",
         READSC_CREATE: "You hear a faint cry of anguish in the distance.",
         READSC_IDENT: "This scroll is an identify scroll",
+        READSC_SMAP1: "Oh, now this scroll has a ",
+        READSC_SMAP2: "very detailed map on it.",
+        READSC_SMAP3: "map on it.",
         READSC_GFIND1: "You begin to feel greedy and sense gold.",
         READSC_GFIND2: "You begin to feel a pull downward.",
         READSC_ENCH1: "You feel a strange sense of loss.",
@@ -219,7 +222,27 @@ function rogueMessage(r){
         TAKEOFF_1: "Not wearing any armor.",
         TAKEOFF_2: (ch, name)=>{return `Was wearing ${ch}) ${name}`},
 
+        //ring
+        RINGON_1: "Already wearing two rings.",
+        RINGON_2: "That won't fit on your finger.",
+        RINGON_3: "You find yourself moving must faster.",
+        RINGON_4: (name)=>{return `Now wearing ${name}`},
 
+        RINGOFF1: "You're not wearing any rings.",
+        RINGOFF2: "Not wearing such a ring.",
+        RINGOFF3: (name)=>{return `Was wearing ${name}`},
+
+        //thins
+        MONEY_1: (value)=>{return `${value} gold pieces.`},
+        MONEY_2: "That gold must have been counterfeit.",
+
+        DROP_1: "There is something there already.",
+        DROP_2: (name)=>{return `${name} sinks out of sight.`},
+        DROP_3: "Thanks for your donation to the Fiend's flea market.",
+        DROP_4: (name)=>{return `Dropped ${name}`},
+
+        DROPCHK_1: "The trader does not accept shoddy merchandise.",
+        DROPCHK_2: "You can't.  It appears to be cursed.",
     }
     return ms;
    
