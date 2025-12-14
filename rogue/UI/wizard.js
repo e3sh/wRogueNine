@@ -27,6 +27,7 @@ function wizard(r){
 		const get_item = r.item.pack_f.get_item;
 		const OBJPTR = f.OBJPTR;
 		const setoflg = r.setoflg; 
+		const inv_name = r.item.things_f.inv_name;
 
 		const s_know = r.item.s_know;	
 		const p_know = r.item.p_know;	

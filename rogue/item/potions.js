@@ -44,7 +44,7 @@ function potions(r){
 		const light = r.player.move.light;
 		const unsee = r.daemon.unsee;
 		const raise_level = r.monster.battle.raise_level;
-		const add_haste = r.player.pstats_f.add_haste;
+		const add_haste = r.player.pstats.add_haste;
 		const notinvinc = r.daemon.notinvinc;
 		const updpack = r.player.encumb.updpack;
 		const ringabil = r.item.ring_f.ringabil;

@@ -232,7 +232,7 @@ function things_f(r){
 
 		rp = player.t_room;
 		if (rp != null && ce(hero, rp.r_gold)) {
-			r.UI.msg(`${rp.r_goldval} gold pieces.`);
+			r.UI.msg(ms.MONEY_1(rp.r_goldval));
 			r.player.purse += rp.r_goldval;
 			rp.r_goldval = 0;
 			cmov(rp.r_gold);
@@ -248,7 +248,7 @@ function things_f(r){
 			}
 		}
 		else
-			r.UI.msg("That gold must have been counterfeit.");
+			r.UI.msg(ms.MONEY_2);
 
 		r.UI.comment("money");
 	}
@@ -278,7 +278,7 @@ function things_f(r){
 		if (item == null) {
 			ch = r.UI.mvinch(hero.y, hero.x);
 			if (ch != d.FLOOR && ch != d.PASSAGE && ch != d.POOL) {
-				r.UI.msg("There is something there already.");
+				r.UI.msg(ms.DROP_1);
 				r.after = false;
 				return d.SOMTHERE;
 			}
@@ -308,7 +308,7 @@ function things_f(r){
 			pack = r.detach(pack, ll);
 		}
 		if (ch == d.POOL) {
-			r.UI.msg(`${inv_name(op, true)} sinks out of sight.`);
+			r.UI.msg(ms.DROP_2(inv_name(op, true)));
 			r.discard(ll);
 		}
 		else {			/* put on dungeon floor */
@@ -316,13 +316,13 @@ function things_f(r){
 				op.o_pos = hero;	/* same place as hero */
 				fall(ll,false);
 				if (item == null)	/* if item wasn't sold */
-					r.UI.msg("Thanks for your donation to the Fiend's flea market.");
+					r.UI.msg(ms.DROP_3);
 			}
 			else {
 				r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj , ll);
 				r.UI.mvaddch(hero.y, hero.x, op.o_type);
 				op.o_pos = hero;
-				r.UI.msg(`Dropped ${inv_name(op, true)}`);
+				r.UI.msg(ms.DROP_4(inv_name(op, true)));
 			}
 		}
 		updpack();			/* new pack weight */
@@ -350,7 +350,7 @@ function things_f(r){
 			return true;
 		if (r.levtype == d.POSTLEV) {
 			if (o_on(op,d.ISCURSED) && o_on(op,d.ISKNOW)) {
-				msg("The trader does not accept shoddy merchandise.");
+				msg(ms.DROPCHK_1);
 				return false;
 			}
 			else {
@@ -362,7 +362,7 @@ function things_f(r){
 		&& op != cur_ring[d.LEFT] && op != cur_ring[d.RIGHT])
 			return true;
 		if (o_on(op,d.ISCURSED)) {
-			msg("You can't.  It appears to be cursed.");
+			msg(ms.DROPCHK_2);
 			return false;
 		}
 		if (op == cur_weapon)

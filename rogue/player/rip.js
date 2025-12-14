@@ -13,6 +13,8 @@
 
 	let scoreline;// [100];
 
+	const cw = d.DSP_MAIN_FG;
+
 	const rip = [
 		"                          ____________________",
 		"                         /                    \\",
@@ -280,30 +282,42 @@
 	*	The hero made it back out alive
 	*/
 	this.total_winner = function()
-	{
-		clear();
-	addstr("                                                               \n");
-	addstr("  @   @               @   @           @          @@@  @     @  \n");
-	addstr("  @   @               @@ @@           @           @   @     @  \n");
-	addstr("  @   @  @@@  @   @   @ @ @  @@@   @@@@  @@@      @  @@@    @  \n");
-	addstr("   @@@@ @   @ @   @   @   @     @ @   @ @   @     @   @     @  \n");
-	addstr("      @ @   @ @   @   @   @  @@@@ @   @ @@@@@     @   @     @  \n");
-	addstr("  @   @ @   @ @  @@   @   @ @   @ @   @ @         @   @  @     \n");
-	addstr("   @@@   @@@   @@ @   @   @  @@@@  @@@@  @@@     @@@   @@   @  \n");
-	addstr("                                                               \n");
-	addstr("     Congratulations, you have made it to the light of day!    \n");
-	addstr("\nYou have joined the elite ranks of those who have escaped the\n");
-	addstr("Dungeons of Doom alive.  You journey home and sell all your loot at\n");
-	addstr("a great profit and are admitted to the fighters guild.\n");
+	{	
+		r.UI.setDsp(cw)
+		r.UI.clear();
 
-		mvaddstr(LINES - 1, 0,spacemsg);
-		refresh();
-		wait_for(stdscr, ' ');
-		clear();
-		oldpurse = purse;
-		showpack(true, null);
-		score(purse, WINNER, 0);
-		byebye(0);
+		const winmsg = [
+			"                                                               ",
+			"  @   @               @   @           @          @@@  @     @  ",
+			"  @   @               @@ @@           @           @   @     @  ",
+			"  @   @  @@@  @   @   @ @ @  @@@   @@@@  @@@      @  @@@    @  ",
+			"   @@@@ @   @ @   @   @   @     @ @   @ @   @     @   @     @  ",
+			"      @ @   @ @   @   @   @  @@@@ @   @ @@@@@     @   @     @  ",
+			"  @   @ @   @ @  @@   @   @ @   @ @   @ @         @   @  @     ",
+			"   @@@   @@@   @@ @   @   @  @@@@  @@@@  @@@     @@@   @@   @  ",
+			"                                                               ",
+			"     Congratulations, you have made it to the light of day!    ",
+			"You have joined the elite ranks of those who have escaped the",
+			"Dungeons of Doom alive.  You journey home and sell all your loot at",
+			"a great profit and are admitted to the fighters guild.",
+		];
+
+		for (let i in winmsg){
+			r.UI.mvaddstr(d.LINES - winmsg.length - 1 + Number(i), 0, winmsg[i]);
+			
+			let ln = winmsg.length - Number(i) -1;
+			if (ln > 8) r.UI.msg(winmsg[winmsg.length - Number(i) -1]);
+		}
+		r.UI.msg("You Made It!");
+		//mvaddstr(LINES - 1, 0,spacemsg);
+		//refresh();
+		//wait_for(stdscr, ' ');
+		//clear();
+		//oldpurse = purse;
+		//showpack(true, null);
+		//score(purse, WINNER, 0);
+		//byebye(0);
+		r.setScene(1);
 	}
 
 	/*

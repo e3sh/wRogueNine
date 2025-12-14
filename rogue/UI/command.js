@@ -357,6 +357,8 @@ function command(r){
 		/*
 		* execute a command
 		*/
+		let use = false;
+
 		if (r.count && !r.running)
 			r.count--;
 		switch (ch) {
@@ -398,7 +400,7 @@ function command(r){
 				if (!get_dir())
 					r.after = false;
 				else
-					missile(r.delta.y, r.delta.x);
+					use = missile(r.delta.y, r.delta.x);
 				break;
 			case 'Q' : r.after = false; quit(-1);
 				break;
@@ -406,23 +408,23 @@ function command(r){
 				break;
 			case 'I' : r.after = false; picky_inven();
 				break;
-			case 'd' : drop(null);
+			case 'd' : use = drop(null);
 				break;
-			case 'q' : quaff();
+			case 'q' : use = quaff();
 				break;
-			case 'r' : read_scroll();
+			case 'r' : use = read_scroll();
 				break;
-			case 'e' : eat();
+			case 'e' : use = eat();
 				break;
-			case 'w' : wield();
+			case 'w' : use = wield();
 				break;
-			case 'W' : wear();
+			case 'W' : use = wear();
 				break;
-			case 'T' : take_off();
+			case 'T' : use = take_off();
 				break;
-			case 'P' : ring_on();
+			case 'P' : use = ring_on();
 				break;
-			case 'R' : ring_off();
+			case 'R' : use = ring_off();
 				break;
 			case 'O' : option();
 				break;
@@ -438,17 +440,17 @@ function command(r){
 				break;
 			case 's' : search();
 				break;
-			case 'z' : do_zap(false);
+			case 'z' : use = do_zap(false);
 				break;
 			case 'p':
 				if (get_dir())
-					do_zap(true);
+					use = do_zap(true);
 				else
 					r.after = false;
 				break;
 			case 'v': msg("Super Rogue version %s.",release);
 				break;
-			case 'D': dip_it();
+			case 'D': use = dip_it();
 				break;
 			case CTRL('L') : r.after = false; restscr(cw);
 				break;
@@ -904,6 +906,7 @@ function command(r){
 		const msg = r.UI.msg
 		const new_level = r.dungeon.new_level.create;
 		const pl_on = r.player.pl_on;
+		const total_winner = r.player.rips.total_winner;
 	
 		const hero = r.player.get_hero();
 
@@ -915,8 +918,10 @@ function command(r){
 			else {				/* player not held here */
 				if (r.amulet) {
 					r.dungeon.level--;
-					if (r.dungeon.level == 0)
+					if (r.dungeon.level == 0){
 						total_winner();
+						return;
+					}
 					new_level(d.NORMLEV);
 					msg("You feel a wrenching sensation in your gut.");
 

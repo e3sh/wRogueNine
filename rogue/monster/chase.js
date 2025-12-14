@@ -231,8 +231,8 @@ this.chase = function(r){
 			r.UI.mvwaddch(cw,th.t_pos.y,th.t_pos.x,th.t_oldch);
 		sch = r.UI.mvwinch(cw, ch_ret.y, ch_ret.x);
 		if (rer != null && rf_on(rer,d.ISDARK) && sch == d.FLOOR &&
-		f.DISTANCE(ch_ret.y,ch_ret.x,th.t_pos.y,th.t_pos.x) < 3 &&
-		pl_off(d.ISBLIND))
+			f.DISTANCE(ch_ret.y,ch_ret.x,th.t_pos.y,th.t_pos.x) < 3 &&
+			pl_off(d.ISBLIND))
 			th.t_oldch = ' ';
 		else
 			th.t_oldch = sch;
@@ -242,8 +242,8 @@ this.chase = function(r){
 		r.UI.mvwaddch(mw, ch_ret.y, ch_ret.x, th.t_type);
 		th.t_oldpos.x = th.t_pos.x;
 		th.t_oldpos.y = th.t_pos.y;
-		th.t_pos.x = ch_ret.x;//{x:ch_ret.x, t:ch_ret.y};
-		th.t_pos.y = ch_ret.y;//{x:ch_ret.x, t:ch_ret.y};
+		th.t_pos.x = ch_ret.x;//{x:ch_ret.x, y:ch_ret.y};
+		th.t_pos.y = ch_ret.y;
 		th.t_room = roomin(ch_ret);
 		i = 5;
 		if (th.t_flags & d.ISREGEN)
@@ -259,6 +259,7 @@ this.chase = function(r){
 			th.t_flags &= ~d.ISRUN;
 
 		mon.l_data = th;
+
 		return d.CHASE;
 	}
 

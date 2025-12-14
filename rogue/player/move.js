@@ -418,6 +418,11 @@ function move(r){
 		const save = r.monster.battle.save;
 		const new_thing = r.item.things_f.new_thing;
 		const save_throw = r.monster.battle.save_throw;
+		const tr_name = r.player.misc.tr_name;
+		const iswearing = r.item.ring_f.iswearing;
+		const chg_abil = r.player.pstats.chg_abil;
+		const THINGPTR = f.THINGPTR;
+		const next = f.next;
 
 		const player = r.player.get_player();
 
@@ -437,9 +442,10 @@ function move(r){
 			stuckee = ms.BE_TRAP_EN(monsters[th.t_indx].m_name);
 		}
 		seeit = cansee(tc.y, tc.x);
-		if (seeit)
-			console.log(trp);
+		if (seeit){
+			console.log(tr_name(trp.tr_type));
 			r.UI.mvwaddch(cw, tc.y, tc.x, trp.tr_type);
+		}
 		trp.tr_flags |= d.ISFOUND;
 		sayso = true;
 
@@ -603,7 +609,7 @@ function move(r){
 						r.UI.msg(ms.BE_TRAP_POOL2);
 					}
 					else if(r.rnd(100) < 40) {
-						r.dungeon.level += rnd(4);
+						r.dungeon.level += r.rnd(4);
 						new_level(d.NORMLEV);
 						r.UI.msg(ms.BE_TRAP_POOL3);
 					}
@@ -618,6 +624,21 @@ function move(r){
 		}
 		r.UI.setEffect("trap",{x:tc.x,y:tc.y},{x:tc.x,y:tc.y-1},120);
 		//flushinp();		/* flush typeahead */
+		if (ishero)
+			r.player.set_player(th);
+		else {
+			let mon, tp;
+			for (mon = r.dungeon.mlist; mon != null; mon = next(mon)) {
+				tp = THINGPTR(mon);
+				if (th == tp){
+					//console.log(th);
+					mon.l_data = th;
+				}
+			}
+		}
+		//	th.t_nocmd += d.SLEEPTIME;
+		//else
+		//	th.t_nomove += d.SLEEPTIME;
 		return ch;
 	}
 
@@ -640,6 +661,9 @@ function move(r){
 		const r_know = r.item.r_know;	
 		const ws_know = r.item.ws_know;
 		
+		const a_magic = v.a_magic;
+		const w_magic = v.w_magic;
+
 		const s_names = r.item.s_names;
 		const p_colors = r.item.p_colors;
 		const r_stones = r.item.r_stones;
@@ -647,11 +671,10 @@ function move(r){
 
 		const armors = v.armors;
 
+		const hero = r.player.get_hero();
 		const cur_weapon = r.player.get_cur_weapon();
 		const cur_armor = r.player.get_cur_armor();
 		const cur_ring = r.player.get_cur_ring();
-
-
 
 		let what; //reg struct linked_list *what;
 		let ob; //reg struct object *ob;
@@ -804,7 +827,7 @@ function move(r){
 		ep = traps[ntraps];
 		//for (tp = traps; tp < ep; tp += 1)
 		for (let i in traps){
-			tp = traps[i];
+			tp = traps[i]; console.log(tp.tr_pos);
 			if (tp.tr_pos.y == y && tp.tr_pos.x == x){
 				break;
 			}

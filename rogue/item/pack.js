@@ -500,7 +500,7 @@ function pack_f(r){
 			}
 		}
 		
-		if (purpose != "protect" && purpose != "enchant"){
+		if (purpose != "protect" && purpose != "enchant" && purpose != "identify"){
 			if (r.player.get_select() != null) {
 				for (pit = pack; pit != null; pit = f.next(pit)) {
 					pob = f.OBJPTR(pit);

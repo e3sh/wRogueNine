@@ -828,7 +828,7 @@ function battle(r){
 						rp.r_goldval += GOLDCALC() + GOLDCALC() + GOLDCALC()
 									+ GOLDCALC() + GOLDCALC();
 					r.UI.mvaddch(rp.r_gold.y, rp.r_gold.x, d.GOLD);
-					if (!rf_on(rp,ISDARK)) {
+					if (!rf_on(rp,d.ISDARK)) {
 						light(hero);
 						r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 					}

@@ -44,7 +44,7 @@ function rings(r){
 		let okring;
 
 		if (cur_ring[d.LEFT] != null && cur_ring[d.RIGHT] != null) {
-			r.UI.msg("Already wearing two rings.");
+			r.UI.msg(ms.RINGON_1);
 			r.after = false;
 			return;
 		}
@@ -55,7 +55,7 @@ function rings(r){
 			return;
 		obj = OBJPTR(item);
 		if (obj.o_type != d.RING) {
-			r.UI.msg("That won't fit on your finger.");
+			r.UI.msg(ms.RINGON_2);
 			return;
 		}
 		/*
@@ -93,7 +93,7 @@ function rings(r){
 					}
 					else {
 						add_haste(false);
-						r.UI.msg("You find yourself moving must faster.");
+						r.UI.msg(ms.RINGON_3);
 					}
 				break;
 				case d.R_GIANT:				/* to 24 */
@@ -158,9 +158,11 @@ function rings(r){
 			}
 		}
 		//mpos = 0;
-		r.UI.msg(`Now wearing ${inv_name(obj,true)}`);
+		r.UI.msg(ms.RINGON_4(inv_name(obj,true)));
 		r.player.ringfood = ring_eat();
 		r.nochange = false;
+
+		r.player.set_cur_ring(cur_ring);
 	}
 
 
@@ -173,34 +175,48 @@ function rings(r){
 		const msg = r.UI.msg;
 		const dropcheck = r.item.things_f.dropcheck;
 		const inv_name = r.item.things_f.inv_name;
+		const get_item = r.item.pack_f.get_item;
 
 		const cur_ring = r.player.get_cur_ring();
 
 		let ring;
-		obj; //reg struct object *obj;
+		let obj; //reg struct object *obj;
 		
 		if (cur_ring[d.LEFT] == null && cur_ring[d.RIGHT] == null) {
-			msg("You're not wearing any rings.");
+			msg(ms.RINGOFF1);
 			return;
 		}
 		else if (cur_ring[d.LEFT] == null)
 			ring = d.RIGHT;
 		else if (cur_ring[d.RIGHT] == null)
 			ring = d.LEFT;
-		else
-			if ((ring = gethand(true)) < 0)
+		else{
+			let item = r.player.get_select();
+			if (item == null) {r.UI.msg("not eq"); return;}
+			if (item == cur_ring[d.LEFT])
+				ring = d.LEFT;
+			else if (item == cur_ring[d.RIGHT])
+				ring = d.RIGHT;
+			else { 
+				r.UI.msg(`not eq?${ring}${inv_name(item, true)}`)
 				return;
-		mpos = 0;
+			}
+		}
+		//	if ((ring = gethand(true)) < 0)
+		//		return;
+		//mpos = 0;
 		obj = cur_ring[ring];
 		if (obj == null) {
-			msg("Not wearing such a ring.");
+			msg(ms.RINGOFF2);
 			return;
 		}
 		if (dropcheck(obj)) {
-			msg("Was wearing %s", inv_name(obj, true));
+			msg(ms.RINGOFF3(inv_name(obj, true)));
 			r.nochange = false;
 			r.player.ringfood = ring_eat();
+			cur_ring[ring] = null;		
 		}
+		r.player.set_cur_ring(cur_ring);
 	}
 
 
@@ -570,7 +586,8 @@ function rings(r){
 	{
 		const cur_ring = r.player.get_cur_ring();
 
-		if (cur_ring[hand] != null && cur_ring[hand].o_which == ring)
+		//if (cur_ring[hand] != null && cur_ring[hand].o_which == ring)
+		if (cur_ring[hand] != null && cur_ring[hand] == ring)
 			return true;
 		return false;
 	}

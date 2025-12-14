@@ -164,6 +164,9 @@ function rogueMessage_jp(r){
         READSC_SLEEP: "あなたは眠りに落ちる。",
         READSC_CREATE: "遠くでかすかな苦痛の叫びが聞こえる。",
         READSC_IDENT: "この巻物は鑑定の巻物である。",
+        READSC_SMAP1: "ああ、さてこの巻物には ",
+        READSC_SMAP2: "非常に詳細な地図が載っている。",
+        READSC_SMAP3: "地図が載っている。",
         READSC_GFIND1: "貪欲な気持ちが芽生え、金の気配を感じる。",
         READSC_GFIND2: "下へ引っ張られるような感覚がする。",
         READSC_ENCH1: "あなたは奇妙な喪失感を感じる。",
@@ -210,17 +213,36 @@ function rogueMessage_jp(r){
         //weapon
         FALL_1: (name)=>{return `${name} は地面にぶつかると消えてしまった。`},
         FALL_2: (name)=>{return `${name}は地面にぶつかるやいなや消え去った。`},
-        WIELD: (name)=>{return `${name}を振るう`}, 
+        WIELD: (name)=>{return `${name}を手に持った。`}, 
 
         //armor
         WEAR_1: "もうすでに着ています。",
         WEAR_2: "それは身につけられない。",
-        WEAR_3: (name)=>{return `${name}を着用しています。`},
-        TAKEOFF_1: "防具を一切着用していない。",
-        TAKEOFF_2: (ch, name)=>{return `${ch}) ${name} を着用していました`},
+        WEAR_3: (name)=>{return `${name}を着用した。`},
+        TAKEOFF_1: "防具を着用していない。",
+        TAKEOFF_2: (ch, name)=>{return `${ch}) ${name} を脱ぎました`},
 
+        //ring
+        RINGON_1: "すでに指輪を二つ身につけている。",
+        RINGON_2: "それは君の指には入らないよ。",
+        RINGON_3: "あなたは自分がより速く動いていることに気づく。",
+        RINGON_4: (name)=>{return `現在、${name}をつけた`},
 
+        RINGOFF1: "あなたは指輪を何もつけていない。",
+        RINGOFF2: "そのような指輪はつけていない。",
+        RINGOFF3: (name)=>{return `${name}を外した`},
 
+        //thins
+        MONEY_1: (value)=>{return `${value} gold pieces.`},
+        MONEY_2: "あの金は偽物だったに違いない。",
+
+        DROP_1: "そこには既に何かがある。",
+        DROP_2: (name)=>{return `${name}は沈んで見えなくなる。`},
+        DROP_3: "魔物のフリーマーケットへのご寄付、ありがとうございます。",
+        DROP_4: (name)=>{return `${name}を落とした`},
+
+        DROPCHK_1: "商人は粗悪品を受け入れない。",
+        DROPCHK_2: "できない。呪われているようだ。",
     }
     return ms;
    

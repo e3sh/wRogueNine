@@ -39,13 +39,13 @@ function DaemonScheduler(r){
 	//const pl_on= r.system.disply.pl_on;
 	//const him = r.player.get_him();
 
-	const daemon = this.daemon;
-	const extinguish = this.extinguish;
+	//const daemon = this.daemon;
+	//const extinguish = this.extinguish;
 	const fuse = this.fuse;
 
 	const msg = r.UI.msg;
 
-	const roll = r.roll;
+	//const roll = r.roll;
 	//const wanderer =  r.monster.wanderer;
 	//const light = r.player.move.light;
 	//const death = r.player.rips.death;
@@ -347,6 +347,7 @@ function DaemonScheduler(r){
 	{
 		//sight
 		const pl_on = r.player.pl_on;
+		const light = r.player.move.light;
 
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();

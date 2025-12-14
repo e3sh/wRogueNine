@@ -34,7 +34,7 @@ function scrolls(r){
 		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
 		const THINGPTR = f.THINGPTR;
 		const makemons = r.UI.wizard.makemons;
-		const teleport = r.wizard.teleport;
+		const teleport = r.UI.wizard.teleport;
 		const setoflg = r.setoflg;
 		const resoflg = r.resoflg;
 		const aggravate = r.player.misc.aggravate;
@@ -189,29 +189,29 @@ function scrolls(r){
 			if (curse)
 				break;
 			s_know[d.S_MAP] = true;
-			r.UI.addmsg("Oh, now this scroll has a ");
+			r.UI.addmsg( ms.READSC_SMAP1);
 			if (r.rnd(100) < 10 || bless) {
-				r.UI.addmsg("very detailed map on it.");
+				r.UI.addmsg( ms.READSC_SMAP2);
 				r.UI.endmsg();
 				r.UI.displevl();
 			}
 			else {
-				r.UI.addmsg("map on it.");
-				r.UI.endmsg();
+				r.UI.addmsg( ms.READSC_SMAP3);
+				r.UI.endmsg(" ");
 				//overwrite(stdscr, hw);
 				for (i = 1; i < d.LINES - 2; i++) {
 					for (j = 0; j < d.COLS; j++) {
-						switch (nch = ch = mvwinch(hw, i, j)) {
+						switch (nch = ch = r.UI.mvwinch(hw, i, j)) {
 							case d.SECRETDOOR:
 								nch = d.DOOR;
-								mvaddch(i, j, nch);
+								r.UI.mvaddch(i, j, nch);
 							case '-':
 							case '|':
 							case d.DOOR:
 							case d.PASSAGE:
 							case ' ':
 							case d.STAIRS:
-								if (mvwinch(mw, i, j) != ' ') {
+								if (r.UI.mvwinch(mw, i, j) != ' ') {
 									let it;// struct thing *it;
 									let blah; //struct linked_list *blah;
 
@@ -227,14 +227,14 @@ function scrolls(r){
 								nch = ' ';
 						}
 						if (nch != ch)
-							waddch(hw, nch);
+							r.UI.waddch(hw, nch);
 					}
 				}
 				//overlay(cw, hw);
 				//overwrite(hw, cw);
 			}
 		break;
-		case S_GFIND:
+		case d.S_GFIND:
 			if (!curse) {
 				let gtotal = 0;
 				let rp; //struct room *rp;
@@ -257,7 +257,7 @@ function scrolls(r){
 					r.UI.msg( ms.READSC_GFIND2);
 			}
 		break;
-		case S_TELEP:
+		case d.S_TELEP:
 			if (!curse) {
 				let rm;
 				let cur_room;//struct room *cur_room;
@@ -305,24 +305,33 @@ function scrolls(r){
 		break;
 		case d.S_REMOVE:
 			if (!curse) {
-				const cur_weapon = r.player.get_cur_weapon();
-				const cur_armor = r.player.get_cur_armor();
-				const cur_ring = r.player.get_cur_ring();
+				let ll; //struct linked_list *ll;
+				let lb; //struct object *lb;
 
-				if (cur_armor != null && o_off(cur_armor,d.ISPROT))
-					resoflg(cur_armor,d.ISCURSED);
-				if (cur_weapon != null && o_off(cur_weapon,d.ISPROT))
-					resoflg(cur_weapon,d.ISCURSED);
-				if (cur_ring[d.LEFT]!=null && o_off(cur_ring[d.LEFT],d.ISPROT))
-					resoflg(cur_ring[d.LEFT],d.ISCURSED);
-				if (cur_ring[RIGHT]!=null && o_off(cur_ring[d.RIGHT],d.ISPROT))
-					resoflg(cur_ring[d.RIGHT],d.ISCURSED);
+				for (ll = r.player.get_pack() ; ll != null ; ll = next(ll)) {
+					lb = OBJPTR(ll);
+					if (o_off(lb,d.ISPROT)) {
+						resoflg(lb, d.ISCURSED);
+					}
+				}
+				//let cur_weapon = r.player.get_cur_weapon();
+				//let cur_armor = r.player.get_cur_armor();
+				//let cur_ring = r.player.get_cur_ring();
+
+				//if (cur_armor != null && o_off(cur_armor,d.ISPROT))
+				//	resoflg(cur_armor,d.ISCURSED);
+				//if (cur_weapon != null && o_off(cur_weapon,d.ISPROT))
+				//	resoflg(cur_weapon,d.ISCURSED);
+				//if (cur_ring[d.LEFT]!=null && o_off(cur_ring[d.LEFT],d.ISPROT))
+				//	resoflg(cur_ring[d.LEFT],d.ISCURSED);
+				//if (cur_ring[d.RIGHT]!=null && o_off(cur_ring[d.RIGHT],d.ISPROT))
+				//	resoflg(cur_ring[d.RIGHT],d.ISCURSED);
 				r.UI.msg( ms.READSC_REMOVE);
 				s_know[d.S_REMOVE] = true;
 
-				r.player.set_cur_weapon(cur_weapon);
-				r.player.set_cur_armor(cur_armor);
-				r.player.set_cur_ring(cur_ring);
+				//r.player.set_cur_weapon(cur_weapon);
+				//r.player.set_cur_armor(cur_armor);
+				//r.player.set_cur_ring(cur_ring);
 			}
 		break;
 		case d.S_AGGR:
@@ -359,7 +368,7 @@ function scrolls(r){
 				}
 			}
 		break;
-		case S_DLEVEL:
+		case d.S_DLEVEL:
 			if (!bless) {
 				let much = r.rnd(9) - 4;
 

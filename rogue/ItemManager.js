@@ -454,7 +454,7 @@ function ItemManager(r){
 
 		const si = r.player.get_select();
 
-		let ch;
+		let ch, use = false;
 
 		if (si == null) {
 			r.UI.msg("No inventory selected.");
@@ -464,41 +464,41 @@ function ItemManager(r){
 		switch(si.o_type){
 			case d.POTION:
 				ch = "q";
-				if (direct) quaff();
+				if (direct){use = true; quaff();}
 				break;
 			case d.SCROLL:
 				ch = "r";	
-				if (direct) read_scroll();
+				if (direct){use = true; read_scroll();}
 				break;
 			case d.FOOD:
 				ch = "e";		
-				if (direct) eat();
+				if (direct){use = true; eat();}
 				break;
 			case d.RING:
 				if (iswearing(si)) {
 					ch = "R";
-					if (direct) ring_off();
+					if (direct){use = true; ring_off();}
 				}else{
 					ch = "P";
-					if (direct) ring_on();
+					if (direct){use = true; ring_on();}
 				}
 				break;
 			case d.ARMOR:
 				if (r.player.get_cur_armor() != null){
 					ch = "T";
-					if (direct) take_off();
+					if (direct){use = true; take_off();}
 				}else{
 					ch = "W";
-					if (direct) wear();
+					if (direct){use = true; wear();}
 				}
 				break;
 			case d.WEAPON:
 				ch = "w";
-				if (direct) wield();
+				if (direct){use = true; wield();}
 				break;
 			case d.STICK:
 				ch = "z";		
-				if (direct) do_zap();
+				if (direct){use = true; do_zap();}
 				break;
 			default:
 				ch = "s";
@@ -520,7 +520,7 @@ function ItemManager(r){
 		const hero = r.player.get_hero();
 		const obj = r.player.get_select();
 
-		let ch;
+		let ch, done = false;;
 
 		if (obj == null) {
 			r.UI.msg("No inventory selected.");
@@ -532,17 +532,17 @@ function ItemManager(r){
 			console.log(obj.o_flags);
 
 			if (obj.o_type == d.WEAPON && o_on(obj, d.ISMISL)){
-				ch = "t"; if (direct) missile();
+				ch = "t"; if (direct) done = missile();
 			}else{
 				let tp = trap_at(hero.y,hero.x);
 				if (tp == null || r.inpool == false || (tp.tr_flags & d.ISGONE)){
-					ch = "d"; if (direct) drop();
+					ch = "d"; if (direct) done = drop();
 				}else{
-					ch = "D"; if (direct) dip_it();
+					ch = "D"; if (direct) done = dip_it();
 				}
 			}
 		}else{
-			ch = "%"; if (direct) sell_it();
+			ch = "%"; if (direct) done = sell_it();
 		}
 		console.log(ch);
 		return ch;
