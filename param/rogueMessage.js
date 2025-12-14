@@ -71,6 +71,7 @@ function rogueMessage(r){
 
         KILLED_1: "Defeated it.",
         KILLED_2: (name)=>{return `Defeated ${name}.`},
+        DEATH:  (name)=>{return `Defeated by  ${name}`},
 
         //dungeon
         BARGAIN_1: "great bargain",
@@ -86,6 +87,7 @@ function rogueMessage(r){
         SELLIT_2: (type, price)=>{return `Your ${type} is worth ${price} pieces of gold.`},
         SELLIT_3: (name)=>{return `Sold ${name}`},
 
+        DO_POST: "Welcome to Friendly Fiend's Flea Market",
         OP_MARKET: "The market is closed. The stairs are that-a-way.",
 
         TRANS_LINE: (num)=>{return `You have ${num} transactions remaining.`},

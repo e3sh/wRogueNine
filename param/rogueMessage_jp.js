@@ -71,6 +71,7 @@ function rogueMessage_jp(r){
 
         KILLED_1: "何かを倒した",
         KILLED_2: (name)=>{return `${name}を倒した`},
+        DEATH:  (name)=>{return `${name}に倒された。`},
         
         //dungeon
         BARGAIN_1: "お買い得",
@@ -86,6 +87,7 @@ function rogueMessage_jp(r){
         SELLIT_2: (type, price)=>{return `あなたの${type}は${price}ゴールドの価値があります。`},
         SELLIT_3: (name)=>{return `${name}を売却しました`},
 
+        DO_POST: "友好的な悪魔のフリーマーケットへようこそ",
         OP_MARKET: "市場は閉まっています。階段からお帰り下さい。",
 
         TRANS_LINE: (num)=>{return `残り${num}回の取引が可能です。`},
@@ -238,7 +240,7 @@ function rogueMessage_jp(r){
 
         DROP_1: "そこには既に何かがある。",
         DROP_2: (name)=>{return `${name}は沈んで見えなくなる。`},
-        DROP_3: "魔物のフリーマーケットへのご寄付、ありがとうございます。",
+        DROP_3: "悪魔のフリーマーケットへのご寄付、ありがとうございます。",
         DROP_4: (name)=>{return `${name}を落とした`},
 
         DROPCHK_1: "商人は粗悪品を受け入れない。",

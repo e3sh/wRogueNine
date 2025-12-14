@@ -73,7 +73,10 @@ function trader(r){
 		r.UI.mvwaddch(cw,14, 0, "Auto: Prices object that you stand upon.");
 		r.UI.mvwaddch(cw,15, 0, "5(A): Buys the object that you stand upon.");
 		r.UI.mvwaddch(cw,16, 0, "D(Y): Trades in something in your pack for gold.");
+
+		r.UI.msg(ms.DO_POST);
 		trans_line();
+
 	}
 
 	/*

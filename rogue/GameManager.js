@@ -336,6 +336,7 @@ function GameManager(g){
             firstinv = true;
             r.UI.msg(ms.MAINSTART);
 
+            r.player.purse = 0;
             r.player.food_left = d.HUNGERTIME;
             r.player.hungry_state = d.F_OKAY;
             //newGame;

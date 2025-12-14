@@ -75,7 +75,11 @@
 		}
 		r.UI.mvaddstr(10, 36 - (whoami.length / 2), whoami);
 		killer = killname(monst);
-		r.UI.mvaddstr(12, 43, vowelstr(killer));
+		
+		//r.UI.mvaddstr(12, 43, vowelstr(killer));
+
+		r.UI.msg(ms.DEATH(killer));
+		
 		r.UI.mvaddstr(14, 36 - (killer.length / 2), killer);
 		purse -= purse/10;
 		buf = `${purse} Gold Pieces`;
