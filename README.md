@@ -10,9 +10,10 @@ Base SuperRogue9.0
 * [SuperRogue9.0](http://rogue.rogueforge.net/super-rogue-9-0/) original rogue source code
 * [wGCs](https://github.com/e3sh/WebGameCoreSystem) Display and Input Control
 * [↑Document](https://e3sh.github.io/WebGameCoreSystem/documents/) Documents
- 
+
+* [wRogueClone](https://github.com/e3sh/wRogueClone) rogue5.4.4base porting  
 ```
-##　移植による変更（予定）点
+##　移植による変更点
 * 移動・操作の簡略化
 - ・操作系の見直し:GamePad対応
 - ・アクションは選択アイテムにより自動判定
@@ -20,7 +21,7 @@ Base SuperRogue9.0
 - ・任意の名前を割り当てる機能削除
 - ・スコアボード未実装
 * 現在の状態
-- ・未完成　最低限動作のみ　戦闘/アイテム周りのコマンド、ゲームオーバー等未実装
+- ・debug中 trap動作・効果、各アイテムの動作・効果/　選択操作調整　2025/12/15
 ```
 
 The large middle section of the screen displays the player's surroundings using the following symbols:

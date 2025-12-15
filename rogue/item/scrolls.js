@@ -13,7 +13,7 @@ function scrolls(r){
 
 	const cw = d.DSP_MAIN_FG;
     const mw = d.DSP_MAIN_BG;
-	const hw = d.DSP_MAIN_FG;
+	const hw = d.DSP_MAIN;
 
 	/*
 	* read_scroll:
@@ -44,7 +44,7 @@ function scrolls(r){
  		const inv_name = r.item.things_f.inv_name;
 		const chg_hpt = r.player.pstats.chg_hpt;
 		const whatis = r.UI.wizard.whatis;
-
+		const idenpack = r.item.pack_f.idenpack;
 
 		const s_know = r.item.s_know;
 		const w_magic = v.w_magic;
@@ -98,6 +98,7 @@ function scrolls(r){
 				r.UI.msg( ms.READSC_CONFUSE);
 				player.t_flags |= d.CANHUH;
 				s_know[d.S_CONFUSE] = true;
+				r.player.set_player( player);
 			}
 		break;
 		case d.S_LIGHT:
@@ -154,6 +155,8 @@ function scrolls(r){
 								th.t_flags &= ~d.ISRUN;
 								th.t_flags |= d.ISHELD;
 								th.t_flags |= d.ISSTUCK;
+
+								r.UI.setEffect(`HOLD`, {x:x,y:y} ,{x: x, y: y-1},120);
 							}
 						}
 					}
@@ -168,6 +171,7 @@ function scrolls(r){
 				s_know[d.S_SLEEP] = true;
 				r.UI.msg( ms.READSC_SLEEP);
 				player.t_nocmd += 4 + r.rnd(d.SLEEPTIME);
+				r.player.set_player( player);
 			}
 		break;
 		case d.S_CREATE:
@@ -192,16 +196,17 @@ function scrolls(r){
 			r.UI.addmsg( ms.READSC_SMAP1);
 			if (r.rnd(100) < 10 || bless) {
 				r.UI.addmsg( ms.READSC_SMAP2);
-				r.UI.endmsg();
+				r.UI.endmsg(" ");
 				r.UI.displevl();
 			}
 			else {
 				r.UI.addmsg( ms.READSC_SMAP3);
 				r.UI.endmsg(" ");
 				//overwrite(stdscr, hw);
-				for (i = 1; i < d.LINES - 2; i++) {
+				for (i = 1; i < d.LINES - 1; i++) {
 					for (j = 0; j < d.COLS; j++) {
-						switch (nch = ch = r.UI.mvwinch(hw, i, j)) {
+						nch = ch = r.UI.mvwinch(hw, i, j);
+						switch (ch) {
 							case d.SECRETDOOR:
 								nch = d.DOOR;
 								r.UI.mvaddch(i, j, nch);
@@ -211,7 +216,7 @@ function scrolls(r){
 							case d.PASSAGE:
 							case ' ':
 							case d.STAIRS:
-								if (r.UI.mvwinch(mw, i, j) != ' ') {
+								if (r.UI.mvwinch(cw, i, j) != ' ') {
 									let it;// struct thing *it;
 									let blah; //struct linked_list *blah;
 
@@ -226,8 +231,8 @@ function scrolls(r){
 							default:
 								nch = ' ';
 						}
-						if (nch != ch)
-							r.UI.waddch(hw, nch);
+						//if (nch != ch)
+							r.UI.mvwaddch(cw, i, j, nch);
 					}
 				}
 				//overlay(cw, hw);
@@ -538,7 +543,7 @@ function scrolls(r){
 		r.nochange = false;
 
 		r.player.set_player( player);
-		r.player.set_hero( hero);
+		//r.player.set_hero( hero);
 
 		//if (s_know[wh] && s_guess[wh]) {
 		//	free(s_guess[wh]);

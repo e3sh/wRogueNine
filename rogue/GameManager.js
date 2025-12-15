@@ -63,6 +63,10 @@ function GameManager(g){
     this.nlmove = false;	/* true when transported to new level */
 
     this.cutpurch; /* name of item ready to buy */
+
+    this.rsmsg_f = false;
+    this.rstime = 0;
+    this.getGametime =()=>{return g.time()};
     
     let entities = [];
     this.entity = entities;
@@ -77,11 +81,12 @@ function GameManager(g){
     * sceneChange param initialize
     */
     const SceneList = {
-        0: ()=>{r.UI.command.main();} ,//null//this.UI.command,
-        1: ()=>{r.UI.scene.keywait();},
-        2: ()=>{r.UI.scene.inventry();},
-        3: ()=>{r.UI.scene.get_item();},
-        4: ()=>{r.UI.scene.create_obj();},
+        0: ()=>{r.UI.command.main();} , //SCE_MAIN 
+        1: ()=>{r.UI.scene.keywait();}, //SCE_KEYWAIT
+        2: ()=>{r.UI.scene.inventry();}, //SCE_INVENT
+        3: ()=>{r.UI.scene.get_item();}, //SCE_GETTIEM
+        4: ()=>{r.UI.scene.create_obj();},//SCE_CREATE
+        5: ()=>{r.UI.scene.result();},  //SCE_RESULT
     }
 
     let SceneFunc;// =  setthis.UI.command();/* Command execution */;
@@ -451,7 +456,7 @@ function GameManager(g){
         //while (playing)
         //    command();		/* Command execution */
         //endit(0);
-        r.setScene(0);
+        r.setScene(d.SCE_MAIN);
         SceneFunc();
         r.playing = true;
 

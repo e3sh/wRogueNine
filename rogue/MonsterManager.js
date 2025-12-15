@@ -331,6 +331,12 @@ function MonsterManager(r){
 	*/
 	this.genocide = function()
 	{
+		const THINGPTR = f.THINGPTR;
+		const next = f.next;
+		const remove_monster = r.monster.battle.remove_monster
+		const lev_mon = r.monster.lev_mon;
+		const midx = r.monster.midx;
+
 		let ip, nip;//reg struct linked_list *ip, *nip;
 		let mp; //reg struct thing *mp;
 		let mm; //struct monster *mm;
@@ -338,48 +344,86 @@ function MonsterManager(r){
 
 		if (r.levcount == 0) {
 			//mpos = 0;
-			msg("You cannot genocide Asmodeus !!");
+			r.UI.msg("You cannot genocide Asmodeus !!");
 			return;
 		}
 
-		let tryagain = false;
-		while (tryagain){
+		//let tryagain = false;
+		//while (tryagain){
 
-			i = true;		/* assume an error now */
-			while (i) {
-				msg("Which monster (remember UPPER & lower case)?");
-				c = readchar();		/* get a char */
-				if (c == ESCAPE) {	/* he can abort (the fool) */
-					msg("");
-					return;
-				}
-				if (isalpha(c))		/* valid char here */
-					i = false;		/* exit the loop */
-				else {				/* he didn't type a letter */
-					mpos = 0;
-					msg("Please specify a letter between 'A' and 'z'");
-				}
-			}
-			i = midx(c);						/* get index to monster */
+		//	i = true;		/* assume an error now */
+		//	while (i) {
+		//		msg("Which monster (remember UPPER & lower case)?");
+		//		c = readchar();		/* get a char */
+		//		if (c == ESCAPE) {	/* he can abort (the fool) */
+		//			msg("");
+		//			return;
+		//		}
+		//		if (isalpha(c))		/* valid char here */
+		//			i = false;		/* exit the loop */
+		//		else {				/* he didn't type a letter */
+		//			mpos = 0;
+		//			msg("Please specify a letter between 'A' and 'z'");
+		//		}
+		//	}
+
+		let enelist = target_genocide();
+		for (let j in enelist){
+			i = midx(enelist[j]);						/* get index to monster */
 			mm = monsters[i];
 			if (mm.m_lev.l_lev < 0) {
-				mpos = 0;
-				msg("You have already eliminated the %s.",mm.m_name);
-				tryagain = true;
+				//mpos = 0;
+				r.UI.msg(`You have already eliminated the ${mm.m_name}.`);
+				//tryagain = true;
+			}else{
+				for (ip = r.dungeon.mlist; ip != null; ip = nip) {
+					mp = THINGPTR(ip);
+					nip = next(ip);
+					if (mp.t_type == enelist[j]){
+						remove_monster(mp.t_pos, ip);
+						let x = mp.t_pos.x;
+						let y = mp.t_pos.y;
+						r.UI.setEffect(`KILL`, {x:x,y:y} ,{x: x, y: y-1},120);
+					}
+				}
+				mm.m_lev.l_lev = -1;				/* get rid of it */
+				mm.m_lev.h_lev = -1;
+				lev_mon();							/* redo monster list */
+				//mpos = 0;
+				r.UI.msg(`You have wiped out the ${mm.m_name}.`);
 			}
 		}
+	}
 
-		for (ip = mlist; ip != null; ip = nip) {
-			mp = THINGPTR(ip);
-			nip = next(ip);
-			if (mp.t_type == c)
-				remove_monster(mp.t_pos, ip);
+	/*
+	* 7*7 area include monster genocide
+	*
+	*/
+	function target_genocide(){
+
+		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
+		const find_mons = r.monster.chase.find_mons;
+		const THINGPTR = f.THINGPTR;
+
+		const hero = r.player.get_hero();
+
+		let x,y;
+		let mon; //reg struct linked_list *mon;
+		let tgt = [];
+
+		for (x = hero.x - 3; x <= hero.x + 3; x++) {
+			for (y = hero.y - 3; y <= hero.y + 3; y++) {
+				if (y > 0 && x > 0 && isalpha(r.UI.mvwinch(mw, y, x))) {
+					if ((mon = find_mons(y, x)) != null) {
+						let th; //reg struct thing *th;
+
+						th = THINGPTR(mon);
+						tgt.push(th.t_type);
+					}
+				}
+			}
 		}
-		mm.m_lev.l_lev = -1;				/* get rid of it */
-		mm.m_lev.h_lev = -1;
-		lev_mon();							/* redo monster list */
-		mpos = 0;
-		msg("You have wiped out the %s.",mm.m_name);
+		return tgt;
 	}
 
 	/*
@@ -391,6 +435,8 @@ function MonsterManager(r){
 	{
 		const midx = r.monster.midx;
 
+		const player = r.player.get_player();
+
 		switch (whichmon) {
 			case 'F':
 				this.fung_hit = 0;
@@ -398,6 +444,7 @@ function MonsterManager(r){
 			case 'd':
 				player.t_flags &= ~d.ISHELD;
 		}
+		r.player.get_player(player);
 	}
 
 	/*

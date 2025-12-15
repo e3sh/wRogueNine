@@ -125,7 +125,7 @@ function wizard(r){
 		}
 		*/
 		r.UI.wclear(hw);
-		r.setScene(4);
+		r.setScene(d.SCE_CREATE);
 		r.UI.overlapview(true);
 		r.UI.scene.create_obj()
 	}
@@ -386,6 +386,8 @@ function wizard(r){
 			r.running = false;
 			//flushinp();			/* flush typeahead */
 			r.nochange = false;
+
+			//r.player.set_hero(hero);
 		}
 		else
 			r.UI.mvwaddch(mw, th.t_pos.y, th.t_pos.x, th.t_type);

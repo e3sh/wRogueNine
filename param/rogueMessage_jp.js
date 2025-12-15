@@ -181,10 +181,10 @@ function rogueMessage_jp(r){
         READSC_DCURSE: "あなたの荷物が震える。",
         READSC_DLEVEL: "あなたはたちまち別の土地へと運ばれる。",
         READSC_PROTECT1: "あなたに守護の力が授けられた。",
-        READSC_PROTECT2: (name)=>{return `保護された ${name}`},
+        READSC_PROTECT2: (name)=>{return `${name}は保護された`},
         READSC_ALLENCH1: "あなたは魅惑の力を授けられた。",
         READSC_ALLENCH2: "巻物が閃光を放ち炎に包まれる！！！あなたは負傷した",
-        READSC_ALLENCH3: (name)=>{return `魔法にかけられた ${name}`},
+        READSC_ALLENCH3: (name)=>{return `${name}に魔法がかかった`},
         READSC_BLESS: "あなたのパックが明るく輝いている。",
         READSC_MAKEIT: "あなたは創造の力を授けられた。",
         READSC_BAN1: "上層に昇る", 
@@ -245,6 +245,14 @@ function rogueMessage_jp(r){
 
         DROPCHK_1: "商人は粗悪品を受け入れない。",
         DROPCHK_2: "できない。呪われているようだ。",
+        
+        TOTALWIN:[
+            "やったぞ！",
+            "おめでとう、ついに日の光の下へたどり着いた！",
+            "あなたは『運命のダンジョン』から生還した選ばれし者たちの",
+            "仲間入りを果たした。",
+        ],
+
     }
     return ms;
    

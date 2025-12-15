@@ -617,6 +617,7 @@ function move(r){
 						r.UI.msg(ms.BE_TRAP_POOL4);
 						//wait_for(cw, ' ');
 						death(d.K_POOL);
+						return;
 					}
 					else
 						r.nlmove = false;

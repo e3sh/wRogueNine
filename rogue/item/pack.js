@@ -337,7 +337,7 @@ function pack_f(r){
 		//restscr(cw);
 		r.UI.setDsp(d.DSP_MAIN);
 
-		r.setScene(2);
+		r.setScene(d.SCE_INVENT);
 		r.UI.overlapview(true);
 
 		return true;
@@ -591,7 +591,7 @@ function pack_f(r){
 			r.UI.setDsp(d.DSP_MAIN);
 
 			r.UI.scene.set_gi_param(purpose, type);
-			r.setScene(3); 
+			r.setScene(d.SCE_GETITEM); 
 			r.UI.overlapview(true);
 		}
 	}

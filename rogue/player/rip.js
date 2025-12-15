@@ -14,6 +14,7 @@
 	let scoreline;// [100];
 
 	const cw = d.DSP_MAIN_FG;
+	const hw = d.DSP_WINDOW;
 
 	const rip = [
 		"                          ____________________",
@@ -92,7 +93,10 @@
 		//score(purse, d.KILLED, monst);
 		//byebye(0);
 		r.UI.io.status();
-		r.setScene(1);
+		r.setScene(d.SCE_KEYWAIT);
+
+	    r.rsmsg_f = false;
+	    r.rstime = r.getGametime();
 
 		if (!r.wizard) r.qs.reset();
 	}
@@ -133,15 +137,15 @@
 		let outf; //reg FILE *outf;
 		let packend;
 
-		signal(SIGINT, byebye);
-		signal(SIGQUIT, byebye);
-		if (aflag != WINNER) {
-			if (aflag == CHICKEN)
+		//signal(SIGINT, byebye);
+		//signal(SIGQUIT, byebye);
+		if (aflag != d.WINNER) {
+			if (aflag == d.CHICKEN)
 				packend = "when you chickened out";
 			else
 				packend = "at your untimely demise";
 			mvaddstr(LINES - 1, 0, retstr);
-			refresh();
+			//refresh();
 			wgetnstr(stdscr,prbuf,80);
 			oldpurse = purse;
 			showpack(false, packend);
@@ -308,20 +312,24 @@
 
 		for (let i in winmsg){
 			r.UI.mvaddstr(d.LINES - winmsg.length - 1 + Number(i), 0, winmsg[i]);
-			
-			let ln = winmsg.length - Number(i) -1;
-			if (ln > 8) r.UI.msg(winmsg[winmsg.length - Number(i) -1]);
 		}
-		r.UI.msg("You Made It!");
+
+		for (let i in ms.TOTALWIN){
+			let ln = ms.TOTALWIN.length - Number(i) -1;
+			r.UI.msg(ms.TOTALWIN[ln]);
+		}
 		//mvaddstr(LINES - 1, 0,spacemsg);
 		//refresh();
 		//wait_for(stdscr, ' ');
 		//clear();
 		//oldpurse = purse;
-		//showpack(true, null);
+		showpack(true, null);
 		//score(purse, WINNER, 0);
 		//byebye(0);
-		r.setScene(1);
+		r.setScene(d.SCE_RESULT);
+		
+	    r.rsmsg_f = false;
+	    r.rstime = r.getGametime();
 	}
 
 	/*
@@ -333,43 +341,61 @@
 	//char *howso;
 	{
 		const get_worth = r.dungeon.trader.get_worth;
-
+		const idenpack = r.item.pack_f.idenpack;
+		const npch = r.UI.io.npch;
+		const OBJPTR = f.OBJPTR;
+		const inv_name = r.item.things_f.inv_name;
+		const next = f.next;
+	
 		let iname;
 		let cnt, worth, ch;
 		let item; //reg struct linked_list *item;
 		let obj; ///reg struct object *obj;
+		let list = [];
 
 		idenpack();
-		cnt = 1;
-		clear();
+		//cnt = 1;
+		//clear();
+		let oldpurse = r.player.purse;
+	
 		if (winner)
-			mvaddstr(0, 0, "   Worth  Item");
+			list.push("   Worth  Item");
 		else
-			mvprintw(0, 0, "Contents of your pack %s:\n",howso);
+			list.push(`Contents of your pack ${howso}`);
 		ch = 'a';
-		for (item = pack; item != null; item = next(item)) {
+		for (item = r.player.get_pack(); item != null; item = next(item)) {
 			obj = OBJPTR(item);
 			iname = inv_name(obj, false);
 			if (winner) {
 				worth = get_worth(obj);
 				worth *= obj.o_count;
-				mvprintw(cnt, 0, "  %6d  %s",worth,iname);
-				purse += worth;
+				let st = "      " + String(worth);
+				list.push(`  ${String(st.slice(-6))} ${iname}`);
+				r.player.purse += worth;
 			}
 			else {
-				mvprintw(cnt, 0, "%c) %s\n",ch,iname);
+				list.push(`${ch}) ${iname}`);
 				ch = npch(ch);
 			}
-			if (++cnt >= LINES - 2 && next(item) != null) {
-				cnt = 1;
-				mvaddstr(LINES - 1, 0, morestr);
-				refresh();
-				wait_for(stdscr, ' ');
-				clear();
-			}
+			//if (++cnt >= LINES - 2 && next(item) != null) {
+			//	cnt = 1;
+			//	mvaddstr(LINES - 1, 0, morestr);
+			//	refresh();
+			//	wait_for(stdscr, ' ');
+			//	clear();
+			//}
 		}
-		mvprintw(cnt + 1,0,"--- %d  Gold Pieces ---",oldpurse);
-		refresh();
+		st = "----- " + String(oldpurse);
+		list.push(`--${st.slice(-6)} Gold Pieces ---`);
+		st = "----- " + String(r.player.purse);
+		list.push(`--${st.slice(-6)} Gold Pieces total ---`);
+
+		//refresh();
+		r.UI.setDsp(hw);
+		r.UI.clear();
+		for (let i in list){
+			r.UI.mvaddstr(Number(i), 0, list[i]);
+		}
 	}
 
 	/*

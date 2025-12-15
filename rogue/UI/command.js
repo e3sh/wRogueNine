@@ -188,6 +188,7 @@ function command(r){
 		etxt.push(`----4-:ISMEAN :${ent_flags(d.ISMEAN	)}`);
 		etxt.push(`---1--:ISGREED:${ent_flags(d.ISGREED	)}`);
 		etxt.push(`---2--:ISWOUND:${ent_flags(d.ISWOUND	)}`);
+		etxt.push(`---4--:ISHELD :${ent_flags(d.ISHELD	)}`);
 		etxt.push(`--1---:ISHUH  :${ent_flags(d.ISHUH	)}`);
 		etxt.push(`--2---:ISREGEN:${ent_flags(d.ISREGEN	)}`);
 		etxt.push(`-1----:WASHIT :${ent_flags(d.WASHIT	)}`);

@@ -406,6 +406,15 @@ function rogueDefines(r){
 
         COLS:80,
         LINES:24,
+
+        //scene
+        SCE_MAIN: 0,
+        SCE_KEYWAIT: 1,
+        SCE_INVENT:  2,
+        SCE_GETITEM: 3,
+        SCE_CREATE: 4,
+        SCE_RESULT: 5,
+
     };
     return d;
 }

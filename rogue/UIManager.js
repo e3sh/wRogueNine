@@ -215,54 +215,60 @@ function UIManager(r, g){
     this.displevl = function()
     {
         const find_mons = r.monster.chase.find_mons;
+        const isatrap = r.player.move.isatrap;
+        const trap_at = r.player.move.trap_at;
+        const illeg_ch = r.UI.io.illeg_ch;
+        const THINGPTR = f.THINGPTR;
+        const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
 
         let ch, mch;//reg char ch, mch;
         let i,j;//reg int i,j;
         let rp;//reg struct room *rp;
 
-        for (rp = rooms; rp < rooms[MAXROOMS]; rp++)
-            rp.r_flags &= ~ISDARK;
+        //for (rp = rooms; rp < r.dungeon.rooms[d.MAXROOMS]; rp++)
+        for (let i in r.dungeon.rooms)
+            r.dungeon.rooms[i].r_flags &= ~d.ISDARK;
 
-        for (i = 0; i < LINES - 2; i++) {
-            for (j = 0; j < COLS - 1; j++) {
-                ch = mvinch(i,j);
+        for (i = 0; i < d.LINES - 2; i++) {
+            for (j = 0; j < d.COLS - 1; j++) {
+                ch = r.UI.mvinch(i,j);
                 if (isatrap(ch)) {
                     let what;//struct trap *what;
 
                     what = trap_at(i, j);
                     if (what != null)
-                        what.tr_flags |= ISFOUND;
+                        what.tr_flags |= d.ISFOUND;
                 }
-                else if (ch == SECRETDOOR) {
-                    ch = DOOR;
-                    mvaddch(i, j, ch);
+                else if (ch == d.SECRETDOOR) {
+                    ch = d.DOOR;
+                    r.UI.mvaddch(i, j, ch);
                 }
                 else if (illeg_ch(ch)) {
-                    ch = FLOOR;
-                    mvaddch(i, j, ch);
+                    ch = d.FLOOR;
+                    r.UI.mvaddch(i, j, ch);
                 }
-                if (mvwinch(mw, i, j) != ' ') {
+                if (r.UI.mvwinch(mw, i, j) != ' ') {
                     let what;//struct linked_list *what;
                     let it;//struct thing *it;
 
                     what = find_mons(i, j);
                     if (what == null) {
-                        ch = FLOOR;
-                        mvaddch(i, j, ch);
+                        ch = d.FLOOR;
+                        r.UI.mvaddch(i, j, ch);
                     }
                     else {
                         it = THINGPTR(what);
                         it.t_oldch = ch;
                     }
                 }
-                mch = mvwinch(cw, i, j);
+                mch = r.UI.mvwinch(cw, i, j);
                 if (isalpha(mch))
                     ch = mch;
-                mvwaddch(cw, i, j, ch);
+                r.UI.mvwaddch(cw, i, j, ch);
             }
         }
-        nochange = false;	/* display status again */
-        draw(cw);
+        r.nochange = false;	/* display status again */
+        //draw(cw);
     }
 
     /*

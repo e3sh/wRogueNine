@@ -201,8 +201,10 @@ function battle(r){
 					r.UI.damageEffect("x", tgt.x, tgt.y);
 					hit(mname);
 				}
-				if (him.s_hpt <= 0)
+				if (him.s_hpt <= 0){
 					death(mp.t_indx);
+					return;
+				}
 				if (off(mp, d.ISCANC))
 					switch (mp.t_type) {
 					case 'R':
@@ -243,8 +245,10 @@ function battle(r){
 					break;
 					case 'W':
 						if (r.rnd(100) < 15 && !iswearing(d.R_SUSAB)) {
-							if (him.s_exp <= 0)
+							if (him.s_exp <= 0){
 								death(mp.t_indx);
+								return;
+							}
 							r.UI.msg( ms.ATTACK_W );
 							if (--him.s_lvl == 0) {
 								him.s_exp = 0;
@@ -325,6 +329,7 @@ function battle(r){
 							r.UI.msg( ms.ATTACK_c2 );
 							//wait_for(cw, ' ');
 							death(mp.t_indx);
+							return;
 						}
 					break;
 					case 'd':
@@ -401,8 +406,10 @@ function battle(r){
 		else if (mp.t_type != 'E') {
 			if (mp.t_type == 'F') {
 				him.s_hpt -= fung_hit;
-				if (him.s_hpt <= 0)
+				if (him.s_hpt <= 0){
 					death(mp.t_indx);
+					return;
+				}
 			}
 			miss(mname);
 		}

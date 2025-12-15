@@ -30,6 +30,7 @@ function pstats(r){
 		if (him.s_hpt < 1) {
 			r.UI.msg(" ");
 			death(what);
+			return;
 		}
 		r.player.set_him(him);
 	}

@@ -26,12 +26,20 @@ function scene(r){
 
         let ki = r.UI.readchar();
 
-		if (ki.includes("Enter") ||
-            ki.includes("NumpadEnter")){
+        if (r.rstime + 500 < r.getGametime()){
+            if (!r.rsmsg_f){
+                r.UI.msg(" ");
+                r.UI.msg("Push Return to NewGame");
+                r.rsmsg_f = true;
+            }
+            if (ki.includes("Enter") ||
+                ki.includes("NumpadEnter")){
 
-            r.item.reset_mi_probs();
-            r.main();
-            r.setScene(0);
+                r.UI.overlapview(false);    
+                r.item.reset_mi_probs();
+                r.main();
+                r.setScene(d.SCE_MAIN);
+            }
         }
     }
 
@@ -69,7 +77,7 @@ function scene(r){
             r.player.set_select(curItem(cur));
             r.UI.io.status();
             r.UI.overlapview(false);
-            r.setScene(0);
+            r.setScene(d.SCE_MAIN);
         }
 		if (ki.includes("Numpad8")||ki.includes("Numpad2")||
             ki.includes("NumpadSubtract")||ki.includes("NumpadAdd")||
@@ -89,7 +97,7 @@ function scene(r){
             r.item.decode_cmd(true);
 
             r.UI.overlapview(false);
-            r.setScene(0);
+            r.setScene(d.SCE_MAIN);
         }
         if (ki.includes("KeyD")){
             console.log("Drop/ThrowItem");
@@ -97,7 +105,7 @@ function scene(r){
             //r.item.decode_drop(true);
             //r.player.set_select(null);
             r.UI.overlapview(false);
-            r.setScene(0);
+            r.setScene(d.SCE_MAIN);
         }
         r.UI.mvaddch(cur ,2, ">");
     }
@@ -142,7 +150,7 @@ function scene(r){
             r.player.set_dest(curItem(cur));
             r.UI.io.status();
             r.UI.overlapview(false);
-            r.setScene(0);
+            r.setScene(d.SCE_MAIN);
         }
        
         //escape
@@ -153,7 +161,7 @@ function scene(r){
             r.UI.msg("get_item select cansel.")
             r.UI.io.status();
             r.UI.overlapview(false);
-            r.setScene(0);
+            r.setScene(d.SCE_MAIN);
         }
         //movecursur
 		if (ki.includes("Numpad8")||ki.includes("Numpad2")||
@@ -210,14 +218,14 @@ function scene(r){
 
                 r.UI.io.status();
                 r.UI.overlapview(false);
-                r.setScene(0);
+                r.setScene(d.SCE_MAIN);
             }
             //quit
             if (co_line == 3){
                 r.UI.msg("create_object select cansel.")
                 r.UI.io.status();
                 r.UI.overlapview(false);
-                r.setScene(0);
+                r.setScene(d.SCE_MAIN);
             }
         }
 
@@ -327,7 +335,7 @@ function scene(r){
             if (col == 3){
                 r.beginproc(true);
             }
-            r.setScene(d.MAINR);
+            r.setScene(d.SCE_MAIN);
 		}
  	}
 
@@ -364,4 +372,27 @@ function scene(r){
 			r.UI.submvprintw(i, 0, `${(col == i && (col >=2 && col <=3))?">":" "} ${menu[i]}`, true);
 		}
 	}
+
+    this.result = function(){
+
+        let ki = r.UI.readchar();
+
+        if (r.rstime + 500 < r.getGametime()){
+            if (!r.rsmsg_f){
+                r.UI.msg(" ");
+                r.UI.msg("Push Return to Result");
+                r.rsmsg_f = true;
+            }
+            if (ki.includes("Enter") ||
+                ki.includes("NumpadEnter")){
+
+                r.UI.overlapview(true);    
+                r.setScene(d.SCE_KEYWAIT);
+                		
+        	    r.rsmsg_f = false;
+	            r.rstime = r.getGametime();
+
+            }
+        }
+    }
 }
