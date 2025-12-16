@@ -52,11 +52,13 @@ function PlayerCharacter(r){
 	this.get_pack		=()=>{return player.t_pack;};
 
 	let cur_select = null;
-	this.get_select =()=>{return cur_select};
+	this.get_select =()=>{
+		return pack_check(cur_select)?cur_select: null;
+	};
 	this.set_select =(obj)=>{cur_select = obj};
-	let cur_dest = null;
-	this.get_dest =()=>{return cur_dest};
-	this.set_dest =(obj)=>{cur_dest = obj};
+	//let cur_dest = null;
+	//this.get_dest =()=>{return cur_dest};
+	//this.set_dest =(obj)=>{cur_dest = obj};
 
 	/*
     * pl_on: Returns true if the player's flag is set
@@ -79,6 +81,22 @@ function PlayerCharacter(r){
 			(obj == cur_armor)||
 			(obj == cur_ring[d.LEFT])||
 			(obj == cur_ring[d.RIGHT]))?true:false;
+	}
+
+	function pack_check(obj){
+		const OBJPTR = f.OBJPTR;
+		const next = f.next;
+
+		let res = false;
+		let op, ip;
+		for (ip = r.player.get_pack(); ip != null; ip = next(ip)) {
+			op = OBJPTR(ip);
+			if (op == obj){
+				res = true;
+				break;
+			}
+		}	
+		return res;
 	}
 
 	r.UI.comment("player");

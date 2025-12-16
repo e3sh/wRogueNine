@@ -185,8 +185,9 @@ function scrolls(r){
 		case d.S_IDENT:
 			if (!curse) {
 				r.UI.msg( ms.READSC_IDENT);
+				get_item("identify",0);
 				s_know[d.S_IDENT] = true;
-				whatis(null);
+				//whatis(null);
 			}
 		break;
 		case d.S_MAP:
@@ -395,10 +396,10 @@ function scrolls(r){
 
 				r.UI.msg(ms.READSC_PROTECT1);
 				if ((ll = get_item("protect",0)) != null) {
-					lb = OBJPTR(ll);
-					setoflg(lb,d.ISPROT);
+				//	lb = OBJPTR(ll);
+				//	setoflg(lb,d.ISPROT);
 					//mpos = 0;
-					r.UI.msg(ms.READSC_PROTECT2(inv_name(lb,true)));
+				//	r.UI.msg(ms.READSC_PROTECT2(inv_name(lb,true)));
 				}
 				s_know[d.S_PROTECT] = true;
 			}
@@ -409,9 +410,10 @@ function scrolls(r){
 				let lb; //struct object *lb;
 				let howmuch, ac, good;
 
-				r.UI.msg( READSC_ALLENCH1);
+				r.UI.msg( ms.READSC_ALLENCH1);
 				good = true;
 				if ((ll = get_item("enchant",0)) != null) {
+					/*
 					lb = OBJPTR(ll);
 					resoflg(lb,d.ISCURSED);
 					resoflg(lb,d.ISPROT);
@@ -443,11 +445,13 @@ function scrolls(r){
 							r.UI.msg(ms. READSC_ALLENCH2);
 							chg_hpt(-r.roll(6,6),false,d.K_SCROLL);
 							good = false;
+							
 					}
 					if (good) {
 						//mpos = 0;
 						r.UI.msg(ms.READSC_ALLENCH3(inv_name(lb,true)));
 					}
+					*/
 				}
 				s_know[d.S_ALLENCH] = true;
 			}
@@ -525,7 +529,7 @@ function scrolls(r){
 		case d.S_LOCTRAP: {
 			let trp; //struct trap *trp;
 
-			if (ntraps > 0) {
+			if (r.dungeon.ntraps > 0) {
 				//for (trp = &traps[0]; trp < &traps[ntraps]; trp++)
 				for (let i in r.dungeon.traps)
 					r.dungeon.traps[i].tr_flags |= d.ISFOUND;
@@ -557,5 +561,101 @@ function scrolls(r){
 		//		strcpy(s_guess[wh], buf);
 		//	}
 		//}
+	}
+	
+	this.identify = function( item){
+	
+		const OBJPTR = f.OBJPTR;
+		const setoflg = r.setoflg; 
+		const inv_name = r.item.things_f.inv_name;
+
+		const s_know = r.item.s_know;	
+		const p_know = r.item.p_know;	
+		const r_know = r.item.r_know;	
+		const ws_know = r.item.ws_know;
+
+		let obj; //reg struct object *obj;
+		let wh;
+
+		obj = OBJPTR(item);
+		setoflg(obj, d.ISKNOW);
+		wh = obj.o_which;
+		switch (obj.o_type) {
+			case d.SCROLL:
+				s_know[wh] = true;
+			break;
+			case d.POTION:
+				p_know[wh] = true;
+			break;
+			case d.STICK:
+				ws_know[wh] = true;
+			break;
+			case d.RING:
+				r_know[wh] = true;
+		}
+		//if (item == null)
+			r.UI.msg(inv_name(obj, false));
+	}
+
+	this.protect = function( item){
+		const OBJPTR = f.OBJPTR;
+		const setoflg = r.setoflg;
+ 		const inv_name = r.item.things_f.inv_name;
+
+		let lb; //struct object *lb;
+
+		lb = OBJPTR( item);
+		setoflg(lb,d.ISPROT);
+		//mpos = 0;
+		r.UI.msg(ms.READSC_PROTECT2(inv_name(lb,true)));
+	}
+
+	this.enchant = function( item){
+
+		const OBJPTR = f.OBJPTR;
+		const resoflg = r.resoflg;
+ 		const inv_name = r.item.things_f.inv_name;
+		const chg_hpt = r.player.pstats.chg_hpt;
+		const armors = v.armors;
+
+		let lb; //struct object *lb;
+		let howmuch, ac, good = true;
+
+		lb = OBJPTR(item);
+		resoflg(lb,d.ISCURSED);
+		resoflg(lb,d.ISPROT);
+		howmuch = r.rnd(3) + 1;
+		switch(lb.o_type) {
+			case d.RING:
+				if (lb.o_ac < 0)
+					lb.o_ac = 0;
+				lb.o_ac += howmuch;
+			break;
+			case d.ARMOR:
+				ac = armors[lb.o_which].a_class;
+				if (lb.o_ac > ac)
+					lb.o_ac = ac;
+				lb.o_ac -= howmuch;
+			break;
+			case d.STICK:
+				lb.o_charges += howmuch + 10;
+			break;
+			case d.WEAPON:
+				if (lb.o_dplus < 0)
+					lb.o_dplus = 0;
+				if (lb.o_hplus < 0)
+					lb.o_hplus = 0;
+				lb.o_hplus += howmuch;
+				lb.o_dplus += howmuch;
+			break;
+			default:
+				r.UI.msg(ms. READSC_ALLENCH2);
+				chg_hpt(-r.roll(6,6),false,d.K_SCROLL);
+				good = false;
+		}
+		if (good) {
+			//mpos = 0;
+			r.UI.msg(ms.READSC_ALLENCH3(inv_name(lb,true)));
+		}
 	}
 }

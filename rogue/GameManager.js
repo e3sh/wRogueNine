@@ -67,6 +67,11 @@ function GameManager(g){
     this.rsmsg_f = false;
     this.rstime = 0;
     this.getGametime =()=>{return g.time()};
+
+    this.castspell = false;
+    this.death = false;
+
+    this.nextScene = 0;
     
     let entities = [];
     this.entity = entities;
@@ -93,6 +98,7 @@ function GameManager(g){
 
      this.setScene = (scene)=>{
         SceneFunc = SceneList[scene];
+        //if (scene == 0) this.nextScene = 0;
     }
     
     this.UI.comment("game");

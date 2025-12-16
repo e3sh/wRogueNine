@@ -423,6 +423,7 @@ function move(r){
 		const chg_abil = r.player.pstats.chg_abil;
 		const THINGPTR = f.THINGPTR;
 		const next = f.next;
+		const chg_hpt = r.player.pstats.chg_hpt;
 
 		const player = r.player.get_player();
 

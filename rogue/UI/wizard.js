@@ -126,6 +126,8 @@ function wizard(r){
 		*/
 		r.UI.wclear(hw);
 		r.setScene(d.SCE_CREATE);
+		r.nextScene = d.SCE_CREATE;
+		
 		r.UI.overlapview(true);
 		r.UI.scene.create_obj()
 	}

@@ -94,6 +94,7 @@
 		//byebye(0);
 		r.UI.io.status();
 		r.setScene(d.SCE_KEYWAIT);
+		r.nextScene = d.SCE_KEYWAIT;
 
 	    r.rsmsg_f = false;
 	    r.rstime = r.getGametime();

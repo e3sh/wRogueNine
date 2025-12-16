@@ -13,6 +13,7 @@ function encumb(r){
 	const armors = v.armors;
 	const weaps = v.weaps;
 	const thnginfo = v.thnginfo;
+	const ws_stuff = v.ws_stuff;
 
 	const rnd = r.rnd;
 	const next = f.next;
@@ -145,6 +146,7 @@ function encumb(r){
 	//struct object *wh;
 	{
 		const getindex = r.player.misc.getindex;
+		const ws_stuff = r.item.ws_stuff;
 
 		let volume, what, extra; //reg int volume, what, extra;
 

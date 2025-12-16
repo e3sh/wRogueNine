@@ -29,6 +29,7 @@ function command(r){
 		const pick_up = r.item.pack_f.pick_up;
 		const waste_time = r.player.misc.waste_time;
 		const price_it = r.dungeon.trader.price_it;
+		const teleport = r.UI.wizard.teleport;
 		
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();
@@ -36,6 +37,14 @@ function command(r){
 		let ch;
 		let ntimes = 1;		/* Number of player moves */
 		let countch, direction, newcount = false;
+
+		if (r.nextScene != d.SCE_MAIN){
+			r.setScene(r.nextScene);
+			if (r.nextScene == d.SCE_GETITEM || r.nextScene == d.SCE_CREATE) 
+				r.UI.overlapview(true);
+			r.nextScene = d.SCE_MAIN;
+			return;
+		}
 
 		if (pl_on(d.ISHASTE))
 			ntimes++;
@@ -294,11 +303,19 @@ function command(r){
 			//}
 		}
 
-		if (ki.includes("KeyC")) {
+		if (ki.includes("KeyW") && ki.includes("Space")) {
 
-			r.wizard = true;
-			ch = 'C';
+			r.wizard = !r.wizard;
+			r.UI.setEffect(r.wizard?"ON":"OFF"
+				,{x:hero.x,y:hero.y},{x:hero.x,y:hero.y-1},120);
+
+			ch = 's';
 		}
+
+		if (r.wizard){
+			if (ki.includes("KeyC")) ch = 'C';
+		}
+
 
 		//if (ki.includes("KeyS")) {
 

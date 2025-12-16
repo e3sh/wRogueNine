@@ -305,7 +305,7 @@ function pack_f(r){
 		let ch;
 		let cnt;
 		
-		r.player.set_dest(null);
+		//r.player.set_dest(null);
 
 		if (list == null) {			/* empty list */
 			r.UI.msg(type == 0 ? "Empty handed." : "Nothing appropriate.");
@@ -437,8 +437,6 @@ function pack_f(r){
 		//identify 0
 
 		const npch = r.UI.io.npch;
-		//const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
-		//const pack_char = this.pack_char;
 		const inv_name = r.item.things_f.inv_name;
 
 		const pack = r.player.get_pack(); 
@@ -471,31 +469,7 @@ function pack_f(r){
 				return null;
 			}
 			else if (anr == 1) {	/* only found one of 'em */
-				//do {
-				//	let opb; //struct object *opb;
-
-				//	opb = f.OBJPTR(savepit);
-				//	r.UI.msg(`${purpose} what (* for the item)?`);
-				//	och = readchar();
-				//	if (och == '*') {
-						//mpos = 0;
-				//		r.UI.msg(`${pack_char(opb)}) ${inv_name(opb,false)}`);
-				//		continue;
-				//	}
-					//if (och == d.ESCAPE) {
-					//	r.UI.msg("");
-					//	r.after = false;
-					//	return null;
-					//}
-					//if (isalpha(och) && och != pack_char(opb)) {
-						//mpos = 0;
-					//	r.UI.msg("You can't %s that !!", purpose);
-					//	r.after = false;
-					//	return null;
-					//}
-				//} while(!isalpha(och));
-				//mpos = 0;
-				r.player.set_dest( f.OBJPTR(savepit) );	
+				//r.player.set_dest( f.OBJPTR(savepit) );	
 				return savepit;		/* return this item */
 			}
 		}
@@ -512,16 +486,16 @@ function pack_f(r){
 			}
 		} else {
 
-			if (r.player.get_dest() != null) {
-				for (pit = pack; pit != null; pit = f.next(pit)) {
-					pob = f.OBJPTR(pit);
-					if (pob == r.player.get_dest()) {
-						r.player.set_dest(null);
-						console.log("getitem_dest")
-						return pit;
-					}
-				}
-			}
+			//if (r.player.get_dest() != null) {
+			//	for (pit = pack; pit != null; pit = f.next(pit)) {
+			//		pob = f.OBJPTR(pit);
+			//		if (pob == r.player.get_dest()) {
+			//			r.player.set_dest(null);
+			//			console.log("getitem_dest")
+			//			return pit;
+			//		}
+			//	}
+			//}
 
 			//for (;;) {
 			r.UI.msg(`${purpose} what?`);// (* for list): ",purpose);
@@ -552,6 +526,7 @@ function pack_f(r){
 					//}
 				}
 			}
+			buf.push("");
 			buf.push(`${purpose} what?`);
 			//wmove(hw, LINES - 1,0);
 			//wprintw(hw,"%s what? ",purpose);
@@ -559,43 +534,15 @@ function pack_f(r){
 			for (let i in buf){
 				r.UI.mvaddch(i ,0, buf[i]);
 			}
-			//draw(hw);		/* write screen */
-			//anr = false;
-			//do {
-			//	ch = readchar();
-			//	if (isalpha(ch) || ch == ESCAPE)
-			//		anr = true; 
-			//} while(!anr);		/* do till we got it right */
-			//restscr(cw);		/* redraw orig screen */
-			//if (ch == ESCAPE) {
-			//	after = false;
-			//	msg("");		/* clear top line */
-			//	return null;	/* all done if abort */
-			//}
-			/* ch has item to get from pack */
-			//}
-			//for (obj=pack,och='a';obj!=null;obj=f.next(obj),och=npch(och))
-			//	if (ch == och)
-			//		break;
-			//if (obj == null) {
-			//	if (och == 'A')
-			//		och = 'z';
-			//	else
-			//		och -= 1;
-			//	r.UI.msg(`Please specify a letter between 'a' and '${och}'`);
-			//	continue;
-			//}
-			//else 
-			//	return obj;
-			//}
-			r.UI.setDsp(d.DSP_MAIN);
 
 			r.UI.scene.set_gi_param(purpose, type);
-			r.setScene(d.SCE_GETITEM); 
-			r.UI.overlapview(true);
+			//r.castspell = true;
+			r.nextScene = d.SCE_GETITEM; 
+			//r.UI.overlapview(true);
+			console.log(`gi-op-end ${purpose}`);
 		}
 	}
-
+	
 	/*
 	* pack_char:
 	*	Get the character of a particular item in the pack

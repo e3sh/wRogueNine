@@ -182,7 +182,7 @@ function rogueMessage_jp(r){
         READSC_DLEVEL: "あなたはたちまち別の土地へと運ばれる。",
         READSC_PROTECT1: "あなたに守護の力が授けられた。",
         READSC_PROTECT2: (name)=>{return `${name}は保護された`},
-        READSC_ALLENCH1: "あなたは魅惑の力を授けられた。",
+        READSC_ALLENCH1: "あなたは魔法の力を授けられた。",
         READSC_ALLENCH2: "巻物が閃光を放ち炎に包まれる！！！あなたは負傷した",
         READSC_ALLENCH3: (name)=>{return `${name}に魔法がかかった`},
         READSC_BLESS: "あなたのパックが明るく輝いている。",

@@ -92,7 +92,7 @@ function scene(r){
             r.UI.scene.setcur(cur);
         }
 		if (ki.includes("Numpad0")){
-            console.log("UseItem");
+           // console.log("UseItem");
             r.player.set_select(curItem(cur));
             r.item.decode_cmd(true);
 
@@ -100,7 +100,7 @@ function scene(r){
             r.setScene(d.SCE_MAIN);
         }
         if (ki.includes("KeyD")){
-            console.log("Drop/ThrowItem");
+            //console.log("Drop/ThrowItem");
             //r.player.set_select(curItem(cur));
             //r.item.decode_drop(true);
             //r.player.set_select(null);
@@ -112,13 +112,16 @@ function scene(r){
 
     //scene get_item
     this.get_item = ()=>{
+        const identify = r.item.scroll_f.identify;
+        const protect = r.item.scroll_f.protect;
+        const enchant = r.item.scroll_f.enchant;
 
         const curItem =(cur)=>{
             packcount = 0;
             for (pk = pack; pk != null; pk = f.next(pk)){
                 pob = f.OBJPTR(pk);
                 if (type == 0 || type == pob.o_type) {
-                    if (packcount == cur) return pob; 
+                    if (packcount == cur) return pk; 
                     packcount++;
                 }
             }
@@ -138,6 +141,7 @@ function scene(r){
                 packcount++;
             }
         }
+        r.UI.mvaddch(cur ,2, " ");
 
     	let ki = r.UI.readchar();   
 
@@ -147,7 +151,14 @@ function scene(r){
         ){
             console.log(purpose);
             //selectReturn
-            r.player.set_dest(curItem(cur));
+            //r.player.set_dest(curItem(cur));
+            if (purpose == "protect"){
+                protect(curItem(cur));
+            }else if (purpose == "enchant"){
+                enchant(curItem(cur));
+            }else if (purpose == "identify"){
+                identify(curItem(cur)); 
+            }
             r.UI.io.status();
             r.UI.overlapview(false);
             r.setScene(d.SCE_MAIN);
@@ -158,10 +169,10 @@ function scene(r){
 			ki.includes("ArrowLeft")|| ki.includes("ArrowRight")||
             ki.includes("Numpad5")  || ki.includes("KeyI")
         ){
-            r.UI.msg("get_item select cansel.")
-            r.UI.io.status();
-            r.UI.overlapview(false);
-            r.setScene(d.SCE_MAIN);
+            //r.UI.msg("get_item select cansel.")
+            //r.UI.io.status();
+            //r.UI.overlapview(false);
+            //r.setScene(d.SCE_MAIN);
         }
         //movecursur
 		if (ki.includes("Numpad8")||ki.includes("Numpad2")||
@@ -197,9 +208,9 @@ function scene(r){
 		{i_name:"potion",       i_type:d.POTION,    i_which:v.p_magic },
 		{i_name:"wand and staff", i_type:d.STICK,   i_which:v.ws_magic },
 		{i_name:"ring"  ,       i_type:d.RING  ,    i_which:v.r_magic }, //mi_name
-        {i_name:"amulet",       i_type:d.AMULET,    i_which:[{mi_name:"Amulet of Yender"}]},
         {i_name:"food",         i_type:d.FOOD,      i_which:[{mi_name:"Some Food"}]},
-		{i_name:"monster"  ,    i_type:d.CALLABLE,  i_which:v.monsters }, //m_name, m_show
+        {i_name:"amulet",       i_type:d.AMULET,    i_which:[{mi_name:"Amulet of Yender"}]},
+        {i_name:"monster"  ,    i_type:d.CALLABLE,  i_which:v.monsters }, //m_name, m_show
 	]
 
     this.create_obj = ()=>{
@@ -248,8 +259,9 @@ function scene(r){
         }
 
         if (co_line == 0){
+            let maxnum = itemsdb.length - (r.wizard?1:3);
             if (co_col < 0) co_col = 0;
-            if (co_col > itemsdb.length-1) co_col = itemsdb.length-1;
+            if (co_col > maxnum) co_col = maxnum;
             sel_t = co_col;
         }
         if (co_line == 1){

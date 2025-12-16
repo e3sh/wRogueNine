@@ -56,6 +56,7 @@ function sticks(r){
 			case d.WS_LIGHT:
 				cur.o_charges += 7 + r.rnd(9);
 		}
+		return cur;
 	}
 
 	/*
@@ -247,11 +248,12 @@ function sticks(r){
 					drain(rp.r_pos.y, rp.r_pos.y+rp.r_max.y,
 					rp.r_pos.x, rp.r_pos.x+rp.r_max.x);
 			}
-		break;case WS_POLYM:
-		case WS_TELAWAY:
-		case WS_TELTO:
-		case WS_CANCEL:
-		case WS_MINVIS:
+		break;
+		case d.WS_POLYM:
+		case d.WS_TELAWAY:
+		case d.WS_TELTO:
+		case d.WS_CANCEL:
+		case d.WS_MINVIS:
 		{
 			let monster, oldch;
 
@@ -275,8 +277,8 @@ function sticks(r){
 					r.dungeon.mlist = r.detach(r.dungeon.mlist, item);
 					r.discard(item);
 					oldch = tp.t_oldch;
-					delta.y = y;
-					delta.x = x;
+					r.delta.y = y;
+					r.delta.x = x;
 					monster = rnd_mon(false, true);
 					item = new_monster(monster, r.delta, false);
 					if (!(tp.t_flags & d.ISRUN))
