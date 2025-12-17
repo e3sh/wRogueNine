@@ -181,7 +181,7 @@ function potions(r){
 				if (show) {
 					r.UI.msg(ms.QUAFF_TFIND1);
 					//overlay(hw,cw);
-					p_know[P_TFIND] = true;
+					p_know[d.P_TFIND] = true;
 					break;
 				}
 			}

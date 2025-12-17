@@ -66,7 +66,7 @@ function pack_f(r){
 			from_floor = true;
 			if ((item = find_obj(hero.y, hero.x)) == null) {
 				//mpos = 0;
-				r.UI.msg("That object must have been an illusion.");
+				r.UI.msg(ms.ADDPACK_1);
 				r.UI.mvaddch(hero.y, hero.x, delchar);
 				return false;
 			}
@@ -76,7 +76,7 @@ function pack_f(r){
 			obj = OBJPTR(item);
 			if (obj.o_type == d.SCROLL && obj.o_which ==d.S_SCARE) {
 				if (o_on(obj,d.ISFOUND)) {
-					r.UI.msg("The scroll turns to dust as you pick it up.");
+					r.UI.msg(ms.ADDPACK_2);
 					r.dungeon.lvl_obj = r.detach(r.dungeon.lvl_obj, item);
 					r.discard(item);
 					r.UI.mvaddch(hero.y, hero.x, delchar);	
@@ -91,14 +91,14 @@ function pack_f(r){
 		* See if this guy can carry any more weight
 		*/
 		if (itemweight(obj) + him.s_pack > him.s_carry) {
-			r.UI.msg(`You can't carry that ${obj.o_typname}.`);
+			r.UI.msg(ms.ADDPACK_3(obj.o_typname));
 			return false;
 		}
 		/*
 		* Check if there is room
 		*/
 		if (r.packvol + obj.o_vol > d.V_PACK) {
-			r.UI.msg(`That ${obj.o_typname} won't fit in your pack.`);
+			r.UI.msg(ms.ADDPACK_4(obj.o_typname));
 			return false;
 		}
 		if (from_floor) {
@@ -474,7 +474,8 @@ function pack_f(r){
 			}
 		}
 		
-		if (purpose != "protect" && purpose != "enchant" && purpose != "identify"){
+		if (purpose != "protect" && purpose != "enchant" 
+			&& purpose != "identify"){ //} && purpose != "drop"){
 			if (r.player.get_select() != null) {
 				for (pit = pack; pit != null; pit = f.next(pit)) {
 					pob = f.OBJPTR(pit);

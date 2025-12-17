@@ -260,6 +260,7 @@ function MonsterManager(r){
 		const on = f.on;
 		const off = f.off;
 		const iswearing = r.item.ring_f.iswearing;
+		const pl_on = r.player.pl_on;
 		const pl_off = r.player.pl_off;
 		const unconfuse = r.daemon.unconfuse;
 		const save = r.monster.battle.save;
@@ -296,7 +297,7 @@ function MonsterManager(r){
 			|| DISTANCE(y, x, hero.y, hero.x) < 3) {
 				if (off(tp,d.ISFOUND) && !save(d.VS_PETRIFICATION)
 				&& !iswearing(d.R_SUSAB) && pl_off(d.ISINVINC)) {
-					msg(ms.WAKEMON);
+					r.UI.msg(ms.WAKEMON);
 					if (pl_on(d.ISHUH))
 						lengthen(unconfuse,r.rnd(20)+d.HUHDURATION);
 					else

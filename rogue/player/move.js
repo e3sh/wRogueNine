@@ -409,7 +409,7 @@ function move(r){
 		const monsters = v.monsters;
 		const cansee = r.monster.chase.cansee;
 		const new_level = r.dungeon.new_level.create;
-		const teleport = ()=>{};
+		const teleport = r.UI.wizard.teleport;
 		const pl_on = r.player.pl_on;
 		const getpdex = r.player.pstats.getpdex;
 		const death = r.player.rips.death;
@@ -444,7 +444,7 @@ function move(r){
 		}
 		seeit = cansee(tc.y, tc.x);
 		if (seeit){
-			console.log(tr_name(trp.tr_type));
+			r.UI.comment(tr_name(trp.tr_type));
 			r.UI.mvwaddch(cw, tc.y, tc.x, trp.tr_type);
 		}
 		trp.tr_flags |= d.ISFOUND;
@@ -458,7 +458,8 @@ function move(r){
 			return d.GONER;
 		}
 
-		switch (ch = trp.tr_type) {
+		ch  = trp.tr_type; //console.log(ch);
+		switch (ch) {
 			case d.POST:
 				if (ishero) {
 					r.nlmove = true;
@@ -478,6 +479,7 @@ function move(r){
 					ch = goner();
 			break;
 			case d.TELTRAP:
+				console.log("teltrap sw");
 				r.nlmove = true;
 				teleport(trp.tr_goto, th);
 			break;
@@ -578,7 +580,7 @@ function move(r){
 							chg_abil(d.CON,-1,true);
 						if (!iswearing(d.R_SUSTSTR))
 							chg_abil(d.STR,-1,true);
-						chg_hpt(-roll(1, 4),false,d.K_DART);
+						chg_hpt(-r.roll(1, 4),false,d.K_DART);
 					}
 					else {
 						if (!save_throw(d.VS_POISON, th))
@@ -822,20 +824,21 @@ function move(r){
 	//int y, x;
 	{
 		const traps = r.dungeon.traps;
-		const ntraps = r.dungeon.ntraps;
+		//const ntraps = r.dungeon.ntraps;
 
-		let tp, ep;//reg struct trap *tp, *ep;
+		let tp = null, ep;//reg struct trap *tp, *ep;
 
-		ep = traps[ntraps];
+		//ep = traps[ntraps];
 		//for (tp = traps; tp < ep; tp += 1)
 		for (let i in traps){
-			tp = traps[i]; console.log(tp.tr_pos);
+			tp = traps[i];
+			if (!Boolean(tp.tr_pos)){console.log(`trap_at ${tp.tr_type}`); continue;};
 			if (tp.tr_pos.y == y && tp.tr_pos.x == x){
 				break;
 			}
 		}
-		if (tp >= ep)
-			tp = null;
+		//if (tp >= ep)
+		//	tp = null;
 		return tp;
 	}
 

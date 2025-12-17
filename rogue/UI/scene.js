@@ -115,6 +115,7 @@ function scene(r){
         const identify = r.item.scroll_f.identify;
         const protect = r.item.scroll_f.protect;
         const enchant = r.item.scroll_f.enchant;
+        const drop = r.item.things_f.drop;
 
         const curItem =(cur)=>{
             packcount = 0;
@@ -158,6 +159,8 @@ function scene(r){
                 enchant(curItem(cur));
             }else if (purpose == "identify"){
                 identify(curItem(cur)); 
+            }else if (purpose == "drop"){
+                drop(curItem(cur)); 
             }
             r.UI.io.status();
             r.UI.overlapview(false);

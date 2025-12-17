@@ -405,7 +405,7 @@ function battle(r){
 		}
 		else if (mp.t_type != 'E') {
 			if (mp.t_type == 'F') {
-				him.s_hpt -= fung_hit;
+				him.s_hpt -= r.monster.fung_hit;
 				if (him.s_hpt <= 0){
 					death(mp.t_indx);
 					return;
@@ -729,7 +729,7 @@ function battle(r){
 		const w_magic = v.w_magic;
 
 		if (weap.o_type == d.WEAPON)
-			r.UI.msg( ms.BOUNCE_1(w_magic[weap.o_which], mname) );
+			r.UI.msg( ms.BOUNCE_1(w_magic[weap.o_which].mi_name, mname) );
 		else
 			r.UI.msg( ms.BOUNCE_2(mname) );
 	}

@@ -246,12 +246,20 @@ function rogueMessage(r){
         DROPCHK_1: "The trader does not accept shoddy merchandise.",
         DROPCHK_2: "You can't.  It appears to be cursed.",
 
+        //rips
         TOTALWIN:[
             "You Made It!",
             "Congratulations, you have made it to the light of day!",
             "You have joined the elite ranks of those who have escaped the",
             "Dungeons of Doom alive.",
         ],
+
+        //pack
+        ADDPACK_1: "That object must have been an illusion.",
+        ADDPACK_2: "The scroll turns to dust as you pick it up.",
+        ADDPACK_3:(name)=>{return `You can't carry that ${name}.`},
+        ADDPACK_4:(name)=>{return `That ${name} won't fit in your pack.`},
+
     }
     return ms;
    

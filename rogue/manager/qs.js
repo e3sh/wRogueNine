@@ -79,6 +79,8 @@ function quick_storage(r){
     this.load = function(){
 
         const add_pack = r.item.pack_f.add_pack;
+        const newgrp = r.item.things_f.newgrp;
+        const resetgroup = r.item.things_f.resetgroup;
 
         let inv;
         let pobj;
@@ -115,11 +117,14 @@ function quick_storage(r){
             r.player.set_player(pobj);
             r.player.set_max_stats(param.maxstats);
 
+            resetgroup();
+
             for (let i in inv){
 
                 let obj = inv[i].data;
                 let eq = inv[i].equip;
 
+                if (obj.o_type != d.FOOD) obj.o_group = newgrp();
                 let pl = r.new_item(obj);
 
                 if (eq){

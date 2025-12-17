@@ -262,6 +262,7 @@ function encumb(r){
 				else if (dropchk == false) {
 					//mpos = 0;
 					r.UI.msg(ms.WGHTCHK_2);
+					err = false;
 				}
 				if (dropchk == true)
 					err = false;

@@ -339,6 +339,8 @@ function wizard(r){
 	//struct coord spot;
 	//struct thing *th;
 	{
+		console.log("telepo");
+
 		const roomin = r.monster.chase.roomin;	
 		const step_ok = r.UI.io.step_ok;
 		const winat = r.UI.winat;

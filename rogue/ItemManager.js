@@ -164,6 +164,7 @@ function ItemManager(r){
 		if (o_on(obj, d.ISMISL))  res += "/MISL";
 		if (o_on(obj, d.ISMANY))  res += "/MANY";
 		
+		res += " " + obj.o_group;	
 		//-----1:ISCURSED:
 		//-----2:ISKNOW :
 		//-----4:ISPOST :
@@ -441,6 +442,7 @@ function ItemManager(r){
 
 	this.decode_cmd = function(direct){
 
+		const o_on = r.o_on;
 		const quaff = r.item.potion_f.quaff;
 		const read_scroll = r.item.scroll_f.read_scroll;
 		const eat = r.player.misc.eat;
@@ -451,6 +453,7 @@ function ItemManager(r){
 		const wear = r.item.armor_f.wear;
 		const wield = r.item.weapon_f.wield;
 		const do_zap = r.item.stick_f.do_zap;
+		const missile = r.item.weapon_f.missile;
 
 		const si = r.player.get_select();
 
@@ -493,8 +496,13 @@ function ItemManager(r){
 				}
 				break;
 			case d.WEAPON:
-				ch = "w";
-				if (direct){use = true; wield();}
+				if (o_on(si, d.ISMANY) && o_on(si, d.ISMISL)){
+					ch = "t";
+					//if (direct){ use = true; missile(); }
+				}else{
+					ch = "w";
+					if (direct){ use = true; wield(); }
+				}
 				break;
 			case d.STICK:
 				ch = "z";		
@@ -530,9 +538,9 @@ function ItemManager(r){
 		if (r.levtype != d.POSTLEV){
 			console.log(obj.o_type == d.WEAPON);
 			console.log(obj.o_flags);
-
+			
 			if (obj.o_type == d.WEAPON && o_on(obj, d.ISMISL)){
-				ch = "t"; if (direct) done = missile();
+				ch = "t"; //if (direct) done = missile();
 			}else{
 				let tp = trap_at(hero.y,hero.x);
 				if (tp == null || r.inpool == false || (tp.tr_flags & d.ISGONE)){

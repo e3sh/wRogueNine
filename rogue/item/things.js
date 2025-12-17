@@ -23,9 +23,10 @@ function things_f(r){
 	const ws_magic = v.ws_magic;
 	const thnginfo = v.thnginfo; 
 
-	let group = v.group;;
+	let group = v.group;
 
 	this.newgrp =()=>{ return ++group;}
+	this.resetgroup =()=>{ group = d.NEWGROUP;}
 
 	/*
 	 * inv_name:

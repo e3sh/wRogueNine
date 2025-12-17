@@ -87,7 +87,7 @@ function command(r){
 			else
 				ch = '.';
 
-			if (player.t_nocmd > 0) {
+			if (player.t_nocmd > 0) { 
 				if (--player.t_nocmd <= 0)
 					r.UI.msg(ms.CMD_MAIN);	
 			}else{
@@ -97,8 +97,10 @@ function command(r){
 			* hero pick it up if not in a trading post.
 			*/
 			if (r.take != 0){
-				if (r.levtype != d.POSTLEV)
+				if (r.levtype != d.POSTLEV){
+					//console.log(`Pup ${r.take}`);
 					pick_up(r.take);
+				}
 				else
 					price_it();
 

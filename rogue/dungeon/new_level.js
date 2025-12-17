@@ -138,20 +138,23 @@ function new_level(r){
 					if (ch == d.POOL || ch == d.POST)
 						trp.tr_flags |= d.ISFOUND;
 
-					if (ch== d.TELTRAP && r.rnd(100)<20)// && trp<maxtrp-1)
+					if (ch == d.TELTRAP && r.rnd(100)<20)// && trp<maxtrp-1)
 					{
 						let newloc; //struct coord newloc;
 
 						newloc = rnd_pos(r.dungeon.rooms[rnd_room()]);
-						trp.tr_goto = newloc;
-						trp++;
-						trp.tr_goto = traploc;
+						trp.tr_goto ={x: newloc.x, y:newloc.y}; console.log(newloc); 
+						r.dungeon.traps[i] = trp;
+						i++;
+						trp = new t.trap();//r.dungeon.traps[i];
+						trp.tr_goto ={x: traploc.x, y:traploc.y};
 						trp.tr_type = d.TELTRAP;
-						trp.tr_pos = newloc;
-						r.UI.mvaddch(newloc.y, newloc.x, d.TELTRAP); 
+						trp.tr_pos = {x: newloc.x, y:newloc.y};
+						r.UI.mvaddch(newloc.y, newloc.x, d.TELTRAP);
 					}
-					else
-						trp.tr_goto = r.rndspot;
+					else{
+						trp.tr_goto = r.rndspot; //console.log(r.rndspot);
+					}
 
 					r.dungeon.traps[i] = trp;
 				}

@@ -292,12 +292,17 @@ function GameManager(g){
         return null;
     }
 
+    function reset_all_entitys(){
+        entities = [];
+    }
 
     //
     this.main = function()
     //char **argv;
     //char **envp;
     {
+        reset_all_entitys();
+
         const daemon = r.daemon.daemon;
         const fuse = r.daemon.fuse;
         const status = r.UI.io.status;;//r.UI.io.status;
