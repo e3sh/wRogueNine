@@ -220,6 +220,16 @@ function GameManager(g){
         return entities[entities.length-1]; //item;
     }
 
+    this.clone_object = function(obj){
+        
+        let nobj = new t.object();
+        for (let key in obj){
+            nobj[key] = obj[key];
+        }
+        return nobj;
+    }
+
+
     this.entityState = function(){
         const inv_name = r.item.things_f.inv_name;
 
@@ -266,7 +276,7 @@ function GameManager(g){
 
         for (let i in map){
             if (map[i]=="o"){
-                res.push(`${inv_name(entities[i].l_data,false)}`)
+                res.push(`${inv_name(entities[i].l_data,false).slice(0,5)} ${Boolean(map[i].l_prev)} ${Boolean(map[i].l_next)}`)
             }
         }
         return res;;

@@ -828,17 +828,18 @@ function move(r){
 
 		let tp = null, ep;//reg struct trap *tp, *ep;
 
-		//ep = traps[ntraps];
+		ep = false
 		//for (tp = traps; tp < ep; tp += 1)
 		for (let i in traps){
 			tp = traps[i];
 			if (!Boolean(tp.tr_pos)){console.log(`trap_at ${tp.tr_type}`); continue;};
 			if (tp.tr_pos.y == y && tp.tr_pos.x == x){
+				ep = true;
 				break;
 			}
 		}
-		//if (tp >= ep)
-		//	tp = null;
+		if (!ep)
+			tp = null;
 		return tp;
 	}
 

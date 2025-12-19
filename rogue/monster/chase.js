@@ -24,7 +24,7 @@ this.chase = function(r){
 	const FARAWAY = 32767;
 	const RDIST =(a, b)=>{return f.DISTANCE(a.y, a.x, b.y, b.x)};
 
-	let ch_ret; //struct coord ch_ret;	/* Where chasing takes you */
+	let ch_ret = {x:0, y:0}; //struct coord ch_ret;	/* Where chasing takes you */
 
 	/*
 	* runners:
@@ -52,6 +52,7 @@ this.chase = function(r){
 					if (do_chase(mon) == -1)
 						continue;
 				tp.t_turn ^= true;
+				mon.l_data = tp;
 			}
 		}
 		//console.log("runners_comp");
@@ -217,8 +218,9 @@ this.chase = function(r){
 			return( attack(th) );
 		}
 		else if ((th.t_flags & (d.ISSTUCK | d.ISPARA)))
-			return(0);				/* if paralyzed or stuck */
-		if ((trp = trap_at(ch_ret.y, ch_ret.x)) != null) {
+			return(0);	/* if paralyzed or stuck */
+		trp = trap_at(ch_ret.y, ch_ret.x);
+		if (trp != null) {
 			ch = be_trapped(ch_ret, th);
 			if (ch == d.GONER || r.nlmove) {
 				if (ch == d.GONER)
@@ -242,7 +244,7 @@ this.chase = function(r){
 		r.UI.mvwaddch(mw, ch_ret.y, ch_ret.x, th.t_type);
 		th.t_oldpos.x = th.t_pos.x;
 		th.t_oldpos.y = th.t_pos.y;
-		th.t_pos.x = ch_ret.x;//{x:ch_ret.x, y:ch_ret.y};
+		th.t_pos.x = ch_ret.x;
 		th.t_pos.y = ch_ret.y;
 		th.t_room = roomin(ch_ret);
 		i = 5;
@@ -293,7 +295,7 @@ this.chase = function(r){
 		let er = tp.t_pos;//reg struct coord *er = &tp.t_pos;
 		let closecoord ={}, ctry ={};//struct coord try, closecoord;
 		let numsteps, onscare;
-
+		//console.log(tp.t_pos);
 		/*
 		* If the thing is confused, let it move randomly.
 		*/
@@ -317,7 +319,7 @@ this.chase = function(r){
 				closest = 0;
 			else
 				closest = FARAWAY;
-			ch_ret = er;//{x:er.x, y:er.y};
+			ch_ret.x = er.x; ch_ret.y = er.y;//{x:er.x, y:er.y};
 			closecoord.x = tp.t_oldpos.x;
 			closecoord.y = tp.t_oldpos.y;
 			for (y = er.y - 1; y <= er.y + 1; y += 1) {
@@ -377,7 +379,7 @@ this.chase = function(r){
 						*/
 						if (y == hero.y && x == hero.x) {
 							if (dofight) {
-								ch_ret = ctry;	/* if fighting */
+								ch_ret.x = ctry.x; ch_ret.y = ctry.y;	/* if fighting */
 								return d.FIGHT;	/* hit hero */
 							}
 							else
@@ -385,7 +387,7 @@ this.chase = function(r){
 						}
 						thisdist = f.DISTANCE(y, x, ee.y, ee.x);
 						if (thisdist <= 0) {
-							ch_ret = ctry;	/* got here but */
+							ch_ret.x = ctry.x; ch_ret.y = ctry.y;	/* got here but */
 							return d.CHASE;	/* dont fight */
 						}
 						numsteps += 1;
@@ -411,12 +413,14 @@ this.chase = function(r){
 			* If dead end, then go back from whence you came.
 			* Otherwise, pick the closest of the remaining spots.
 			*/
-			if (numsteps > 0)			/* move to best spot */
-				ch_ret = closecoord;
+			if (numsteps > 0){			/* move to best spot */
+				ch_ret.x = closecoord.x; ch_ret.y = closecoord.y;
+			}
 			else {						/* nowhere to go */
 				if (f.DISTANCE(tp.t_pos.y, tp.t_pos.x, hero.y, hero.x) < 2)
-					if (!onscare)
-						ch_ret = hero;//{x:hero.x, y:hero.y};
+					if (!onscare){
+						ch_ret.x = hero.x; ch_ret.y = hero.y;
+					}//{x:hero.x, y:hero.y};
 			}
 			if (f.ce(hero, ch_ret))
 				ch = d.FIGHT;

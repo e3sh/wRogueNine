@@ -192,7 +192,7 @@ function command(r){
 		}
 		etxt.push("");
 		etxt.push(`entity.t-flags:${ent_title()}`);
-		etxt.push(`-----1:ISSTUCK:${ent_flags(d.ISSUTCK	)}`);
+		etxt.push(`-----1:ISSTUCK:${ent_flags(d.ISSTUCK	)}`);
 		etxt.push(`-----2:ISPARA :${ent_flags(d.ISPARA	)}`);
 		etxt.push(`-----4:ISRUN  :${ent_flags(d.ISRUN	)}`);
 		etxt.push(`----2-:ISINVIS:${ent_flags(d.ISINVIS	)}`);
@@ -903,10 +903,10 @@ function command(r){
 		const hero = r.player.get_hero();
 
 		if (winat(hero.y, hero.x) != d.STAIRS)
-			msg("I see no way down.");
+			msg(ms.D_LEVEL1);
 		else {
 			if (pl_on(d.ISHELD)) {
-				msg("You are being held.");
+				msg(ms.UD_LEVEL1);
 				return;
 			}
 			r.dungeon.level++;
@@ -932,7 +932,7 @@ function command(r){
 
 		if (winat(hero.y, hero.x) == d.STAIRS)  {
 			if (pl_on(d.ISHELD)) {
-				msg("You are being held.");
+				msg(ms.UD_LEVEL1);
 				return;
 			}
 			else {				/* player not held here */
@@ -943,14 +943,14 @@ function command(r){
 						return;
 					}
 					new_level(d.NORMLEV);
-					msg("You feel a wrenching sensation in your gut.");
+					msg(ms.U_LEVEL1);
 
 					r.qs.save();
 					return;
 				}
 			}
 		}
-		msg("I see no way up.");
+		msg(ms.U_LEVEL2);
 	}
 
 	/*

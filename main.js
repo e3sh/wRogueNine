@@ -48,7 +48,7 @@ function SpriteFontData() {
 	let sp = [];
     for (let i = 0; i < 8; i++) {// normal 1 - 3(<4)
         for (j = 0; j <32; j++) {
-            ptn = { x:  8 * j, y: 16 * i, w:  8, h: 14 }
+            ptn = { x:  8 * j, y: 16 * i, w:  8, h: 16 }
             sp.push(ptn);
         }
     }

@@ -81,6 +81,7 @@ function quick_storage(r){
         const add_pack = r.item.pack_f.add_pack;
         const newgrp = r.item.things_f.newgrp;
         const resetgroup = r.item.things_f.resetgroup;
+        const get_worth = r.dungeon.trader.get_worth;
 
         let inv;
         let pobj;
@@ -119,12 +120,27 @@ function quick_storage(r){
 
             resetgroup();
 
+            let before = {type: null, which: null, worth: null, group: null};
+
             for (let i in inv){
 
                 let obj = inv[i].data;
                 let eq = inv[i].equip;
 
-                if (obj.o_type != d.FOOD) obj.o_group = newgrp();
+                let worth = get_worth(obj); 
+
+                if (obj.o_type != d.FOOD) {
+                    if (before.type == obj.o_type && before.which == obj.o_which && before.worth == worth){
+                        obj.o_group = before.group;
+                    } else {
+                        before.group = newgrp();
+                        obj.o_group = before.group; 
+                    }
+                }
+                before.type = obj.o_type;
+                before.which = obj.o_which;
+                before.worth = worth;
+
                 let pl = r.new_item(obj);
 
                 if (eq){

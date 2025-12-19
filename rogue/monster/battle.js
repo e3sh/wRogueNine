@@ -765,6 +765,8 @@ function battle(r){
 	this.is_magic = function(obj)
 	//struct object *obj;
 	{
+		const armors = v.armors;
+
 		switch (obj.o_type) {
 			case d.ARMOR:
 				return obj.o_ac != armors[obj.o_which].a_class;

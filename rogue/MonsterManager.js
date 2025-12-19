@@ -243,7 +243,7 @@ function MonsterManager(r){
 		tp.t_flags |= d.ISRUN;
 		tp.t_dest = hero;
 
-		console.log("wanderer");
+		r.UI.comment("wanderer");
 	}
 
 	/*

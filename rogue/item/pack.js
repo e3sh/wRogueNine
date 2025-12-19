@@ -248,7 +248,7 @@ function pack_f(r){
 					item.l_prev = ip.l_prev; //挿入するアイテムの位置の「前」のアイテムを ip-.l_prev に設定
 					ip.l_prev = item; // 挿入位置の「次」のアイテム ip の前のアイテムを itemへ設定
 
-					old_iplprev.l_next = item; //直前のアイテムの「次」のアイテムをitemに設定
+					if (old_iplprev != null) old_iplprev.l_next = item; //直前のアイテムの「次」のアイテムをitemに設定
 
 					//save = item;
 					pack_result = "og-tail";
@@ -480,7 +480,7 @@ function pack_f(r){
 				for (pit = pack; pit != null; pit = f.next(pit)) {
 					pob = f.OBJPTR(pit);
 					if (pob == r.player.get_select()) {
-						console.log("getitem_select")
+						//console.log("getitem_select")
 						return pit;
 					}
 				}
@@ -540,7 +540,7 @@ function pack_f(r){
 			//r.castspell = true;
 			r.nextScene = d.SCE_GETITEM; 
 			//r.UI.overlapview(true);
-			console.log(`gi-op-end ${purpose}`);
+			//console.log(`gi-op-end ${purpose}`);
 		}
 	}
 	

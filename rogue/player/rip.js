@@ -358,7 +358,9 @@
 		//cnt = 1;
 		//clear();
 		let oldpurse = r.player.purse;
-	
+		let before = {worth: 0, count: 0, type: 0, which: 0, iname: ""};
+
+		// Display the contents of the hero's pack
 		if (winner)
 			list.push("   Worth  Item");
 		else
@@ -367,12 +369,32 @@
 		for (item = r.player.get_pack(); item != null; item = next(item)) {
 			obj = OBJPTR(item);
 			iname = inv_name(obj, false);
+
+			if (obj.o_type != d.WEAPON && obj.o_type != d.ARMOR && obj.o_type != d.AMULET)
+				iname = iname.slice(2);
+
 			if (winner) {
 				worth = get_worth(obj);
-				worth *= obj.o_count;
-				let st = "      " + String(worth);
-				list.push(`  ${String(st.slice(-6))} ${iname}`);
-				r.player.purse += worth;
+				if (before.worth == worth &&
+					before.type == obj.o_type && 
+					before.which == obj.o_which 
+				) {
+					before.count += obj.o_count;
+					// Skip the item if it's the same as the previous one
+					continue;
+				}
+				if (before.worth != 0){
+					before.worth *= before.count;
+					let st = "      " + String(before.worth);
+					list.push(`  ${String(st.slice(-6))} ${before.iname} ${before.count}`);
+					r.player.purse += before.worth;
+				}
+
+				before.worth = worth;
+				before.count = obj.o_count;
+				before.type = obj.o_type;
+				before.which = obj.o_which;
+				before.iname = iname;
 			}
 			else {
 				list.push(`${ch}) ${iname}`);
@@ -386,6 +408,15 @@
 			//	clear();
 			//}
 		}
+		if (winner) {
+			if (before.worth != 0){
+				before.worth *= before.count;
+				let st = "      " + String(before.worth);
+				list.push(`  ${String(st.slice(-6))} ${before.iname} ${before.count}`);
+				r.player.purse += before.worth;
+			}
+		}
+
 		st = "----- " + String(oldpurse);
 		list.push(`--${st.slice(-6)} Gold Pieces ---`);
 		st = "----- " + String(r.player.purse);

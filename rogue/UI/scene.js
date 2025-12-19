@@ -150,7 +150,7 @@ function scene(r){
 		if (ki.includes("Enter")    || ki.includes("NumpadEnter")||
             ki.includes("Numpad0")  || ki.includes("KeyD")
         ){
-            console.log(purpose);
+            //console.log(purpose);
             //selectReturn
             //r.player.set_dest(curItem(cur));
             if (purpose == "protect"){

@@ -35,7 +35,7 @@ class ioControl extends GameTask {
 			//fontID,prompt	,charw, linew, location x,y,bgcolor, useutf
 			[80, 24,"std"	,false  ,8,16,160,  0,null], //0: bg_mainscreen printw, addch, move, clear
 			[80, 24,"std"	,false  ,8,16,160,  0,null], //1: sp_mainscreen printw, addch, move, clear
-			[80, 24,"std"	,PTUB  ,8,16,160,  0,null], //2: fg_mainscreen printw, addch, move, clear
+			[80, 24,"stdbg"	,PTUB  ,8,16,160,  0,null], //2: fg_mainscreen printw, addch, move, clear
 			[80,  2,"std"	,false ,8,16,160,384,"rgb(128  0   0)"], //3:statusbar
 			[40, 12,"std_l"	,false ,8,16,640,416,"rgb( 64 64  64)",true], //4:equip/select
 			[74, 36,"std_l"	,PTMSG ,8,16, 48,416,"rgb(  0  0 100)",true], //5:msg

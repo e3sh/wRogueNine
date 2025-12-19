@@ -164,7 +164,8 @@ function ItemManager(r){
 		if (o_on(obj, d.ISMISL))  res += "/MISL";
 		if (o_on(obj, d.ISMANY))  res += "/MANY";
 		
-		res += " " + obj.o_group;	
+		let count = "";//(obj.o_count != 1)?`x${obj.o_count}`:"";
+		res += ` ${obj.o_group} ${count}`;	
 		//-----1:ISCURSED:
 		//-----2:ISKNOW :
 		//-----4:ISPOST :
@@ -536,8 +537,8 @@ function ItemManager(r){
 		}
 
 		if (r.levtype != d.POSTLEV){
-			console.log(obj.o_type == d.WEAPON);
-			console.log(obj.o_flags);
+			//console.log(obj.o_type == d.WEAPON);
+			//console.log(obj.o_flags);
 			
 			if (obj.o_type == d.WEAPON && o_on(obj, d.ISMISL)){
 				ch = "t"; //if (direct) done = missile();
@@ -552,7 +553,7 @@ function ItemManager(r){
 		}else{
 			ch = "%"; if (direct) done = sell_it();
 		}
-		console.log(ch);
+		//console.log(ch);
 		return ch;
 	}
 }

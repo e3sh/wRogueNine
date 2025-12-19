@@ -56,6 +56,7 @@ function encumb(r){
 		him.s_pack = curcarry;				/* update pack weight */
 		r.packvol = pack_vol();				/* update pack volume */
 		r.nochange = false;					/* also change display */
+		r.amulet = amulet_check();		/* see if he has the amulet */
 
 		r.player.set_him( him );
 	}
@@ -151,7 +152,7 @@ function encumb(r){
 		let volume, what, extra; //reg int volume, what, extra;
 
 		extra = 0;
-		what = getindex(wh.o_type);
+		what = getindex(wh.o_type); //console.log("itemvol type index:", what);
 		switch (wh.o_type) {
 			case d.ARMOR:
 				extra = armors[wh.o_which].a_vol;
@@ -282,5 +283,20 @@ function encumb(r){
 	this.hitweight = function()
 	{
 		return(2 - r.player.foodlev);
+	}
+
+	/*
+	* amulet_check:
+	*	Check for amulet in pack
+	*
+	*/
+	function amulet_check(){
+		let pc;
+
+		for (pc = r.player.get_pack() ; pc != null ; pc = f.next(pc)) {
+			obj = f.OBJPTR(pc);
+			if (obj.o_type == d.AMULET) return true;
+		}
+		return false;
 	}
 }

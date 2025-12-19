@@ -93,9 +93,14 @@ class jncurses{
         this.setCharwidth = (num)=>{
             charw = num;
         }
-
-        this.setUseUTF = (num)=>{
-            useutf = num;
+        /**
+         * @method
+         * @param {boolean} sw 漢字使用
+         * @description
+         * ASCIIのみか漢字使用か選択指定
+         */
+        this.setUseUTF = (sw)=>{
+            useutf = sw;
         }
         /**
          * @method

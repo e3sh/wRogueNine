@@ -136,7 +136,7 @@ function io(r){
 
 		carwght = Math.floor((r.packvol * 100) / d.V_PACK);
 		//pb = &buf[strlen(buf)];
-		r.UI.mvaddstr(0, 65,`Vol: ${carwght}%`);//%3d%%", carwght);
+		r.UI.mvaddstr(0, 67,`Vol: ${carwght}%`);//%3d%%", carwght);
 
 		r.UI.mvaddstr(1, 75, r.UI.get_deltaText(r.delta.x, r.delta.y));
 		//mvwaddstr(cw, LINES - 2, 0, buf);

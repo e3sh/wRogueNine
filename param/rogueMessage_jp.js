@@ -260,6 +260,23 @@ function rogueMessage_jp(r){
         ADDPACK_3:(name)=>{return `その${name}は持ち運べません。`},
         ADDPACK_4:(name)=>{return `その ${name} はあなたのバックパックには収まりきらない。`},
 
+        //ud_level
+        D_LEVEL1: "降りていく方法が見当たらない。",
+        UD_LEVEL1: "あなたは拘束されています。",
+
+        U_LEVEL1: "胃のあたりに締め付けられるような感覚を覚える。",
+        U_LEVEL2: "上へ進む道は見当たらない。",
+
+        //inv_name
+        INV_NAME1: " (着用中)",
+        INV_NAME2: " (手に持っている)",
+        INV_NAME3: " (左手に装備中)",
+        INV_NAME4: " (右手に装備中)",
+        INV_NAME5: " [保護]",
+        INV_NAME6: " [購入]",
+        INV_NAME7: " [呪詛]",
+        INV_NAME8: " [加護]",
+
     }
     return ms;
    

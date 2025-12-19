@@ -339,7 +339,7 @@ function wizard(r){
 	//struct coord spot;
 	//struct thing *th;
 	{
-		console.log("telepo");
+		//console.log("telepo");
 
 		const roomin = r.monster.chase.roomin;	
 		const step_ok = r.UI.io.step_ok;
@@ -379,7 +379,7 @@ function wizard(r){
 		th.t_nomove = 0;
 		if (ishero) {
 			light(hero);
-			r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
+			//r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 			/*
 			* turn off ISHELD in case teleportation was done
 			* while fighting a Fungi or Bone Devil.

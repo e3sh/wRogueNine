@@ -129,12 +129,13 @@ function things_f(r){
 			if (obj.o_count == 1)
 				q = vowelstr(inm);
 			//pb = &prbuf[strlen(prbuf)];
+			let inum = o_on(obj,d.ISMANY)?`${obj.o_count} `:"";
 			if (o_on(obj,d.ISKNOW | d.ISPOST)) {
 				knowit = true;
-				pb = `${num(obj.o_hplus, obj.o_dplus)} ${inm}${pl}`;
+				pb = `${inum}${num(obj.o_hplus, obj.o_dplus)} ${inm}${pl}`;
 			}
 			else
-				pb = `${q} ${inm}${pl}`;
+				pb = `${inum}${q} ${inm}${pl}`;
 			//strcat(prbuf, pl);
 			break;
 		case d.ARMOR:
@@ -185,26 +186,26 @@ function things_f(r){
 			pb = `Something bizarre ${obj.o_type}`;//unctrl(obj.o_type)}`;
 		}
 		if (obj == cur_armor)
-			pb += " (being worn)";
+			pb += ms.INV_NAME1;
 		if (obj == cur_weapon)
-			pb += " (weapon in hand)";
+			pb += ms.INV_NAME2;
 		if (obj == cur_ring[d.LEFT])
-			pb += " (on left hand)";
+			pb += ms.INV_NAME3;
 		else if (obj == cur_ring[d.RIGHT])
-			pb += " (on right hand)";
+			pb += ms.INV_NAME4;
 		if (drop && f.isupper(pb.substring(0,1)))
 			pb = f.tolower(pb);
 		else if (!drop && f.islower(pb.substring(0,1)))
 			pb = f.toupper(pb);
 		if (o_on(obj, d.ISPROT))
-			pb += " [!]";
+			pb += ms.INV_NAME5;
 		if (o_on(obj, d.ISPOST))
-			pb += " [$]";
+			pb += ms.INV_NAME6;
 		if (knowit) {
 			if (o_on(obj, d.ISCURSED))
-				pb += " [-]";
+				pb += ms.INV_NAME7;
 			else if (o_on(obj, d.ISBLESS))
-				pb += " [+]";
+				pb += ms.INV_NAME8;
 		}
 		if (r.wizard) pb += ` ${r.item.item_flagcheck(obj)}`;
 		if (!drop)
@@ -315,6 +316,7 @@ function things_f(r){
 		else {			/* put on dungeon floor */
 			if (r.levtype == d.POSTLEV) {
 				op.o_pos = hero;	/* same place as hero */
+				ll.l_data = op;
 				fall(ll,false);
 				if (item == null)	/* if item wasn't sold */
 					r.UI.msg(ms.DROP_3);
@@ -323,6 +325,7 @@ function things_f(r){
 				r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj , ll);
 				r.UI.mvaddch(hero.y, hero.x, op.o_type);
 				op.o_pos = hero;
+				ll.l_data = op;
 				r.UI.msg(ms.DROP_4(inv_name(op, true)));
 			}
 		}

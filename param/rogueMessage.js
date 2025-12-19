@@ -260,6 +260,23 @@ function rogueMessage(r){
         ADDPACK_3:(name)=>{return `You can't carry that ${name}.`},
         ADDPACK_4:(name)=>{return `That ${name} won't fit in your pack.`},
 
+        //ud_level
+        D_LEVEL1: "I see no way down.",
+        UD_LEVEL1: "You are being held.",
+
+        U_LEVEL1: "You feel a wrenching sensation in your gut.",
+        U_LEVEL2: "I see no way up.",
+
+        //inv_name
+        INV_NAME1: " (being worn)",
+        INV_NAME2: " (weapon in hand)",
+        INV_NAME3: " (on left hand)",
+        INV_NAME4: " (on right hand)",
+        INV_NAME5: " [!]",
+        INV_NAME6: " [$]",
+        INV_NAME7: " [-]",
+        INV_NAME8: " [+]",
+
     }
     return ms;
    

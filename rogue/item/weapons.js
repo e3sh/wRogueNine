@@ -74,11 +74,17 @@ function weapons(r){
 		else {
 			obj.o_count--;
 			obj.o_vol = itemvol(obj);
-			nitem = new_item(obj);
+			item.l_data = obj;
+
+        	let nitem = r.new_item(new t.object());
+			//let nobj;
+			nitem.l_data = r.clone_object(obj);
+			//nitem = new_item(obj);
 			obj = OBJPTR(nitem);
 			//obj = (OBJPTR(item));
-			obj.o_count = 1;
-			obj.o_vol = itemvol(obj);
+			obj.o_count = 1;  
+			obj.o_vol = itemvol(obj); 
+;			nitem.l_data = obj;
 			item = nitem;
 		}
 		updpack();						/* new pack weight */
@@ -295,6 +301,12 @@ function weapons(r){
 		const hero = r.player.get_hero();
 
 		let y, x, ch;
+
+		//console.log("fallpos");
+		//console.log(pos);
+		//console.log(newpos);
+		//console.log(passages);
+
 
 		for (y = pos.y - 1; y <= pos.y + 1; y++) {
 			for (x = pos.x - 1; x <= pos.x + 1; x++) {
