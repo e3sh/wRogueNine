@@ -78,27 +78,27 @@ function things_f(r){
 		if (obj.o_count > 1)
 			nm =`${obj.o_count}`;
 		else
-			nm = "A";
+			nm = ms.INV_NCS;
 		tn = obj.o_typname;
 		q = "";
 		switch(obj.o_type) {
 		case d.SCROLL:
 			//sprintf(prbuf, "%s %s%s ",`${nm} ${tn}${pl}`);
-			pb = `${nm} ${tn}${pl}`;
+			pb = "";
 			if (s_know[wh] || o_on(obj,d.ISPOST)) {
 				knowit = true;
-				pb += `of ${s_magic[wh].mi_name}`;
+				pb += ms.INV_SCROLL1(nm, tn,pl, ms.S_MAGIC[wh]);//s_magic[wh].mi_name}`;
 			}
 			else if (s_guess[wh])
 				pb += `called ${s_guess[wh]}`;
 			else
-				pb += `titled '${s_names[wh]}'`;
+				pb += ms.INV_SCROLL2(nm, tn, pl, s_names[wh]);
 			break;
 		case d.POTION:
 			//sprintf(prbuf, "%s %s%s ", nm, tn, pl);
-			pb = `${nm} ${tn}${pl}`;
+			pb = "";
 			if (p_know[wh] || o_on(obj, d.ISPOST)) {
-				pb += `of ${p_magic[wh].mi_name}`;
+				pb += ms.INV_POTION1(nm, tn, pl, ms.P_MAGIC[wh]);//p_magic[wh].mi_name}`;
 				knowit = true;
 				if (p_know[wh]) {
 					pb += `(${p_colors[wh]})`;
@@ -107,24 +107,24 @@ function things_f(r){
 			else if (p_guess[wh])
 				pb += `called ${p_guess[wh]}(${p_colors[wh]})`;
 			else
-				pb += `${nm}${vowelstr(p_colors[wh])} ${p_colors[wh]} ${tn}${pl}`;
+				pb += ms.INV_POTION2(nm, vowelstr(p_colors[wh]), p_colors[wh], tn, pl);
 			break;
 		case d.FOOD:
 			if (wh == 1) {
 				if (obj.o_count == 1)
 					q = vowelstr(fruit);
-				pb = `${nm}${q} ${fruit}${pl}`;
+				pb = ms.INV_FOOD1(nm, q, fruit, pl);
 			}
 			else {
 				if (obj.o_count == 1)
-					pb = `Some ${tn}`;
+					pb = ms.INV_FOOD2(tn);
 				else
-					pb = `${nm} rations of ${tn}`;
+					pb = ms.INV_FOOD3(nm, tn);
 			}
 			knowit = true;
 			break;
 		case d.WEAPON:
-			inm = w_magic[wh].mi_name;
+			inm = ms.W_MAGIC[wh];//w_magic[wh].mi_name;
 			//strcpy(prbuf, nm);
 			if (obj.o_count == 1)
 				q = vowelstr(inm);
@@ -132,20 +132,20 @@ function things_f(r){
 			let inum = o_on(obj,d.ISMANY)?`${obj.o_count} `:"";
 			if (o_on(obj,d.ISKNOW | d.ISPOST)) {
 				knowit = true;
-				pb = `${inum}${num(obj.o_hplus, obj.o_dplus)} ${inm}${pl}`;
+				pb = ms.INV_WEAPON1(inum, num(obj.o_hplus, obj.o_dplus), inm, pl);
 			}
 			else
-				pb = `${inum}${q} ${inm}${pl}`;
+				pb = ms.INV_WEAPON2(inum, q, inm, pl);
 			//strcat(prbuf, pl);
 			break;
 		case d.ARMOR:
-			inm = a_magic[wh].mi_name;
+			inm = ms.A_MAGIC[wh]; //a_magic[wh].mi_name;
 			if (o_on(obj,d.ISKNOW | d.ISPOST)) {
 				knowit = true;
-				pb = `${num(armors[wh].a_class - obj.o_ac, 0)} ${inm}`;
+				pb = ms.INV_ARMOR1(num(armors[wh].a_class - obj.o_ac, 0), inm);
 			}
 			else
-				pb = `${inm}`;
+				pb = ms.INV_ARMOR2(inm);
 			break;
 		case d.AMULET:
 			pb  = "The Amulet of Yendor";
@@ -154,11 +154,11 @@ function things_f(r){
 			let rd;//struct rod *rd;
 
 			rd = ws_stuff[wh];
-			pb = `A ${rd.ws_type}`;
+			pb = "";//`A ${rd.ws_type}`;
 			//pb = &prbuf[strlen(prbuf)];
 			if (ws_know[wh] || o_on(obj, d.ISPOST)) {
 				knowit = true;
-				pb += `of ${ws_magic[wh].mi_name}${charge_str(obj)}`;
+				pb += ms.INV_STICK1(rd.ws_type, ms.WS_MAGIC[wh], charge_str(obj));
 				if (ws_know[wh]) {
 					pb += `(${rd.ws_made})`;
 				}
@@ -166,13 +166,13 @@ function things_f(r){
 			else if (ws_guess[wh])
 				pb += `called ${ws_guess[wh]}(${rd.ws_made})`;
 			else
-				pb += `A${vowelstr(rd.ws_made)} ${rd.ws_made} ${rd.ws_type}`;
+				pb += ms.INV_STICK2(vowelstr(rd.ws_made), rd.ws_made, rd.ws_type);
 			}
 			break;
 		case d.RING:
 			if (r_know[wh] || o_on(obj, d.ISPOST)) {
 				knowit = true;
-				pb = `A${ring_num(obj)} ${tn} of ${r_magic[wh].mi_name}`;
+				pb = ms.INV_RING1(ring_num(obj), tn, ms.R_MAGIC[wh]);//r_magic[wh].mi_name;
 				if (r_know[wh]) {
 					pb += `(${r_stones[wh]})`;
 				}
@@ -180,10 +180,10 @@ function things_f(r){
 			else if (r_guess[wh])
 				pb = `A ${tn} called ${r_guess[wh]}(${r_stones[wh]})`;
 			else
-				pb = `A${vowelstr(r_stones[wh])} ${r_stones[wh]} ${tn}`;
+				pb = ms.INV_RING2(vowelstr(r_stones[wh]), r_stones[wh], tn);
 			break;
 		default:
-			pb = `Something bizarre ${obj.o_type}`;//unctrl(obj.o_type)}`;
+			pb = ms.INV_DEFAULT(obj.o_type);//unctrl(obj.o_type)}`;
 		}
 		if (obj == cur_armor)
 			pb += ms.INV_NAME1;
@@ -429,7 +429,7 @@ function things_f(r){
 				which = Number(pick_one(mi));
 			}
 		}
-		cur.o_typname = things[whi].mi_name;  //console.log(things[whi].mi_name);
+		cur.o_typname = ms.THINGS[whi];//things[whi].mi_name;  //console.log(things[whi].mi_name);
 		cur.o_weight = things[whi].mi_wght;
 		//console.log(`whi:${whi} which:${which} type:${type} `);
 		switch (Number(whi)) {

@@ -48,7 +48,7 @@ function ItemManager(r){
 		"Indigo",	"Beige",	"Lavender",	"Saffron",
 	];
 	d.NCOLORS = v.rainbow.length;
-	const rainbow = v.rainbow;
+	const rainbow = ms.RAINBOW; //v.rainbow;
 
 	v.sylls = [
 		"a", "ab", "ag", "aks", "ala", "an", "ankh", "app", "arg", "arze",
@@ -70,7 +70,7 @@ function ItemManager(r){
 		"zant", "zap", "zeb", "zim", "zok", "zon", "zum",
 	];
 	d.NSYLS = v.sylls.length;
-	const sylls = v.sylls;
+	const sylls = ms.SYLLS; //v.sylls;
 
 	v.stones = [
 		"Agate",		"Alexandrite",	"Amethyst",
@@ -86,7 +86,7 @@ function ItemManager(r){
 		"Spinel",		"Tiger eye",	"Topaz",
 		"Tourmaline",	"Turquoise",
 	];
-	const stones = v.stones;
+	const stones = ms.STONES; //v.stones;
 
 	v.wood = [
 		"Avocado wood",	"Balsa",	"Banyan",		"Birch",
@@ -97,7 +97,7 @@ function ItemManager(r){
 		"Teak",			"Walnut",	"Zebra wood", 	"Persimmon wood",
 	];
 	d.NWOOD = v.wood.length;
-	const wood = v.wood;
+	const wood = ms.WOOD; //v.wood;
 
 	v.metal = [
 		"Aluminium",	"Bone",		"Brass",	"Bronze",
@@ -106,7 +106,7 @@ function ItemManager(r){
 		"Tin",			"Titanium",	"Zinc",
 	];
 	d.NMETAL = v.metal.length;
-	const metal = v.metal;
+	const metal = ms.METAL; //v.metal;
 
 	const things = v.things;
 	const a_magic = v.a_magic;
@@ -330,14 +330,14 @@ function ItemManager(r){
 			rd = ws_stuff[i];
 			if (r.rnd(100) > 50) {
 				str = metal[metnum[mc]]; mc++;
-				rd.ws_type = "wand";
+				rd.ws_type = ms.INIT_MTL1; //"wand";
 				rd.ws_vol = d.V_WS_WAND;
 				rd.ws_wght = d.W_WS_WAND;
 				//metused[j] = true;
 			}
 			else {
 				str = wood[woodnum[wc]]; wc++;
-				rd.ws_type = "staff";
+				rd.ws_type = ms.INIT_MTL2; //"staff";
 				rd.ws_vol = d.V_WS_STAFF;
 				rd.ws_wght = d.W_WS_WAND;
 				//woodused[j] = true;
