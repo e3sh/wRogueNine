@@ -237,7 +237,8 @@ function ItemManager(r){
 			nums[i] = i;
 		nums = shuffle(nums);
 		for (i = 0; i < d.MAXPOTIONS; i++) {
-			p_colors[i] = rainbow[nums[i]];
+			p_colors[i] = String.fromCharCode(Number(d.COLORCHIP[v.rainbow[nums[i]]]));
+			p_colors[i] += rainbow[nums[i]]
 			p_know[i] = false;
 			p_guess[i] = null;
 			//if (i > 0)

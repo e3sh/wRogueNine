@@ -46,6 +46,17 @@ function UIManager(r, g){
         this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},120);
     } 
 
+    this.setCameraPos = function(pos){
+
+        let x = -pos.x + Math.floor(d.COLS/2);
+        let y = -pos.y + Math.floor(d.LINES/2);
+                
+        sceneC.setCameraPos(x, y);
+    }
+    this.setCameraEnable = function(flg){
+        sceneC.setCameraEnable(flg);
+    }
+ 
     //dispaly functions
     //cursus bridge    
 	this.setDsp =(num)=>{dspmode = num;}

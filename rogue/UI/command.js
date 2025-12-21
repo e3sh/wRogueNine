@@ -38,6 +38,11 @@ function command(r){
 		let ntimes = 1;		/* Number of player moves */
 		let countch, direction, newcount = false;
 
+		r.UI.setCameraPos({x:hero.x, y:hero.y});
+		if (r.levtype == d.POSTLEV){
+			r.UI.setCameraEnable(false);
+		} 
+
 		if (r.nextScene != d.SCE_MAIN){
 			r.setScene(r.nextScene);
 			if (r.nextScene == d.SCE_GETITEM || r.nextScene == d.SCE_CREATE) 

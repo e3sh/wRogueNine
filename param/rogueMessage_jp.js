@@ -271,10 +271,10 @@ function rogueMessage_jp(r){
         INV_NCS: "1",
 
         INV_SCROLL1: (nm, tn, pl, name)=>{return `${nm} ${name}の${tn}`},
-        INV_SCROLL2: (nm, tn, pl, name)=>{return `${nm} ${tn}${pl} titled ${name}`},
+        INV_SCROLL2: (nm, tn, pl, name)=>{return `${nm} 表題が「${name}」の${tn}`},
 
         INV_POTION1: (nm, tn, pl, name)=>{return `${nm} ${name}の${tn}`},
-        INV_POTION2: (nm, colhead, colname, tn, pl)=>{return `${nm}${colhead} ${colname} ${tn}${pl}`},
+        INV_POTION2: (nm, colhead, colname, tn, pl)=>{return `${nm}${colhead} ${colname}の${tn}`},
 
         INV_FOOD1: (nm, tn, fruit, pl)=>{return `${nm}${tn} ${fruit}`},
         INV_FOOD2: (name)=>{return `Some ${name}`},

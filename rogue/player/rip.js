@@ -63,6 +63,8 @@
 		let buf; //char buf[LINLEN];
 		let localtime;//struct tm *localtime();
 
+		r.UI.setCameraEnable(false);
+
 		lt = new Date();
 		lt.getFullYear();
 
@@ -292,6 +294,7 @@
 	*/
 	this.total_winner = function()
 	{	
+		r.UI.setCameraEnable(false);
 		r.UI.setDsp(cw)
 		r.UI.clear();
 

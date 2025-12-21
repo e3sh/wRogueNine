@@ -68,6 +68,8 @@ class ioControl extends GameTask {
 		this.input = {};
 
 		this.msgCfullposition = false;
+
+		this.camera = {x:0, y:0, enable:false};
 	}
 //----------------------------------------------------------------------
 	step(g){// this.enable が true時にループ毎に実行される。
@@ -92,12 +94,13 @@ class ioControl extends GameTask {
 
 			if (input.LOG) {
 				this.debugview = (this.debugview)?false:true;
+				this.camera.enable = Boolean(!this.debugview);
 				this.waittime = g.time() + 500;
 			}
 
 			if (input.P_UP || input.P_DOWN){
 				this.msgCfullposition = (input.P_DOWN)?true:false;
-			}6
+			}
 		}
 		let p = false;
 		for (let i in input){
@@ -131,6 +134,8 @@ class ioControl extends GameTask {
 			//Hungup debug用
 			//this.resetWatchdog();
 		}
+
+		//this.camera.enable = !this.debugview;
 
 		//-----------------------------------------------------------------------------
 		// internal function 
@@ -210,10 +215,17 @@ class ioControl extends GameTask {
 
 		for (let i in this.layout){
 			let d = this.layout[i];
+			let x = this.layout[i].x;
+			let y = this.layout[i].y;
+
+			if (i==2 && this.camera.enable){
+				x = x + this.camera.x;
+				y = y + this.camera.y;
+			}
 
 			if (dispf[i]) {
-				if (d.bg) g.screen[0].fill(d.x, d.y, d.w, d.h, d.bg);
-				d.con.draw(g, d.x, d.y);
+				if (d.bg) g.screen[0].fill(x, y, d.w, d.h, d.bg);
+				d.con.draw(g, x, y);
 			}
 		}
 	}

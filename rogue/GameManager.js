@@ -100,7 +100,7 @@ function GameManager(g){
         SceneFunc = SceneList[scene];
         //if (scene == 0) this.nextScene = 0;
     }
-    
+
     this.UI.comment("game");
 
     //methods

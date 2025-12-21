@@ -64,6 +64,18 @@ function moveEffect(g){
      */
     this.setEffect = function(ch, st, ed, lt, sd){
 
+        const ioC = g.task.read("io");
+        if (ioC.camera.enable){
+            let locx = ioC.camera.x/8;
+            let locy = ioC.camera.y/16;
+
+            st.x += locx;
+            st.y += locy;
+            ed.x += locx;
+            ed.y += locy;
+        }
+
+
         const obj = new eftask(ch, st, ed, lt, sd);
         elist.push(obj)
     }
