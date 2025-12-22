@@ -344,7 +344,7 @@ function things_f(r){
 		const msg = r.UI.msg;
 		const cur_null = r.item.pack_f.cur_null;
 		const waste_time = r.player.misc.waste_time;
-		const toss_ring = ()=>{};//r.item.ring_f.toss_ring;
+		const toss_ring = r.item.ring_f.toss_ring;
 
 		const cur_weapon = r.player.get_cur_weapon();
 		const cur_armor = r.player.get_cur_armor();

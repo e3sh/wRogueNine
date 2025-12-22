@@ -202,8 +202,10 @@ function UIManager(r, g){
 
         let res = ' '; 
         if (buff.length >= y){
-            if (buff[y].length >= x){
-                res = buff[y].substring(x,x+1);
+            if (typeof buff[y] !== 'undefined'){
+                if (buff[y].length >= x){
+                    res = buff[y].substring(x,x+1);
+                }
             }
         }
         return res;

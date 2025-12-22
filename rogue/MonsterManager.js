@@ -113,12 +113,12 @@ function MonsterManager(r){
 		item = r.new_item(new t.thing());//sizeof(struct thing));
 		r.dungeon.mlist = r.attach(r.dungeon.mlist, item);
 		tp = f.THINGPTR(item);
-		tp.t_stats	= new t.coord();
+		tp.t_stats	= new t.stats();
 		tp.t_pos	= new t.coord();
-		tp.t_oldpos = new t.stats();
+		tp.t_oldpos = new t.coord();
 		tp.t_dest = [];;
 
-		st = tp.t_stats;
+		//st = tp.t_stats;
 		mp = monsters[type];	//console.log(mp); console.log(type);	/* point to this monsters structure */
 		tp.t_type = mp.m_show;
 		tp.t_indx = type;
@@ -133,7 +133,13 @@ function MonsterManager(r){
 		/*
 		* copy monster data
 		*/
-		tp.t_stats = mp.m_stats;
+		//tp.t_stats = mp.m_stats;
+
+        let nstatobj = new t.stats();
+        for (let key in mp.m_stats){
+            nstatobj[key] = mp.m_stats[key];
+        }
+        st = nstatobj;
 
 		/*
 		* If below amulet level, make the monsters meaner the
@@ -206,6 +212,8 @@ function MonsterManager(r){
 				mch = 'M';		/* no disguise in treasure room */
 			tp.t_disguise = mch;
 		}
+		tp.t_stats = st;
+		
 		item.l_data = tp;
 		return item;
 	}
@@ -348,25 +356,6 @@ function MonsterManager(r){
 			r.UI.msg("You cannot genocide Asmodeus !!");
 			return;
 		}
-
-		//let tryagain = false;
-		//while (tryagain){
-
-		//	i = true;		/* assume an error now */
-		//	while (i) {
-		//		msg("Which monster (remember UPPER & lower case)?");
-		//		c = readchar();		/* get a char */
-		//		if (c == ESCAPE) {	/* he can abort (the fool) */
-		//			msg("");
-		//			return;
-		//		}
-		//		if (isalpha(c))		/* valid char here */
-		//			i = false;		/* exit the loop */
-		//		else {				/* he didn't type a letter */
-		//			mpos = 0;
-		//			msg("Please specify a letter between 'A' and 'z'");
-		//		}
-		//	}
 
 		let enelist = target_genocide();
 		for (let j in enelist){

@@ -80,70 +80,36 @@ function io(r){
 		stmx = max_stats.s_re;
 		totwght = Math.floor(him.s_carry / 10);
 		carwght = Math.floor(him.s_pack / 10);
-		//getyx(cw, oy, ox);
-		if (him.s_maxhp >= 100) {
-		//	hwidth[1] = '3';	/* if hit point >= 100	*/
-		//	hwidth[5] = '3';	/* change %2d to %3d	*/
-		}
-		//if (stre.a_str < stmx.a_str)
-		//	ch = '*';
-		//else
-		//	ch = ' ';
+
 		r.UI.setDsp(d.DSP_STATUS);
 		r.UI.clear();
 		r.UI.mvaddstr(1, 0,
 			`Str: ${stef.a_str}(${(stre.a_str < stmx.a_str)?"*":""}${stre.a_str})` //%2d(%c%2d)", stef.a_str, ch, stre.a_str);
 		);
-		//pb = &buf[strlen(buf)];
-		//if (stre.a_dex < stmx.a_dex)
-		//	ch = '*';
-		//else
-		//	ch = ' ';
 		r.UI.mvaddstr(1, 13,
 			`Dex: ${stef.a_dex}(${(stre.a_dex < stmx.a_dex)?"*":""}${stre.a_dex})` //%2d(%c%2d)", stef.a_dex, ch, stre.a_dex);
 		);
-		//pb = &buf[strlen(buf)];
-		//if (stre.a_wis < stmx.a_wis)
-		//	ch = '*';
-		//else
-		//	ch = ' ';
 		r.UI.mvaddstr(1, 26,
 			`Wis: ${stef.a_wis}(${(stre.a_wis < stmx.a_wis)?"*":""}${stre.a_wis})`//%2d(%c%2d)", stef.a_wis, ch, stre.a_wis);
 		);
-		//pb = &buf[strlen(buf)];
-		//if (stre.a_con < stmx.a_con)
-		//	ch = '*';
-		//else
-		//	ch = ' ';
 		r.UI.mvaddstr(1, 39,
 			`Con: ${stef.a_con}(${(stre.a_con < stmx.a_con)?"*":""}${stre.a_con})`//%2d(%c%2d)", stef.a_con, ch, stre.a_con);
 		);
-		//pb = &buf[strlen(buf)];
 		r.UI.mvaddstr(1, 52,
 			`Carry: ${carwght}(${totwght}) ${hungstr[r.player.hungry_state]}`//%3d(%3d)", carwght, totwght);
 		);
-		//mvwaddstr(cw, LINES - 1, 0, buf);
 		
 		r.UI.mvaddstr(0, 0,`Level: ${r.dungeon.level}  `);
 		r.UI.mvaddstr(0, 13,`Gold: ${r.player.purse} `);
 		r.UI.mvaddstr(0, 26,`Hp: ${him.s_hpt}(${him.s_maxhp})`);//",level, purse);
-		//pb = &buf[strlen(buf)];
-		//sprintf(pb, hwidth, him.s_hpt, him.s_maxhp);
-		//pb = &buf[strlen(buf)];
 
 		r.UI.mvaddstr(0, 39,`Ac: ${cur_armor == null ? him.s_arm :cur_armor.o_ac}`);
 		r.UI.mvaddstr(0, 52,`Exp: ${him.s_lvl}/${him.s_exp}`);
 
 		carwght = Math.floor((r.packvol * 100) / d.V_PACK);
-		//pb = &buf[strlen(buf)];
 		r.UI.mvaddstr(0, 67,`Vol: ${carwght}%`);//%3d%%", carwght);
 
 		r.UI.mvaddstr(1, 75, r.UI.get_deltaText(r.delta.x, r.delta.y));
-		//mvwaddstr(cw, LINES - 2, 0, buf);
-		//r.UI.mvaddstr(1, 65, `.${hungstr[r.player.hungry_state]}`);
-		//waddstr(cw, hungstr[hungry_state]);
-		//wclrtoeol(cw);
-		//wmove(cw, oy, ox);
 		r.UI.setDsp(d.DSP_MAIN);
 
 		equipstatus();

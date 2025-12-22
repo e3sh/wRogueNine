@@ -460,14 +460,6 @@ function GameManager(g){
     {
         const roomin = r.monster.chase.roomin;
 
-        //reg char *opts;
-
-        //tcgetattr(0,&terminal);
-
-        /* parse environment declaration of options */
-
-        //if ((opts = getenv("ROGUEOPTS")) != null)
-        //    parse_opts(opts);
         const player = r.player.get_player();
         const hero = r.player.get_hero();
 
@@ -475,9 +467,7 @@ function GameManager(g){
         r.player.set_player(player);
         r.oldrp = roomin(hero);
         r.nochange = false;
-        //while (playing)
-        //    command();		/* Command execution */
-        //endit(0);
+
         r.setScene(d.SCE_MAIN);
         SceneFunc();
         r.playing = true;

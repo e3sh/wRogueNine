@@ -367,13 +367,6 @@ function ItemManager(r){
 		console.log(`Bad percentages for ${name}`);
 		for (let i in magic)
 			console.log(`${magic[i].mi_prob} ${magic[i].mi_name}`);
-		//for (mg = magic; mg.mi_name != null; mg++)
-			//printf("%4d%% %s\n", mg.mi_prob, mg.mi_name);
-
-		//printf("%s", retstr);
-		//fflush(stdout);
-		//while (getchar() != '\n')
-		//	continue;
 	}
 
 

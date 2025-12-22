@@ -35,31 +35,9 @@ function DaemonScheduler(r){
     let between = 0;
 
 	const rnd = this.rnd;
-	//const isring = r.item.ring.isring;
-	//const pl_on= r.system.disply.pl_on;
-	//const him = r.player.get_him();
-
-	//const daemon = this.daemon;
-	//const extinguish = this.extinguish;
 	const fuse = this.fuse;
 
 	const msg = r.UI.msg;
-
-	//const roll = r.roll;
-	//const wanderer =  r.monster.wanderer;
-	//const light = r.player.move.light;
-	//const death = r.player.rips.death;
-	//const updpack = r.player.encumb.updpack; //inner function
-	//const wghtchk = r.player.encumb.wghtchk;
-
-	//const dead_end = r.UI.io.dead_end ;
-	//const identify = r.UI.command.identify;
-	//const chg_abil = r.player.pstats.chg_Abil;
-
-	//const player = new t.thing();
-	//const food_left = 0;
-	//const hungry_state = 0;
-	//const count = 0;
 
 	r.UI.comment("daemon");
 
@@ -226,7 +204,7 @@ function DaemonScheduler(r){
 	{
 		//doctor
 		const him = r.player.get_him();
-		const isring = (a,b)=>{return false};
+		const isring = r.item.ring_f.isring;
 		const pl_on = r.player.pl_on;
 
 		let thp, lv, ohp, ccon;

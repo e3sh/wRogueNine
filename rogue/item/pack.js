@@ -24,19 +24,6 @@ function pack_f(r){
 	//struct linked_list *item;
 	//bool silent;
 	{
-		/*
-		const picked_up =()=>{
-			//console.log(item);
-			obj = OBJPTR(item);
-			if (!silent){
-				let pach = pack_char(obj);
-				r.UI.msg(`${inv_name(obj,false)} ${(pach =='%')?"":`(${pach})`}`);
-			}
-			if (obj.o_type == d.AMULET)
-				r.amulet = true;
-			updpack();
-		}
-		*/
 		const find_obj = r.player.misc.find_obj;
 		const OBJPTR = f.OBJPTR;
 		const o_on = r.o_on;
@@ -322,12 +309,6 @@ function pack_f(r){
 		for (ch = 'a', pc = list; pc != null; pc = next(pc), ch = npch(ch)) {
 			obj = OBJPTR(pc);
 			buf.push(`${ch}) ${inv_name(obj, false)}`);
-			//wprintw(hw,"%c) %s\n\r",ch,inv_name(obj, false));
-			//if (++cnt > LINES - 2 && next(pc) != null) {
-			//	dbotline(hw, morestr);
-			//	cnt = 0;
-			//	wclear(hw);
-			//}
 		}
 		r.UI.setDsp(hw);
 		for (let i in buf){
@@ -486,30 +467,7 @@ function pack_f(r){
 				}
 			}
 		} else {
-
-			//if (r.player.get_dest() != null) {
-			//	for (pit = pack; pit != null; pit = f.next(pit)) {
-			//		pob = f.OBJPTR(pit);
-			//		if (pob == r.player.get_dest()) {
-			//			r.player.set_dest(null);
-			//			console.log("getitem_dest")
-			//			return pit;
-			//		}
-			//	}
-			//}
-
-			//for (;;) {
 			r.UI.msg(`${purpose} what?`);// (* for list): ",purpose);
-
-			//ch = readchar();
-			//mpos = 0;
-			//if (ch == d.ESCAPE) {		/* abort if escape hit */
-			//	after = false;
-			//	r.UI.msg("");			/* clear display */
-			//	return null;
-			//}
-			//if (false){
-			//if (ch == '*') {
 			r.UI.wclear(hw);
 
 			pit = pack;		/* point to pack */
@@ -518,13 +476,7 @@ function pack_f(r){
 				pob = f.OBJPTR(pit);
 				if (type == 0 || type == pob.o_type) {
 					buf.push(`${ch}) ${inv_name(pob, false)}`);
-					//wprintw(hw,"%c) %s\n\r",ch,inv_name(pob,false));
 					cnt++;
-					//if (++cnt > LINES - 2 && next(pit) != null) {
-					//	cnt = 0;
-					//	dbotline(hw, morestr);
-					//	wclear(hw);
-					//}
 				}
 			}
 			buf.push("");

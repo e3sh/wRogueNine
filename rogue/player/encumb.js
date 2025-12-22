@@ -13,21 +13,9 @@ function encumb(r){
 	const armors = v.armors;
 	const weaps = v.weaps;
 	const thnginfo = v.thnginfo;
-	const ws_stuff = v.ws_stuff;
-
-	const rnd = r.rnd;
 	const next = f.next;
 	const OBJPTR = f.OBJPTR;
-	const itemweight = this.itemweight;
-	const itemvol = this.itemvol;
-	const o_on = r.o_on;
 	const o_off = r.o_off;
-	//const getindex = r.player.misc.getindex;
-	const extinguish = r.daemon.extinguish;
-	const fuse = r.daemon.fuse;
-	const msg = r.UI.msg;
-	//const inwhgt = r.player.misc.inwhgt;
-	const totalenc = this.totalenc;
 
 	/*
 	* updpack:

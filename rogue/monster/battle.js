@@ -32,7 +32,7 @@ function battle(r){
 		const off = f.off;
 		const monsters = v.monsters;
 		const roll_em = this.roll_em;
-		const unhold = this.unhold;
+		const unhold = r.monster.unhold;
 		const killed = this.killed;
 		const monhurt = r.monster.monhurt;
 		const rf_on = r.dungeon.rooms_f.rf_on;
@@ -160,13 +160,14 @@ function battle(r){
 		const GOLDCALC = ()=>{ return (r.rnd(50 + 10 * r.dungeon.level) + 2) };
 		const find_mons = r.monster.chase.find_mons;
 		const remove_monster = this.remove_monster;
-		const get_worth = ()=>{};//trader
+		const get_worth = r.dungeon.trader.get_worth;
 		const cur_null = r.item.pack_f.cur_null;
 		const updpack = r.player.encumb.updpack;
 		const rchg_str = r.player.pstats.rchg_str;
 		const fuse = r.daemon.fuse;
 		const lengthen = r.daemon.lengthen;
-		const notslow = r.daemon.notslow; 
+		const notslow = r.daemon.notslow;
+		const unhold = r.monster.unhold; 
 
 		const e_levels = v.e_levels;
 		const monsters = v.monsters;
@@ -479,7 +480,7 @@ function battle(r){
 	//bool hurl;
 	{	
 		const o_on = r.o_on;
-		const isring = ()=>{return false;}
+		const isring = r.item.ring_f.isring;
 		const pl_off = r.player.pl_off;	
 		const getpdex = r.player.pstats.getpdex;
 		const add_dam = r.player.pstats.add_dam;	
@@ -572,7 +573,7 @@ function battle(r){
 				hplus + str_plus(att)
 				))
 			{
-				let proll;
+				let proll, sthp = def.s_hpt;
 
 				proll = r.roll(ndice, nsides);
 				damage = dplus + proll + add_dam(att);
@@ -580,7 +581,7 @@ function battle(r){
 					def.s_hpt -= Math.max(0, damage);
 					r.UI.set_battledmg(Math.max(0, damage));
 				}
-				r.UI.comment(`damage:${damage} ${(def != him)?"->":"<-"} `);
+				r.UI.comment(`${(def != him)?" fight":"attack"}:${damage} ${Math.max(0,def.s_hpt)}/${sthp}`);
 				did_hit = true;
 			}
 			//if (cp.indexOf('/') == -1)
