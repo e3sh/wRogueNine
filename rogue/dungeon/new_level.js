@@ -180,6 +180,8 @@ function new_level(r){
 		r.UI.mvwaddch(cw,hero.y,hero.x,d.PLAYER);  //CW
 		r.nochange = false;
 
+		r.UI.setCameraPos({x:hero.x, y:hero.y});
+
 		r.UI.comment("new_level");
 	}
 

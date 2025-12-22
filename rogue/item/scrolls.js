@@ -204,7 +204,7 @@ function scrolls(r){
 				r.UI.addmsg( ms.READSC_SMAP3);
 				r.UI.endmsg(" ");
 				//overwrite(stdscr, hw);
-				for (i = 1; i < d.LINES - 1; i++) {
+				for (i = 1; i < d.LINES; i++) {
 					for (j = 0; j < d.COLS; j++) {
 						nch = ch = r.UI.mvwinch(hw, i, j);
 						switch (ch) {
@@ -252,7 +252,7 @@ function scrolls(r){
 					gtotal += rp.r_goldval;
 					if (rp.r_goldval != 0 &&
 					r.UI.mvinch(rp.r_gold.y,rp.r_gold.x) == d.GOLD)
-						r.UI.mvwaddch(hw,rp.r_gold.y,rp.r_gold.x,d.GOLD);
+						r.UI.mvwaddch(cw,rp.r_gold.y,rp.r_gold.x,d.GOLD);
 				}
 				if (gtotal) {
 					s_know[d.S_GFIND] = true;

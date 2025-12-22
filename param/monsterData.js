@@ -123,7 +123,7 @@ function monsterData(r){
         ]
     );
 
-    d.MAXMONS = v.monsters.length;
+    d.MAXMONS = v.monsters.length-1;
 	//#undef _p		/* erase these definitions */
 	//#undef _c
 	//#undef _r

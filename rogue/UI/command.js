@@ -41,7 +41,9 @@ function command(r){
 		r.UI.setCameraPos({x:hero.x, y:hero.y});
 		if (r.levtype == d.POSTLEV){
 			r.UI.setCameraEnable(false);
-		} 
+		} else {
+			//r.UI.setCameraEnable(true);	
+		}
 
 		if (r.nextScene != d.SCE_MAIN){
 			r.setScene(r.nextScene);
@@ -136,6 +138,7 @@ function command(r){
 							teleport(r.rndspot, player);
 				}
 			}
+			r.UI.setCameraPos({x:hero.x, y:hero.y});
 		}
 
 		entityStatus();

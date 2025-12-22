@@ -66,6 +66,7 @@ function sticks(r){
 	this.do_zap = function(gotdir)
 	//bool gotdir;
 	{
+		const on = f.on;
 		const find_mons = r.monster.chase.find_mons;
 		const runto = r.monster.chase.runto;
 		const del_pack = r.item.pack_f.del_pack;
@@ -93,6 +94,8 @@ function sticks(r){
 		const fight = r.monster.battle.fight;
 		const show = r.player.move.show;
 		const check_level = r.monster.battle.check_level;
+		const light = r.player.move.light;
+		const save = r.monster.battle.save;
 
 		const ws_know = r.item.ws_know;
 		const monsters = v.monsters;
@@ -122,14 +125,14 @@ function sticks(r){
 			return;
 		}
 		if (obj.o_charges == 0) {
-			r.UI.msg("Nothing happens.");
+			r.UI.msg(ms.DO_ZAP_1);
 			return;
 		}
-		if (!gotdir)
-			do {
-				r.delta.y = r.rnd(3) - 1;
-				r.delta.x = r.rnd(3) - 1;
-			} while (r.delta.y == 0 && r.delta.x == 0);
+		//if (!gotdir)
+		//	do {
+		//		r.delta.y = r.rnd(3) - 1;
+		//		r.delta.x = r.rnd(3) - 1;
+		//	} while (r.delta.y == 0 && r.delta.x == 0);
 		rp = player.t_room;
 		if (bless)
 			better = 3;
@@ -153,7 +156,7 @@ function sticks(r){
 		break;
 		case d.WS_PYRO:
 			if (!bless) {
-				r.UI.msg("The rod explodes !!!");
+				r.UI.msg(ms.DO_ZAP_PYRO);
 				chg_hpt(-r.roll(6,6), false, d.K_ROD);
 				ws_know[d.WS_PYRO] = true;
 				del_pack(item);		/* throw it away */
@@ -222,9 +225,9 @@ function sticks(r){
 			if (!curse) {
 				ws_know[d.WS_LIGHT] = true;
 				if (rp == null)
-					r.UI.msg("The corridor glows and then fades.");
+					r.UI.msg(ms.DO_ZAP_LIGHT1);
 				else {
-					r.UI.msg("The room is lit.");
+					r.UI.msg(ms.DO_ZAP_LIGHT2);
 					rp.r_flags &= ~d.ISDARK;
 					light(hero);
 					r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
@@ -238,7 +241,7 @@ function sticks(r){
 			* if he is in a passage)
 			*/
 			if (him.s_hpt < 2) {
-				r.UI.msg("You are too weak to use it.");
+				r.UI.msg(ms.DO_ZAP_DRAIN);
 				return;
 			}
 			else if (!curse) {
@@ -317,6 +320,7 @@ function sticks(r){
 					r.UI.mvwaddch(mw, tp.t_pos.y, tp.t_pos.x, monster);
 					tp.t_oldch = r.UI.mvwinch(cw,tp.t_pos.y,tp.t_pos.x);
 				}
+				item.l_data = tp;
 			}
 		}
 		break;
@@ -363,11 +367,11 @@ function sticks(r){
 					}
 				}
 			}
-			r.UI.msg("Missle vanishes.");
+			r.UI.msg(ms.DO_ZAP_MSIL);
 		}
 		break;
 		case d.WS_NOP:
-			r.UI.msg(`Your ${ws_stuff[wh].ws_type} flickers momentarily and then fades`);
+			r.UI.msg(ms.DO_ZAP_NOP(ws_stuff[wh].ws_type));
 		break;
 		case d.WS_HIT: {
 			let ch;
@@ -447,6 +451,7 @@ function sticks(r){
 				delta.y = y;
 				delta.x = x;
 				runto(delta, hero);
+				item.l_data = tp;
 			}
 		}
 		break;
@@ -493,11 +498,11 @@ function sticks(r){
 			switch (r.delta.y + r.delta.x) {
 				case 0: dirch = '/';
 				break;
-				case 1: case -1: dirch = (delta.y == 0 ? '-' : '|');
+				case 1: case -1: dirch = (r.delta.y == 0 ? '-' : '|');
 				break;
 				case 2: case -2: dirch = '\\';
 			}
-			pos = hero;
+			pos = {x:hero.x, y:hero.y};
 			bounced = false;
 			boingcnt = 0;
 			used = false;
@@ -507,60 +512,68 @@ function sticks(r){
 				name = "flame";
 			else
 				name = "ice";
+			let wcnt = 0
 			for (y = 0; y < boltlen && !used; y++) {
+
 				ch = winat(pos.y, pos.x);
+		//console.log(`${ch} ${(pos.x == hero.x && pos.y == hero.y)}
+		//	delta:${r.delta.x} ${r.delta.y} 
+		//	pos :${pos.x} ${pos.y} 
+		//	hero:${hero.x} ${hero.y}`);
+
 				spotpos[y] = pos;
 				switch (ch) {
-					case d.SECRETDOOR:
-					case '|':
-					case '-':
-					case ' ':
-						bounced = true;
-						if (++boingcnt > 6) 
-							used = true;	/* only so many bounces */
-						r.delta.y = -r.delta.y;
-						r.delta.x = -r.delta.x;
-						y--;
-						r.UI.msg("The bolt bounces");
-						break;
-					default:
-						if (isalpha(ch)) {
-							let it; //struct linked_list *it;
+				case d.SECRETDOOR:
+				case '|':
+				case '-':
+				case ' ':
+					bounced = true;
+					if (++boingcnt > 6) 
+						used = true;	/* only so many bounces */
+					r.delta.y = -r.delta.y;
+					r.delta.x = -r.delta.x;
+					y--;
+					r.UI.msg(ms.DO_ZAP_ELM1);
+					break;
+				default:
+					if (isalpha(ch)) {
+						let it; //struct linked_list *it;
 
-							it = find_mons(pos.y, pos.x);
-							runto(pos, hero);
-							if (it != null) {
-								if (!save_throw(d.VS_MAGIC+better,THINGPTR(it))) {
-									bolt.o_pos = pos;
-									hit_monster(pos, bolt);
-									used = true;
-								}
-								else if(ch != 'M' || show(pos.y,pos.x)=='M') {
-									r.UI.msg(`${name} misses`);
-								}
-							}
-						}
-						else if(bounced && pos.y==hero.y && pos.x==hero.x) {
-							bounced = false;
-							if (!save(d.VS_MAGIC + better)) {
-								r.UI.msg(`The ${name} hits you.`);
-								chg_hpt(-r.roll(6, 6),false,d.K_BOLT);
+						it = find_mons(pos.y, pos.x);
+						runto(pos, hero);
+						if (it != null) {
+							if (!save_throw(d.VS_MAGIC+better,THINGPTR(it))) {
+								bolt.o_pos = pos;
+								hit_monster(pos, bolt);
 								used = true;
 							}
-							else
-								r.UI.msg(`The ${name} whizzes by you.`);
+							else if(ch != 'M' || show(pos.y,pos.x)=='M') {
+								r.UI.msg(ms.DO_ZAP_ELM2(name));
+							}
 						}
-						r.UI.mvwaddch(cw, pos.y, pos.x, dirch);
-						draw(cw);
 					}
-					pos.y += delta.y;
-					pos.x += delta.x;
+					else if(bounced && pos.y==hero.y && pos.x==hero.x) {
+						bounced = false;
+						if (!save(d.VS_MAGIC + better)) {
+							r.UI.msg(ms.DO_ZAP_ELM3(name));
+							chg_hpt(-r.roll(6, 6),false,d.K_BOLT);
+							used = true;
+						}
+						else
+							r.UI.msg(ms.DO_ZAP_ELM4(name));
+					}
+					//r.UI.mvwaddch(cw, pos.y, pos.x, dirch);
+					//draw(cw);
 				}
-				for (x = 0; x < y; x++)
-					r.UI.mvwaddch(cw, spotpos[x].y, spotpos[x].x,
-					show(spotpos[x].y, spotpos[x].x));
-				ws_know[wh] = true;
+				pos.y += r.delta.y;
+				pos.x += r.delta.x;
+				r.UI.setEffect("*", {x:hero.x,y:hero.y}, {x:pos.x,y:pos.y}, 90, wcnt++*10);
 			}
+			for (x = 0; x < y; x++)
+				r.UI.mvwaddch(cw, spotpos[x].y, spotpos[x].x,
+				show(spotpos[x].y, spotpos[x].x));
+			ws_know[wh] = true;
+		}
 		break;
 		case d.WS_ANTIM: {
 			let m1, m2, x1, y1;
@@ -619,7 +632,7 @@ function sticks(r){
 		}
 		break;
 		default:
-			r.UI.msg("What a bizarre schtick!");
+			r.UI.msg(ms.DO_ZAP_DEFAULT);
 		}
 		obj.o_charges--;
 
@@ -635,6 +648,10 @@ function sticks(r){
 	//int ymin, ymax, xmin, xmax;
 	{
 		const cansee = r.monster.chase.cansee;
+		const isalpha = (ch)=>{ return /^[a-zA-Z]+$/.test(ch); }
+		const find_mons = r.monster.chase.find_mons;
+		const THINGPTR = f.THINGPTR;
+		const killed = r.monster.battle.killed;
 
 		const him = r.player.get_him();
 
@@ -651,7 +668,7 @@ function sticks(r){
 				if (isalpha(r.UI.mvwinch(mw, i, j)))
 					cnt++;
 		if (cnt == 0) {
-			r.UI.msg("You have a tingling feeling.");
+			r.UI.msg(ms.DRAIN);
 			return;
 		}
 		cnt = him.s_hpt / cnt;

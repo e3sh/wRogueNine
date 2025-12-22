@@ -17,11 +17,11 @@ Base SuperRogue9.0
 * 移動・操作の簡略化
 - ・操作系の見直し:GamePad対応
 - ・アクションは選択アイテムにより自動判定
+- ・自分を中心にマップをスクロールする　
 - ・回数指定でのコマンド指示や部屋・通路の自動移動は機能削除
 - ・任意の名前を割り当てる機能削除
 - ・スコアボード未実装
-* 現在の状態
-- ・debug中 trap動作・効果、各アイテムの動作・効果/　選択操作調整　2025/12/15
+2025/12/22
 ```
 
 The large middle section of the screen displays the player's surroundings using the following symbols:
@@ -60,4 +60,5 @@ $	 	Any magical item. (During magic detection)
 A letter
 	 	A monster. Note that a given letter may signify
                 multiple monsters, depending on the level of the dungeon. 
+
 ```

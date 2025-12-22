@@ -194,6 +194,22 @@ function rogueMessage_jp(r){
         READSC_LOCTRAP: "あなたは今、落とし穴を認識している。",
         READSC_DEFAULT: "なんとも不可解な巻物だ。",
 
+        //stick
+        DO_ZAP_1: "何も起こらない。",
+        DO_ZAP_PYRO: "ロッドが爆発した！！！",    
+        DO_ZAP_LIGHT1: "廊下が光り、そして消える。",
+        DO_ZAP_LIGHT2: "部屋は明るくなっています。",   
+        DO_ZAP_DRAIN: "あなたは弱すぎて使えない。",
+        DO_ZAP_MSIL: "ミサイルが消える。",
+        DO_ZAP_NOP: (name)=>{return `${name}が一瞬、点滅してから消えた`},
+        DO_ZAP_ELM1: "ボルトが跳ね返る",
+        DO_ZAP_ELM2: (name)=>{return `${name}は命中しない`},
+        DO_ZAP_ELM3: (name)=>{return `${name}が命中した。`},
+        DO_ZAP_ELM4: (name)=>{return `${name}があなたを通り過ぎた。`},
+        DO_ZAP_DEFAULT: "なんて奇妙な技だ！",
+
+        DRAIN: "あなたはピリピリとした感覚を覚える。",
+
         //eat
         EAT_1: "それは食べられない！",
         EAT_2: (fruit)=> {return `なんておいしい${fruit}だ。`},
@@ -438,7 +454,7 @@ function rogueMessage_jp(r){
 			"混乱",
 			"麻痺",
 			"毒",	
-			"力の増加",
+			"腕力増加",
 			"不可視視認",
 			"回復",
 			"魔物識別",
@@ -446,7 +462,7 @@ function rogueMessage_jp(r){
 			"レベルアップ",
 			"追加回復",
 			"加速",
-			"力の回復",
+			"腕力回復",
 			"盲目",
 			"渇き癒し",
 			"敏捷性向上",
@@ -460,7 +476,7 @@ function rogueMessage_jp(r){
         R_MAGIC:[
 			"防御",
 			"力",
-			"力の維持",
+			"腕力維持",
 			"探索",
 			"不可視視認",
 			"耐久力",
@@ -487,7 +503,7 @@ function rogueMessage_jp(r){
         ],
         WS_MAGIC:[
 			"照明",	
-			"閃光",
+			"打撃",
 			"雷",
 			"火炎",
 			"冷気",

@@ -69,7 +69,7 @@ class ioControl extends GameTask {
 
 		this.msgCfullposition = false;
 
-		this.camera = {x:0, y:0, enable:false};
+		this.camera = {x:0, y:0, enable: true};
 	}
 //----------------------------------------------------------------------
 	step(g){// this.enable が true時にループ毎に実行される。

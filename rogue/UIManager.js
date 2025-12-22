@@ -46,6 +46,11 @@ function UIManager(r, g){
         this.setEffect(`${battledmg}`, {x:x,y:y} ,{x: x, y: y-1},120);
     } 
 
+    this.setCameraCenter = function(){
+        sceneC.setCameraPos(0,0);
+    }
+
+
     this.setCameraPos = function(pos){
 
         let x = -pos.x + Math.floor(d.COLS/2);

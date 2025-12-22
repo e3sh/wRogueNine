@@ -194,6 +194,22 @@ function rogueMessage(r){
         READSC_LOCTRAP: "You now recognize pitfalls.",
         READSC_DEFAULT: "What a puzzling scroll!",
 
+        //stick
+        DO_ZAP_1: "Nothing happens.",
+        DO_ZAP_PYRO: "The rod explodes !!!",    
+        DO_ZAP_LIGHT1: "The corridor glows and then fades.",
+        DO_ZAP_LIGHT2: "The room is lit.",   
+        DO_ZAP_DRAIN: "You are too weak to use it.",
+        DO_ZAP_MSIL: "Missle vanishes.",
+        DO_ZAP_NOP: (name)=>{return `Your ${name} flickers momentarily and then fades`},
+        DO_ZAP_ELM1: "The bolt bounces",
+        DO_ZAP_ELM2: (name)=>{return `${name} misses`},
+        DO_ZAP_ELM3: (name)=>{return `The ${name} hits you.`},
+        DO_ZAP_ELM4: (name)=>{return `The ${name} whizzes by you.`},
+        DO_ZAP_DEFAULT: "What a bizarre schtick!",
+
+        DRAIN: "You have a tingling feeling.",
+
         //eat
         EAT_1: "That's Inedible!",
         EAT_2: (fruit)=> {return `My, that was a yummy ${fruit}.`},

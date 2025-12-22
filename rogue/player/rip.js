@@ -63,6 +63,7 @@
 		let buf; //char buf[LINLEN];
 		let localtime;//struct tm *localtime();
 
+		r.UI.setCameraCenter();
 		r.UI.setCameraEnable(false);
 
 		lt = new Date();
@@ -294,6 +295,7 @@
 	*/
 	this.total_winner = function()
 	{	
+		r.UI.setCameraCenter();
 		r.UI.setCameraEnable(false);
 		r.UI.setDsp(cw)
 		r.UI.clear();
@@ -334,6 +336,8 @@
 		
 	    r.rsmsg_f = false;
 	    r.rstime = r.getGametime();
+
+		if (!r.wizard) r.qs.save();
 	}
 
 	/*

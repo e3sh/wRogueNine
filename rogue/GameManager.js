@@ -350,6 +350,7 @@ function GameManager(g){
         init_everything();
         initscr();			/* Start up cursor package */
         //setup();
+        r.UI.setCameraEnable(true);
 
         let firstinv;
         if (r.qs.check()){
@@ -446,7 +447,7 @@ function GameManager(g){
         }
 
         r.player.set_select(null);
-
+ 
         r.playit();
     }
 

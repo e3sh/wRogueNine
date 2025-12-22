@@ -119,7 +119,7 @@ function MonsterManager(r){
 		tp.t_dest = [];;
 
 		st = tp.t_stats;
-		mp = monsters[type];		/* point to this monsters structure */
+		mp = monsters[type];	//console.log(mp); console.log(type);	/* point to this monsters structure */
 		tp.t_type = mp.m_show;
 		tp.t_indx = type;
 		tp.t_pos = cp;
