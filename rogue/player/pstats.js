@@ -66,6 +66,8 @@ function pstats(r){
 		pstats.s_ef = updabil(what,amt,pstats.s_ef,how);	/* effective */
 		updpack();
 		wghtchk(false);
+
+		r.player.set_pstats(pstats);
 	}
 
 	/*

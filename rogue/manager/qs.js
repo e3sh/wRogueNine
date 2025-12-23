@@ -49,6 +49,9 @@ function quick_storage(r){
 
         let svd = JSON.stringify(savedata);
 
+        let dd = JSON.stringify(r.daemon.get_dlist());
+        console.log(dd);
+ 
         //console.log(jsontext);
         //console.log(json2);
         //console.log(svd);
@@ -57,6 +60,7 @@ function quick_storage(r){
         localStorage.setItem("rogue9.inventry", jsontext);
         localStorage.setItem("rogue9.player", json2);
         localStorage.setItem("rogue9.params", svd);
+        localStorage.setItem("rogue9.daemons", dd);
 
         r.UI.comment("quick_save");
     }
@@ -68,6 +72,7 @@ function quick_storage(r){
         localStorage.removeItem("rogue9.inventry");
         localStorage.removeItem("rogue9.player");
         localStorage.removeItem("rogue9.params");
+        localStorage.removeItem("rogue9.daemons");
 
         r.UI.comment("quick_remove");
     }
@@ -86,6 +91,7 @@ function quick_storage(r){
         let inv;
         let pobj;
         let param;
+        let daem;
 
         if (Boolean(localStorage.getItem("rogue9.save"))){
             //localStorage.removeItem("rogue.Save");
@@ -103,7 +109,11 @@ function quick_storage(r){
                 param = JSON.parse(localStorage.getItem("rogue9.params"));
                 r.UI.comment("param_load comp");
             }
-
+                if (Boolean(localStorage.getItem("rogue9.daemons"))) {
+                daem = JSON.parse(localStorage.getItem("rogue9.daemons"));
+                r.UI.comment("daemon_load comp");
+            }
+            
             r.item.s_know = param.scr;	
             r.item.p_know = param.pot;	
             r.item.r_know = param.ring;	
@@ -162,6 +172,42 @@ function quick_storage(r){
                 }
                 add_pack(pl, true);
             }
+
+            const chk_daemon = (label)=>{
+                for (let fn in daem){
+                    if (daem[fn].d_func == label){ 
+                        return daem[fn].d_time;
+                    }
+                }
+                return 0;
+            }
+
+            if (r.player.pl_on(d.ISHUH)) {
+                r.daemon.fuse(r.daemon.unconfuse, true, chk_daemon("unconfuse"));
+            }
+            if (r.player.pl_on(d.CANSEE)) {
+                r.daemon.fuse(r.daemon.unsee, true, chk_daemon("unsee"));
+            }
+            if (r.player.pl_on(d.ISBLIND)) {
+                r.daemon.fuse(r.daemon.sight, true, chk_daemon("sight"));
+            }
+            if (r.player.pl_on(d.ISHASTE)) {
+                r.daemon.fuse(r.daemon.nohaste, true, chk_daemon("nohaste"));
+            }
+            if (r.player.pl_on(d.ISETHER)) {
+                r.daemon.fuse(r.daemon.noteth, true, chk_daemon("noteth"));
+            }
+            if (r.player.pl_on(d.ISSLOW)) {
+                r.daemon.fuse(r.daemon.notslow, true, chk_daemon("notslow"));
+            }
+            if (r.player.pl_on(d.ISINVINC)) {
+                r.daemon.fuse(r.daemon.notinvinc, true, chk_daemon("notinvinc"));
+            }
+            if (r.player.pl_on(d.ISREGEN)) {
+                r.daemon.fuse(r.daemon.notregen, true, chk_daemon("notregen"));
+            }
+            console.log(r.daemon.get_dlist());
+
             r.UI.comment("quick_load");
         }else{
             r.UI.comment("quick_load(nodata)");

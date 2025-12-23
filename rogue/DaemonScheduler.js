@@ -41,6 +41,35 @@ function DaemonScheduler(r){
 
 	r.UI.comment("daemon");
 
+	this.get_dlist =()=>{
+		const flist = [
+			{func: r.daemon.unconfuse, name: "unconfuse"},
+			{func: r.daemon.unsee, name: "unsee"},
+			{func: r.daemon.sight, name: "sight"},
+			{func: r.daemon.nohaste, name: "nohaste"},
+			{func: r.daemon.noteth, name: "noteth"},
+			{func: r.daemon.notslow, name: "notslow"},
+			{func: r.daemon.notregen, name: "notregen"},	
+			{func: r.daemon.notinvinc, name: "notinvinc"},
+		];
+
+		let rr = [];
+		for (let i in d_list){
+			//if (typeof(d_list[i].d_func) == "undefined") continue; 
+			for (let j in flist){
+				//console.log(String(d_list[i].d_func)+" vs "+flist[j].name);
+				if (d_list[i].d_func == flist[j].func){
+					rr.push({
+						d_type: d_list[i].d_type,
+						d_func: flist[j].name,
+						d_arg: d_list[i].d_arg,
+						d_time: d_list[i].d_time
+					})
+				}
+			}
+		}
+		return rr;
+	}
 	/*
 	* d_insert:
 	*	Insert a function in the daemon list.
@@ -145,9 +174,13 @@ function DaemonScheduler(r){
 	{
 		//reg struct delayed_action *wire;
 		//for (wire = d_list; wire < &d_list[demoncnt]; wire++)
-		for (let i=0; i<demoncnt; i++)
-			if (d_list[i].d_type != EMPTY && func == d_list[i].d_func)
+		for (let i=0; i<demoncnt; i++){
+			if (d_list[i].d_type != EMPTY && func == d_list[i].d_func){
 				d_list[i].d_time += xtime;
+				return true;
+			}
+		}
+		return false;  //executed if not found
 	}
 
 	/*
@@ -423,11 +456,13 @@ function DaemonScheduler(r){
 	this.noteth =(fromfuse)=>
 	//int fromfuse;
 	{
+		//console.log("noteth start");
 		//noteth
 		const pl_on = r.player.pl_on;
 		const player = r.player.get_player();
 		const dead_end = r.UI.io.dead_end;
 		const death = r.player.rips.death;
+		const identify = r.UI.command.identify;
 
 		let ch;
 
@@ -437,11 +472,13 @@ function DaemonScheduler(r){
 			if (dead_end(ch)) {
 				msg(ms.NOTETH_2(identify(ch)));
 				msg(" ");
-				death(K_STONE);	/* can't materialize in walls */
+				death(d.K_STONE);	/* can't materialize in walls */
 			}
 		}
-		player.t_flags &= ~ISETHER;
+		player.t_flags &= ~d.ISETHER;
 		r.player.set_player(player);
+
+		//console.log("noteth end");
 	}
 
 	/*

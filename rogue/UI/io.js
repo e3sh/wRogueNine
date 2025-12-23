@@ -104,7 +104,7 @@ function io(r){
 		r.UI.mvaddstr(0, 26,`Hp: ${him.s_hpt}(${him.s_maxhp})`);//",level, purse);
 
 		r.UI.mvaddstr(0, 39,`Ac: ${cur_armor == null ? him.s_arm :cur_armor.o_ac}`);
-		r.UI.mvaddstr(0, 52,`Exp: ${him.s_lvl}/${him.s_exp}`);
+		r.UI.mvaddstr(0, 52,`Exp: ${him.s_lvl}/${Math.floor(him.s_exp)}`);
 
 		carwght = Math.floor((r.packvol * 100) / d.V_PACK);
 		r.UI.mvaddstr(0, 67,`Vol: ${carwght}%`);//%3d%%", carwght);

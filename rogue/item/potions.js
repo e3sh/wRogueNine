@@ -260,7 +260,7 @@ function potions(r){
 		case d.P_SMART:
 			if (!curse) {
 				r.UI.msg( ms.QUAFF_SMART);
-				p_know[P_SMART] = true;
+				p_know[d.P_SMART] = true;
 				chg_abil(d.WIS,1,true);
 			}
 		break;
@@ -296,12 +296,14 @@ function potions(r){
 		case d.P_ETH:
 			if (!curse) {
 				let ethlen = r.roll(40,20);
+				console.log(ethlen)	;
 
 				r.UI.msg( ms.QUAFF_ETH);
-				if (pl_on(d.ISETHER))
+				if (pl_on(d.ISETHER)){
 					lengthen(noteth,ethlen);
-				else
+				}else{
 					fuse(noteth,true,ethlen);
+				}
 				player.t_flags |= d.ISETHER;
 				p_know[d.P_ETH] = true;
 			}

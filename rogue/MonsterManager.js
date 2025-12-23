@@ -273,6 +273,8 @@ function MonsterManager(r){
 		const unconfuse = r.daemon.unconfuse;
 		const save = r.monster.battle.save;
 		const DISTANCE = f.DISTANCE;
+		const lengthen = r.daemon.lengthen;
+		const fuse = r.daemon.fuse;
 
 		const player = r.player.get_player();
 		const hero = r.player.get_hero();

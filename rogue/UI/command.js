@@ -180,6 +180,7 @@ function command(r){
 		etxt.push(`----1-:ISINVINC:${(on(player,d.ISINVINC)	?"o":"-")}`);
 		etxt.push(`---4--:ISHELD  :${(on(player,d.ISHELD)	?"o":"-")}`);
 		etxt.push(`--1---:ISHUH   :${(on(player,d.ISHUH)	?"o":"-")}`);
+		etxt.push(`--2---:ISREGEN :${(on(player,d.ISREGEN)	?"o":"-")}`);
 		etxt.push(`--4---:CANHUH  :${(on(player,d.CANHUH)	?"o":"-")}`);
 		etxt.push(`-1----:CANSEE  :${(on(player,d.CANSEE)	?"o":"-")}`);
 		etxt.push(`-4----:ISSLOW  :${(on(player,d.ISSLOW)	?"o":"-")}`);
@@ -818,18 +819,23 @@ function command(r){
 	this.identify = function(what)
 	//int what;
 	{
+		const isalpha =(ch)=>{ return /^[a-zA-Z]+$/.test(ch); };
+		const midx = r.monster.midx;
+
+		const monsters = v.monsters;
+
 		let ch, str;
 
-		if (what == 0) {
-			msg("What do you want identified? ");
-			ch = readchar();
-			mpos = 0;
-			if (ch == d.ESCAPE) {
-				msg("");
-				return null;
-			}
-		}
-		else
+		//if (what == 0) {
+			//msg("What do you want identified? ");
+			//ch = readchar();
+			//mpos = 0;
+			//if (ch == d.ESCAPE) {
+			//	msg("");
+			//	return null;
+			//}
+		//}
+		//else
 			ch = what;
 		if (isalpha(ch))
 			str = monsters[midx(ch)].m_name;
@@ -894,7 +900,7 @@ function command(r){
 			}
 		}
 		if (what == 0)
-			msg("'%s' : %s", unctrl(ch), str);
+			r.UI.msg(`'${ch}': ${str}`);
 		return str;
 	}
 

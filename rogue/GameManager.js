@@ -119,7 +119,7 @@ function GameManager(g){
     */
     this.roll = function(number, sides){
         let dtotal = 0;
-        while (number--) {
+        while (number-->= 0) {
             dtotal += this.rnd(sides)+1;
         }
         return dtotal;
