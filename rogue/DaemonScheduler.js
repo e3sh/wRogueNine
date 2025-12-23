@@ -43,14 +43,14 @@ function DaemonScheduler(r){
 
 	this.get_dlist =()=>{
 		const flist = [
-			{func: r.daemon.unconfuse, name: "unconfuse"},
-			{func: r.daemon.unsee, name: "unsee"},
-			{func: r.daemon.sight, name: "sight"},
-			{func: r.daemon.nohaste, name: "nohaste"},
-			{func: r.daemon.noteth, name: "noteth"},
-			{func: r.daemon.notslow, name: "notslow"},
-			{func: r.daemon.notregen, name: "notregen"},	
-			{func: r.daemon.notinvinc, name: "notinvinc"},
+			{func: r.daemon.unconfuse,	name: "unconfuse",	flag: d.ISHUH},
+			{func: r.daemon.unsee, 		name: "unsee",		flag: d.CANSEE},
+			{func: r.daemon.sight,		name: "sight",		flag: d.ISBLIND},
+			{func: r.daemon.nohaste,	name: "nohaste",	flag: d.ISHASTE},
+			{func: r.daemon.noteth,		name: "noteth",		flag: d.ISETHER},
+			{func: r.daemon.notslow,	name: "notslow",	flag: d.ISSLOW},
+			{func: r.daemon.notregen,	name: "notregen",	flag: d.ISREGEN},	
+			{func: r.daemon.notinvinc,	name: "notinvinc",	flag: d.ISINVINC},
 		];
 
 		let rr = [];
@@ -63,7 +63,8 @@ function DaemonScheduler(r){
 						d_type: d_list[i].d_type,
 						d_func: flist[j].name,
 						d_arg: d_list[i].d_arg,
-						d_time: d_list[i].d_time
+						d_time: d_list[i].d_time,
+						d_flag: flist[j].flag,
 					})
 				}
 			}

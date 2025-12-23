@@ -340,7 +340,6 @@ function GameManager(g){
         const armors = r.globalValiable.armors; 
 
         r.player.fruit = ms.FRUIT;
-        //r.UI.msg(ms.MAINSTART);
 
         r.dungeon.level = 1;
 

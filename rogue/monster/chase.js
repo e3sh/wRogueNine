@@ -160,7 +160,7 @@ this.chase = function(r){
 			* wounded, find the best door to run to.
 			*/
 			else if (wound) {
-				console.log(wound);
+				//console.log(wound);
 				let ex;//struct coord *ex;
 				let poss, mdtd, hdtd, ghdtd, nx, gx = 0, best;
 

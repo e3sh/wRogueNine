@@ -173,19 +173,29 @@ function command(r){
 		etxt.push("");
 		etxt.push(`mlist:${wml} lvl_obj:${wlo} pack:${pak}`);
 
+		let dlst = r.daemon.get_dlist();
+		const dtime = (flg)=>{
+			for (let i in dlst){
+				if (dlst[i].d_flag == flg)
+					return dlst[i].d_time;
+			}
+			return " ";
+		};
+
+
 		let fs = `.....${Number(player.t_flags).toString(8)}`;
 		etxt.push(`${fs.substring(fs.length-6,fs.length)}:player.t-flags`);
-		etxt.push(`-----1:ISBLIND :${(pl_on(d.ISBLIND)	?"o":"-")}`);
-		etxt.push(`-----4:ISRUN   :${(on(player,d.ISRUN)	?"o":"-")}`);
-		etxt.push(`----1-:ISINVINC:${(on(player,d.ISINVINC)	?"o":"-")}`);
-		etxt.push(`---4--:ISHELD  :${(on(player,d.ISHELD)	?"o":"-")}`);
-		etxt.push(`--1---:ISHUH   :${(on(player,d.ISHUH)	?"o":"-")}`);
-		etxt.push(`--2---:ISREGEN :${(on(player,d.ISREGEN)	?"o":"-")}`);
-		etxt.push(`--4---:CANHUH  :${(on(player,d.CANHUH)	?"o":"-")}`);
-		etxt.push(`-1----:CANSEE  :${(on(player,d.CANSEE)	?"o":"-")}`);
-		etxt.push(`-4----:ISSLOW  :${(on(player,d.ISSLOW)	?"o":"-")}`);
-		etxt.push(`1-----:ISHASTE :${(on(player,d.ISHASTE)	?"o":"-")}`);
-		etxt.push(`2-----:ISETHER :${(on(player,d.ISETHER)	?"o":"-")}`);
+		etxt.push(`-----1:ISBLIND :${(pl_on(d.ISBLIND)	?"o":"-")} ${dtime(d.ISBLIND)} `);
+		etxt.push(`-----4:ISRUN   :${(on(player,d.ISRUN)	?"o":"-")} `);
+		etxt.push(`----1-:ISINVINC:${(on(player,d.ISINVINC)	?"o":"-")} ${dtime(d.ISINVINC)} `);
+		etxt.push(`---4--:ISHELD  :${(on(player,d.ISHELD)	?"o":"-")} `);
+		etxt.push(`--1---:ISHUH   :${(on(player,d.ISHUH)	?"o":"-")} ${dtime(d.ISHUH)} `);
+		etxt.push(`--2---:ISREGEN :${(on(player,d.ISREGEN)	?"o":"-")} ${dtime(d.ISREGEN)} `);
+		etxt.push(`--4---:CANHUH  :${(on(player,d.CANHUH)	?"o":"-")} `);
+		etxt.push(`-1----:CANSEE  :${(on(player,d.CANSEE)	?"o":"-")} ${dtime(d.CANSEE)} `);
+		etxt.push(`-4----:ISSLOW  :${(on(player,d.ISSLOW)	?"o":"-")} ${dtime(d.ISSLOW)} `);
+		etxt.push(`1-----:ISHASTE :${(on(player,d.ISHASTE)	?"o":"-")} ${dtime(d.ISHASTE)} `);
+		etxt.push(`2-----:ISETHER :${(on(player,d.ISETHER)	?"o":"-")} ${dtime(d.ISETHER)} `);
 
 		const ent_title = ()=>{
 			let st = "";

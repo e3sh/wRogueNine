@@ -15,6 +15,7 @@ function trader(r){
 	const mw = d.DSP_MAIN_BG;
 
 	const NOTPRICED = -1;
+	const scol = 20; //d.COLS - 40;
 
 	let trader;
 	this.market = ()=>{ return open_market()};
@@ -68,11 +69,11 @@ function trader(r){
 		}
 		trader = 0;
 		r.UI.wmove(cw,12,0);
-		r.UI.mvwaddch(cw,12, 0, "Welcome to Friendly Fiend's Flea Market");
-		r.UI.mvwaddch(cw,13, 0, "=======================================");
-		r.UI.mvwaddch(cw,14, 0, "Auto: Prices object that you stand upon.");
-		r.UI.mvwaddch(cw,15, 0, "5(A): Buys the object that you stand upon.");
-		r.UI.mvwaddch(cw,16, 0, "D(Y): Trades in something in your pack for gold.");
+		r.UI.mvwaddch(cw,12, scol, "Welcome to Friendly Fiend's Flea Market");
+		r.UI.mvwaddch(cw,13, scol, "=======================================");
+		r.UI.mvwaddch(cw,14, scol, "Auto: Prices object that you stand upon.");
+		r.UI.mvwaddch(cw,15, scol, "5(A): Buys the object that you stand upon.");
+		r.UI.mvwaddch(cw,16, scol, "D(Y): Trades in something in your pack for gold.");
 
 		r.UI.msg(ms.DO_POST);
 		trans_line();
@@ -332,7 +333,7 @@ function trader(r){
 	function trans_line()
 	{
 		let prbuf = `You have ${d.MAXPURCH-trader} transactions remaining.`;
-		r.UI.mvwaddstr(cw, d.LINES - 4, 0, prbuf);
+		r.UI.mvwaddstr(cw, d.LINES - 4, scol, prbuf);
 		r.UI.msg(ms.TRANS_LINE(d.MAXPURCH-trader));
 	}
 

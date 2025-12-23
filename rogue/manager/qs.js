@@ -206,7 +206,7 @@ function quick_storage(r){
             if (r.player.pl_on(d.ISREGEN)) {
                 r.daemon.fuse(r.daemon.notregen, true, chk_daemon("notregen"));
             }
-            console.log(r.daemon.get_dlist());
+            //console.log(r.daemon.get_dlist());
 
             r.UI.comment("quick_load");
         }else{
