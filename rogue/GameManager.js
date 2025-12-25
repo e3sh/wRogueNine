@@ -177,6 +177,8 @@ function GameManager(g){
             ptr = f.next(item);
             discard(item);
         }
+        //this.gabage_collect();
+
         return null;
     }
 
@@ -236,38 +238,22 @@ function GameManager(g){
         let th = 0;
         let ob = 0;
         let c = 0;
-        let map = [];
-        for (let i in entities){
-            if (entities[i].l_data == null){
-                c++;
-                map[i] = ".";
-            } else {
-                if (Boolean(entities[i].l_data.o_type)) {
-                    ob++; map[i] = "o"; 
-                    for (let item = r.player.get_pack(); item != null; item = item.l_next){
-                        if (item.l_data == entities[i].l_data){
-                            map[i] = "p";
-                            break;
-                        }
-                    }
-                    for (let item = r.dungeon.lvl_obj; item != null; item = item.l_next){
-                        if (item.l_data == entities[i].l_data){
-                            map[i] = "l";
-                            break;
-                        }
-                    }    
-                }
-                if (Boolean(entities[i].l_data.t_type)) {th++; map[i] = "t"; }
-            }
+        let map = check_entity_type();
+
+        for (let i in map){
+            if (map[i] == "t") th++;
+            if (map[i] == "l" || map[i] == "p" || map[i] == "m") ob++;
+            if (map[i] == ".") c++;
         }
+
         let el = entities.length;
         let res = [];
-        res.push(`ALL:${el} OBJ:${ob} THING:${th} FREE:${c}    `);
+        res.push(`ALL:${el} OBJ:${ob} THING:${th} FREE:${c}+${el-ob-th-c} `);
         res.push(`----|----1----|----2----|----3`);
         let st = "";
         for (let i in map){
             st += map[i];
-            if (st.length > 30){
+            if (st.length >= 30){
                 res.push(st);
                 st = "";
             }
@@ -281,6 +267,62 @@ function GameManager(g){
         }
         return res;;
     }
+
+    function check_entity_type(){
+
+        let map = [];
+        for (let i in entities){
+            if (entities[i].l_data == null){
+                map[i] = ".";
+            } else {
+                if (Boolean(entities[i].l_data.o_type)) {
+                    map[i] = "o"; 
+                    for (let item = r.player.get_pack(); item != null; item = item.l_next){
+                        if (item.l_data == entities[i].l_data){
+                            map[i] = "p";
+                            break;
+                        }
+                    }
+                    for (let item = r.dungeon.lvl_obj; item != null; item = item.l_next){
+                        if (item.l_data == entities[i].l_data){
+                            map[i] = "l";
+                            break;
+                        }
+                    }    
+                }
+                if (Boolean(entities[i].l_data.t_type)) {
+                    map[i] = "t";
+                    if (entities[i].l_data.t_pack != null){ 
+                        let tp = entities[i].l_data.t_pack; 
+                        for (let lw in entities){
+                            if (entities[lw] == tp){
+                                map[i] = "m";
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
+    this.gabage_collect = function(){
+        
+        let gc = 0;
+        let map = check_entity_type();
+
+        for (let i in map){
+            if (map[i]=="o"){
+                if (entities[i].l_prev == null && entities[i].l_next == null) {
+                    entities[i].l_data = null;
+                    gc++;
+                }
+            }
+        }
+        if (gc != 0) r.UI.comment(`GC executed: ${gc}`);
+    }
+
 
     this.on_entity = function(item){
 

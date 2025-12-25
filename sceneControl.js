@@ -18,6 +18,8 @@ class sceneControl extends GameTask {
 			this.moveEffect = new moveEffect(g);
 			this.moveEffect.setDrawIndex(160, 0);
 
+			this.monsHpView = new monsHpView(g);
+			this.monsHpView.setDrawIndex(160, -8);
 			//let mode = document.getElementById("lang").checked;
 
 			const r = new GameManager(g);// ,mode? "jp":"en"); 
@@ -92,6 +94,9 @@ class sceneControl extends GameTask {
 		}
 
 		this.draw = function(g){
+
+			this.monsHpView.draw(g);
+
 			this.moveEffect.step();
 			this.moveEffect.step();
 			this.moveEffect.step();

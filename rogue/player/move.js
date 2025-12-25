@@ -479,7 +479,7 @@ function move(r){
 					ch = goner();
 			break;
 			case d.TELTRAP:
-				console.log("teltrap sw");
+				//console.log("teltrap sw");
 				r.nlmove = true;
 				teleport(trp.tr_goto, th);
 			break;

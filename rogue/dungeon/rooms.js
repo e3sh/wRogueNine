@@ -295,6 +295,7 @@ function room(r){
 	//struct room *rm;
 	//long bit;
 	{
+		if (rm == null) return false;
 		return (rm.r_flags & bit);
 	}
 }

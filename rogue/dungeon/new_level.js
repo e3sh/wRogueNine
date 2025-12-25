@@ -143,7 +143,7 @@ function new_level(r){
 						let newloc; //struct coord newloc;
 
 						newloc = rnd_pos(r.dungeon.rooms[rnd_room()]);
-						trp.tr_goto ={x: newloc.x, y:newloc.y}; console.log(newloc); 
+						trp.tr_goto ={x: newloc.x, y:newloc.y}; //console.log(newloc); 
 						r.dungeon.traps[i] = trp;
 						i++;
 						trp = new t.trap();//r.dungeon.traps[i];

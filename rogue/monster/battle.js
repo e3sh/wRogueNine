@@ -81,7 +81,7 @@ function battle(r){
 			if (pl_on(d.ISBLIND))
 				mname = ms.BATTLE_IT;
 			else
-				mname = monsters[tp.t_indx].m_name;
+				mname = ms.MONS_NAME[tp.t_indx];//mname = monsters[tp.t_indx].m_name;
 			/*
 			* If the hero can see the invisibles, then
 			* make it easier to hit.
@@ -190,7 +190,7 @@ function battle(r){
 		if (pl_on(d.ISBLIND))
 			mname = ms.BATTLE_IT;
 		else
-			mname = monsters[mp.t_indx].m_name;
+			mname = ms.MONS_NAME[mp.t_indx];//monsters[mp.t_indx].m_name;
 		if (roll_em(mp.t_stats, him, null, false)) {
 			if (pl_on(d.ISINVINC)) {
 				r.UI.msg( ms.ATTACK_1(prname(mname,true)) );
@@ -625,7 +625,7 @@ function battle(r){
 
 		tbuf = '';
 		if (who == null)
-			tbuf = ms.PRNAME_1; 
+			{tbuf = ms.PRNAME_1; console.log(who);}
 		else if (r.player.pl_on(d.ISBLIND))
 			tbuf = ms.BATTLE_IT;
 		else {
@@ -821,7 +821,7 @@ function battle(r){
 			if (pl_on(d.ISBLIND))
 				r.UI.msg( ms.KILLED_1);
 			else
-				r.UI.msg( ms.KILLED_2(monsters[tp.t_indx].m_name) );
+				r.UI.msg( ms.KILLED_2(ms.MONS_NAME[tp.t_indx]));//monsters[tp.t_indx].m_name) );
 		}
 		him.s_exp += tp.t_stats.s_exp;
 		r.isfight = false;

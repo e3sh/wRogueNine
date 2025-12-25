@@ -45,6 +45,7 @@ const w = [
         r + "UI/scene.js",
         r + "UI/wizard.js",
         r + "UI/moveEffect.js",
+        r + "UI/monsHpView.js",
     r + "DaemonScheduler.js",
     // Rogue Parameters
     p + "rogueDefines.js",

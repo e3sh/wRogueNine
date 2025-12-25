@@ -24,6 +24,11 @@ function UIManager(r, g){
     const moveEffect = sceneC.moveEffect;
     this.setEffect = moveEffect.setEffect; 
 
+    //
+    const monsHpView = sceneC.monsHpView;
+    this.setMonsHp = monsHpView.setEffect;
+    this.resetMonsHp = monsHpView.resetEffects;
+
     let battledmg = 0;
     this.set_battledmg = function(num){battledmg = num}
     this.battleEffect = function(asch, x ,y){

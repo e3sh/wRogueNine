@@ -50,7 +50,7 @@ function quick_storage(r){
         let svd = JSON.stringify(savedata);
 
         let dd = JSON.stringify(r.daemon.get_dlist());
-        console.log(dd);
+        //console.log(dd);
  
         //console.log(jsontext);
         //console.log(json2);

@@ -13,6 +13,8 @@ function command(r){
 
 	let lastscore = -1;
 
+	let scrmode = false;
+
 	//running, count, take, after, door_stop  gamemanager, waswizard
 
 	/*
@@ -41,8 +43,9 @@ function command(r){
 		r.UI.setCameraPos({x:hero.x, y:hero.y});
 		if (r.levtype == d.POSTLEV){
 			r.UI.setCameraEnable(false);
+			scrmode = true;
 		} else {
-			//r.UI.setCameraEnable(true);	
+			if (scrmode) {r.UI.setCameraEnable(true); scrmode = false;}	
 		}
 
 		if (r.nextScene != d.SCE_MAIN){
@@ -150,6 +153,8 @@ function command(r){
 		const hero = r.player.get_hero();
 		const on = f.on;
 		const pl_on = r.player.pl_on;
+
+		const tgt_chk =(mon)=>{return (mon.t_dest.x == hero.x && mon.t_dest.y == hero.y);};
 		
 		let etxt = [];
 		let res = r.entityState();
@@ -162,12 +167,20 @@ function command(r){
 		//etxt.push(`stairs x:${r.dungeon.stairs.x} y:${r.dungeon.stairs.y}    `);
 		etxt.push("");
 		let wml = wlo = pak = 0;
+		r.UI.resetMonsHp();
 		for (let w = r.dungeon.mlist; w != null ; w = w.l_next) {
 			wml++; 
 			let fs = `.....${Number(w.l_data.t_flags).toString(8)}`;
 			let fst = fs.substring(fs.length-6,fs.length);
-			etxt.push(`${w.l_data.t_type}:${fst}:x:${w.l_data.t_pos.x} y:${w.l_data.t_pos.y}`);
-		}
+			let en = w.l_data;
+			let enst = w.l_data.t_stats; 
+			etxt.push(
+				`${en.t_type}:${fst}:x:${en.t_pos.x} y:${en.t_pos.y} hp:${enst.s_hpt}/${enst.s_maxhp} ${tgt_chk(en)?"*":""}`);
+
+				//if (on(en, d.ISRUN))
+				if (tgt_chk(en)) 
+					r.UI.setMonsHp(en.t_pos, enst.s_hpt, enst.s_maxhp);	
+			}
 		for (let w = r.dungeon.lvl_obj; w != null ; w = w.l_next) {wlo++;}// etxt.push(" " + w.l_data.o_type);}
 		for (let w = r.player.get_pack(); w != null ; w = w.l_next) {pak++;}
 		etxt.push("");

@@ -79,7 +79,7 @@ function moveEffect(g){
         const obj = new eftask(ch, st, ed, lt, sd);
         elist.push(obj)
     }
-
+    
     this.step = function(){
 
         let nl = [];
