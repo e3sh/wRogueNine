@@ -11,6 +11,9 @@ function rings(r){
 	const v = r.globalValiable;
 	const ms = r.messages;
 
+	const cw = d.DSP_MAIN_FG;
+	const mw = d.DSP_MAIN_BG;
+
 	/*
 	* ring_on:
 	*	Put on a ring
@@ -143,7 +146,7 @@ function rings(r){
 
 					r_know[d.R_LIGHT] = true;
 					if ((rop = player.t_room) != null) {
-						rop.r_flags &= ~dISDARK;
+						rop.r_flags &= ~d.ISDARK;
 						light(hero);
 						r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 					}

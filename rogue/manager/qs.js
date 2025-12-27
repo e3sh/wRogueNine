@@ -162,11 +162,13 @@ function quick_storage(r){
                             r.player.set_cur_armor(obj);
                         break;
                         case d.RING:
-                            if (r.player.get_cur_ring(d.LEFT) == null){
-                                r.player.set_cur_ring(d.LEFT, obj);
+                            let cur_ring = r.player.get_cur_ring();
+                            if (cur_ring[d.LEFT] == null){
+                                cur_ring[d.LEFT] = obj;
                             } else {
-                                r.player.set_cur_ring(d.RIGHT, obj);
+                                cur_ring[d.RIGHT] = obj;
                             }
+                            r.player.set_cur_ring(cur_ring);
                         break;
                     }
                 }

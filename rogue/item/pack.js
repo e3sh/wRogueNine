@@ -561,7 +561,7 @@ function pack_f(r){
 	this.cur_null = function(op)
 	//struct object *op;
 	{
-		const cur_ring = r.player.get_cur_ring;
+		const cur_ring = r.player.get_cur_ring();
 
 		if (op == r.player.get_cur_weapon())
 			r.player.set_cur_weapon(null);

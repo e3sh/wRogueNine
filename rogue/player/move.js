@@ -812,7 +812,7 @@ function move(r){
 			}
 		}
 		//cur_weapon = ob;	/* hero has to weild item to dip it */
-		r.player.set_cur_weapon(ob);
+		//r.player.set_cur_weapon(ob);
 	}
 
 
