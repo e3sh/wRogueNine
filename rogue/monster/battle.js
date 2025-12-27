@@ -625,7 +625,7 @@ function battle(r){
 
 		tbuf = '';
 		if (who == null)
-			{tbuf = ms.PRNAME_1; console.log(who);}
+			{tbuf = ms.PRNAME_1;}
 		else if (r.player.pl_on(d.ISBLIND))
 			tbuf = ms.BATTLE_IT;
 		else {

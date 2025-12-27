@@ -490,7 +490,7 @@ function DaemonScheduler(r){
 	//int fromfuse;
 	{
 		//sapem
-		const chh_abil = r.player.pstat.chg_abil;
+		const chg_abil = r.player.pstats.chg_abil;
 
 		chg_abil(rnd(4) + 1, -1, true);
 		fuse(this.sapem, true, 150);

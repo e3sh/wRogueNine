@@ -499,7 +499,7 @@ function move(r){
 			case d.BEARTRAP:
 				th.t_nomove += d.BEARTIME;
 				if (seeit) {
-					r.UI.msg(ms.BE_TRAP_BEAR(stuckee, (ishero ? " are" : " is")));
+					r.UI.msg(ms.BE_TRAP_BEAR(stuckee, (ishero ? ms.BE_TRAP_BEAR2 : ms.BE_TRAP_BEAR3)));
 				}
 			break;
 			case d.SLEEPTRAP:
@@ -511,7 +511,7 @@ function move(r){
 					else
 						th.t_nomove += d.SLEEPTIME;
 					if (seeit)
-						r.UI.msg(ms.BE_TRAP_SLEEP2(stuckee,` fall${ishero ? "":"s"}`));
+						r.UI.msg(ms.BE_TRAP_SLEEP2(stuckee,ms.BE_TRAP_SLEEP3(ishero)));
 					}
 			break;
 			case d.ARROWTRAP: {
@@ -659,6 +659,7 @@ function move(r){
 		const o_off = r.o_off;
 		const setoflg = r.setoflg;
 		const resoflg = r.resoflg;
+		const magring = r.item.ring_f.magring;
 
 		const s_know = r.item.s_know;	
 		const p_know = r.item.p_know;	

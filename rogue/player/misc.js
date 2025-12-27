@@ -369,10 +369,11 @@ function misc(r){
 	{
 		const runto = r.monster.chase.runto;
 
+		const hero = r.player.get_hero();
 
 		let mi; //reg struct linked_list *mi;
 
-		for (mi = mlist; mi != null; mi = f.next(mi))
+		for (mi = r.dungeon.mlist; mi != null; mi = f.next(mi))
 			runto((f.THINGPTR(mi)).t_pos, hero);
 	}
 

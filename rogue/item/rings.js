@@ -30,6 +30,11 @@ function rings(r){
 		const setoflg = r.setoflg;
 		const add_haste = r.player.pstats.add_haste;
 		const inv_name = r.item.things_f.inv_name;
+		const aggravate = r.player.misc.aggravate;
+		const updpack = r.player.encumb.updpack;
+		const look = r.player.move.look;
+		const fuse = r.daemon.fuse;
+		const sapem = r.daemon.sapem;
 
 		const cur_ring = r.player.get_cur_ring();
 
@@ -151,11 +156,11 @@ function rings(r){
 		}
 		else if(!r_know[wh] && r_guess[wh] == null) {
 			//mpos = 0;
-			buf = r_stones[wh];
-			r.UI.msg(callit);
-			if (get_str(buf, cw) == d.NORM) {
-				r_guess[wh] = buf;
-			}
+			//buf = r_stones[wh];
+			//r.UI.msg(callit);
+			//if (get_str(buf, cw) == d.NORM) {
+			//	r_guess[wh] = buf;
+			//}
 		}
 		//mpos = 0;
 		r.UI.msg(ms.RINGON_4(inv_name(obj,true)));
@@ -239,6 +244,8 @@ function rings(r){
 		const hero = r.player.get_hero();
 		const unsee = r.daemon.unsee;
 
+		const cur_ring = r.player.get_cur_ring();
+
 		let okring;
 
 		/*
@@ -278,6 +285,8 @@ function rings(r){
 					light(hero);
 					r.UI.mvwaddch(cw, hero.y, hero.x, d.PLAYER);
 			}
+			r.player.set_him(him);
+			r.player.set_player(player);
 		}
 	}
 

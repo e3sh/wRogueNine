@@ -108,9 +108,12 @@ function rogueMessage(r){
         BE_TRAP_MAZE: "You are surrounded by twisty passages!",
 
         BE_TRAP_BEAR:  (name, asis)=>{return `${name}${asis} caught in a bear trap.`},
+        BE_TRAP_BEAR2: "are",
+        BE_TRAP_BEAR3: "is",
 
         BE_TRAP_SLEEP1: "You feel momentarily dizzy.",
         BE_TRAP_SLEEP2: (name, asis)=>{return `${name}${asis} asleep in a strange white mist.`},
+        BE_TRAP_SLEEP3: (ishero)=>{return ` fall${ishero ? "":"s"}`},
 
         BE_TRAP_ARROW1: (how, name)=>{return `${how}An arrow shot ${name}.`},
         BE_TRAP_ARROW2: (name)=>{return `An arrow shoots past ${name}`},

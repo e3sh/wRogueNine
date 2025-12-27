@@ -295,7 +295,7 @@ function ItemManager(r){
 			nums[i] = i;
 		nums = shuffle(nums);
 		for (i = 0; i < d.MAXRINGS; i++) {
-			r_stones[i] = stones[nums[j]];
+			r_stones[i] = stones[nums[i]];
 			r_know[i] = false;
 			r_guess[i] = null;
 			//if (i > 0)

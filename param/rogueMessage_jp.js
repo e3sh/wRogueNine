@@ -107,10 +107,13 @@ function rogueMessage_jp(r){
 
         BE_TRAP_MAZE: "あなたは曲がりくねった通路に囲まれています！",
 
-        BE_TRAP_BEAR:  (name, asis)=>{return `${name}${asis} 熊の罠にかかった。`},
+        BE_TRAP_BEAR:  (name, asis)=>{return `${name}${asis}トラバサミにかかった。`},
+        BE_TRAP_BEAR2: "は",
+        BE_TRAP_BEAR3: "が",
 
         BE_TRAP_SLEEP1: "あなたは一瞬めまいを感じる",
-        BE_TRAP_SLEEP2: (name, asis)=>{return `${name}${asis} 見知らぬ白い霧の中で眠っている。`},
+        BE_TRAP_SLEEP2: (name, asis)=>{return `${name}は、奇妙な白い霧の中で眠りについた。`},
+        BE_TRAP_SLEEP3: (ishero)=>{return ` fall${ishero ? "":"s"}`},
 
         BE_TRAP_ARROW1: (how, name)=>{return `${how}${name}に矢が放たれる.`},
         BE_TRAP_ARROW2: (name)=>{return `${name}の側を矢が飛び去る `},
@@ -480,7 +483,7 @@ function rogueMessage_jp(r){
 			"探索",
 			"不可視視認",
 			"耐久力",
-			"敵を挑発",
+			"挑発",
 			"敏捷性",
 			"ダメージ増加",
 			"再生",
@@ -493,7 +496,7 @@ function rogueMessage_jp(r){
 			"能力維持",
 			"盲目",
 			"無気力",
-			"オーガの力",
+			"怪力",
 			"弱体化",
 			"重荷",	
 			"照明",

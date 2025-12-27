@@ -227,10 +227,10 @@ function trader(r){
 			r.nochange = false;		/* show gold value */
 			r.player.purse += wo;			/* give him his money */
 			++trader;			/* another transaction */
-			wo = obj.o_count;
-			obj.o_count = 1;
+			//wo = obj.o_count;
+			//obj.o_count = 1;
 			r.UI.msg( ms.SELLIT_3(inv_name(obj,true)) );
-			obj.o_count = wo;
+			//obj.o_count = wo;
 			trans_line();			/* show remaining deals */
 		}
 	}
