@@ -5,8 +5,10 @@ class sceneControl extends GameTask {
 	constructor(id){
 		super(id);
 
-		let io, stf, waitc 
+		let io, stf, waitc; 
 		let keyon;
+		//let runstep;
+
 		const keywait = 100; //0.10s
 
 		this.init = function(g){
@@ -14,6 +16,7 @@ class sceneControl extends GameTask {
 		}
 
 		this.pre = function(g){
+
 			io = g.task.read("io");
 			this.moveEffect = new moveEffect(g);
 			this.moveEffect.setDrawIndex(160, 0);
@@ -25,7 +28,8 @@ class sceneControl extends GameTask {
 			const r = new GameManager(g);// ,mode? "jp":"en"); 
 			g.rogue = r;
 
-			const wName = ["0:MAIN_BG","1:MAIN","2:MAIN_FG","3:STATUS","4:EQUIP","5:MESSAGE","6:WINDOW","7:COMMENT","8:ENTITY"];
+			const wName = ["0:MAIN_BG","1:MAIN","2:MAIN_FG","3:STATUS",
+				"4:EQUIP","5:MESSAGE","6:WINDOW","7:COMMENT","8:ENTITY"];
 			for (let i in wName){
 				g.console[i].printw(`console:${wName[i]}`);
 				g.console[i].insertln();
@@ -33,6 +37,8 @@ class sceneControl extends GameTask {
 
 			stf = false;
 			waitc = 0;
+			this.runstep = 0;
+
 			keyon = g.time();
 
 			this.setCameraPos = function(x, y){
@@ -80,7 +86,10 @@ class sceneControl extends GameTask {
 							keys.includes("Home") || keys.includes("End") || 
 							keys.includes("PageUp") || keys.includes("PageDown") || 
 							keys.includes("CapsLock") || keys.includes("Space"));
-						if  (keys.length > (fl?1:0)) g.rogue.scenestep();
+						if  (keys.length > (fl?1:0)) {
+							g.rogue.scenestep();
+							this.runstep++;
+						}
 						if (!g.rogue.playing){
 							if (keys.includes("Space"))
 								g.rogue.playing = true;
@@ -89,11 +98,20 @@ class sceneControl extends GameTask {
 						//if (fl) keyon += keywait*2;
  
 					}
+				}else{
+					//no input
+					if (!g.rogue.haste && this.runstep%2 == 0){
+						g.rogue.scenestep();
+						this.runstep++;
+					}
 				}
 			}
 		}
 
 		this.draw = function(g){
+
+			if (io.debugview)
+				g.font["small"].putchr(`STEP:${this.runstep} ${this.runstep%2==0?"haste":"normal"}`, 840, 8);				
 
 			this.monsHpView.draw(g);
 

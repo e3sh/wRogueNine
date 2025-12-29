@@ -37,6 +37,7 @@ this.chase = function(r){
 
 		let tp; //reg struct thing *tp;
 		let mon, nextmon; //reg struct linked_list *mon,*nextmon;
+		let sh = r.UI.check_hastestep();
 
 		for (mon = r.dungeon.mlist; mon != null; mon = nextmon) {
 			tp = THINGPTR(mon);
@@ -45,9 +46,10 @@ this.chase = function(r){
 				if (tp.t_nomove > 0)
 					if (--tp.t_nomove > 0)
 						continue;
-				if (on(tp, d.ISHASTE))
+				if (on(tp, d.ISHASTE) && sh)
 					if (do_chase(mon) == -1)
 						continue;
+				if (sh) continue;
 				if (off(tp, d.ISSLOW) || tp.t_turn)
 					if (do_chase(mon) == -1)
 						continue;

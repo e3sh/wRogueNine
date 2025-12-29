@@ -55,7 +55,6 @@ function UIManager(r, g){
         sceneC.setCameraPos(0,0);
     }
 
-
     this.setCameraPos = function(pos){
 
         let x = -pos.x + Math.floor(d.COLS/2);
@@ -66,7 +65,10 @@ function UIManager(r, g){
     this.setCameraEnable = function(flg){
         sceneC.setCameraEnable(flg);
     }
- 
+    //sceneRunstep status 
+    this.get_runstep = function(){ return sceneC.runstep;}
+    this.check_hastestep =()=>{    return (sceneC.runstep%2 == 0)?true:false;} 
+
     //dispaly functions
     //cursus bridge    
 	this.setDsp =(num)=>{dspmode = num;}

@@ -77,6 +77,7 @@ function GameManager(g){
     this.entity = entities;
 
     this.playing = false;
+    this.haste = false; //player statsflag haste on/off (outread sceneControl.js)(checkwrite command)
 
     const r = this;
 
@@ -518,6 +519,7 @@ function GameManager(g){
 
     //
     this.scenestep = function(){
+        r.haste = true;
         if (r.playing) SceneFunc();
     }
 

@@ -56,12 +56,15 @@ function command(r){
 			return;
 		}
 
-		if (pl_on(d.ISHASTE))
-			ntimes++;
+		r.haste = ((pl_on(d.ISHASTE) !=0) ? true: false);
+		//if (pl_on(d.ISHASTE)) r.haste = true;
+		//	ntimes++;
 		/*
 		* Let the daemons start up
 		*/
-		while (ntimes-- > 0) {
+		let sh = r.UI.check_hastestep(); //console.log("haste mode" + sh)
+		if (!sh ||(sh && r.haste)){ //console.log("haste step" + sh + r.haste);
+		//while (ntimes-- > 0) {
 			do_daemons(d.BEFORE);
 			look(true);
 			if (!r.running)
