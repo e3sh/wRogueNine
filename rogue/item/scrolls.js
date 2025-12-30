@@ -210,7 +210,7 @@ function scrolls(r){
 						switch (ch) {
 							case d.SECRETDOOR:
 								nch = d.DOOR;
-								r.UI.mvaddch(i, j, nch);
+								r.UI.mvwaddch(hw, i, j, nch);
 							case '-':
 							case '|':
 							case d.DOOR:
@@ -320,24 +320,8 @@ function scrolls(r){
 						resoflg(lb, d.ISCURSED);
 					}
 				}
-				//let cur_weapon = r.player.get_cur_weapon();
-				//let cur_armor = r.player.get_cur_armor();
-				//let cur_ring = r.player.get_cur_ring();
-
-				//if (cur_armor != null && o_off(cur_armor,d.ISPROT))
-				//	resoflg(cur_armor,d.ISCURSED);
-				//if (cur_weapon != null && o_off(cur_weapon,d.ISPROT))
-				//	resoflg(cur_weapon,d.ISCURSED);
-				//if (cur_ring[d.LEFT]!=null && o_off(cur_ring[d.LEFT],d.ISPROT))
-				//	resoflg(cur_ring[d.LEFT],d.ISCURSED);
-				//if (cur_ring[d.RIGHT]!=null && o_off(cur_ring[d.RIGHT],d.ISPROT))
-				//	resoflg(cur_ring[d.RIGHT],d.ISCURSED);
 				r.UI.msg( ms.READSC_REMOVE);
 				s_know[d.S_REMOVE] = true;
-
-				//r.player.set_cur_weapon(cur_weapon);
-				//r.player.set_cur_armor(cur_armor);
-				//r.player.set_cur_ring(cur_ring);
 			}
 		break;
 		case d.S_AGGR:
@@ -391,68 +375,19 @@ function scrolls(r){
 		break;
 		case d.S_PROTECT:
 			if (!curse) {
-				let ll; //struct linked_list *ll;
-				let lb; //struct object *lb;
 
 				r.UI.msg(ms.READSC_PROTECT1);
-				if ((ll = get_item("protect",0)) != null) {
-				//	lb = OBJPTR(ll);
-				//	setoflg(lb,d.ISPROT);
-					//mpos = 0;
-				//	r.UI.msg(ms.READSC_PROTECT2(inv_name(lb,true)));
-				}
+				get_item("protect",0); //action this.protect()
 				s_know[d.S_PROTECT] = true;
 			}
 		break;
 		case d.S_ALLENCH:
 			if (!curse) {
-				let ll; //struct linked_list *ll;
-				let lb; //struct object *lb;
-				let howmuch, ac, good;
+				let good;
 
 				r.UI.msg( ms.READSC_ALLENCH1);
 				good = true;
-				if ((ll = get_item("enchant",0)) != null) {
-					/*
-					lb = OBJPTR(ll);
-					resoflg(lb,d.ISCURSED);
-					resoflg(lb,d.ISPROT);
-					howmuch = r.rnd(3) + 1;
-					switch(lb.o_type) {
-						case d.RING:
-							if (lb.o_ac < 0)
-								lb.o_ac = 0;
-							lb.o_ac += howmuch;
-						break;
-						case d.ARMOR:
-							ac = armors[lb.o_which].a_class;
-							if (lb.o_ac > ac)
-								lb.o_ac = ac;
-							lb.o_ac -= howmuch;
-						break;
-						case d.STICK:
-							lb.o_charges += howmuch + 10;
-						break;
-						case d.WEAPON:
-							if (lb.o_dplus < 0)
-								lb.o_dplus = 0;
-							if (lb.o_hplus < 0)
-								lb.o_hplus = 0;
-							lb.o_hplus += howmuch;
-							lb.o_dplus += howmuch;
-						break;
-						default:
-							r.UI.msg(ms. READSC_ALLENCH2);
-							chg_hpt(-r.roll(6,6),false,d.K_SCROLL);
-							good = false;
-							
-					}
-					if (good) {
-						//mpos = 0;
-						r.UI.msg(ms.READSC_ALLENCH3(inv_name(lb,true)));
-					}
-					*/
-				}
+				get_item("enchant",0); //action this.enchant()
 				s_know[d.S_ALLENCH] = true;
 			}
 		break;
@@ -498,7 +433,6 @@ function scrolls(r){
 			if ((!bless && r.dungeon.level < howdeep) || bless) {
 				r.dungeon.level = howdeep;
 				new_level(d.NORMLEV);
-				//mpos = 0;
 				r.UI.msg(ms.READSC_BAN3(ptr));
 				s_know[d.S_BAN] = true;
 			}
@@ -530,7 +464,6 @@ function scrolls(r){
 			let trp; //struct trap *trp;
 
 			if (r.dungeon.ntraps > 0) {
-				//for (trp = &traps[0]; trp < &traps[ntraps]; trp++)
 				for (let i in r.dungeon.traps)
 					r.dungeon.traps[i].tr_flags |= d.ISFOUND;
 				look(false);
@@ -548,19 +481,6 @@ function scrolls(r){
 
 		r.player.set_player( player);
 		//r.player.set_hero( hero);
-
-		//if (s_know[wh] && s_guess[wh]) {
-		//	free(s_guess[wh]);
-		//	s_guess[wh] = null;
-		//}
-		//else if (!s_know[wh] && s_guess[wh] == null) {
-		//	strcpy(buf, s_names[wh]);
-		//	msg(callit);
-		//	if (get_str(buf, cw) == NORM) {
-		//		s_guess[wh] = new(strlen(buf) + 1);
-		//		strcpy(s_guess[wh], buf);
-		//	}
-		//}
 	}
 	
 	this.identify = function( item){
