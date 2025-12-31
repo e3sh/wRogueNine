@@ -440,7 +440,7 @@ function move(r){
 			r.count = r.running = false;
 		}
 		else {
-			stuckee = ms.BE_TRAP_EN(monsters[th.t_indx].m_name);
+			stuckee = ms.BE_TRAP_EN(ms.MONS_NAME[th.t_indx]);//monsters[th.t_indx].m_name);
 		}
 		seeit = cansee(tc.y, tc.x);
 		if (seeit){

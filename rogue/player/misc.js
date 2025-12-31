@@ -87,34 +87,34 @@ function misc(r){
 
 		switch (ch) {
 			case d.TRAPDOOR:
-				s = "A trapdoor.";
+				s = ms.TR_NAME_DOOR;
 				break;
 			case d.BEARTRAP:
-				s = "A beartrap.";
+				s = ms.TR_NAME_BEAR;
 				break;
 			case d.SLEEPTRAP:
-				s = "A sleeping gas trap.";
+				s = ms.TR_NAME_SLEEP;
 				break;
 			case d.ARROWTRAP:
-				s = "An arrow trap.";
+				s = ms.TR_NAME_ARROW;
 				break;
 			case d.TELTRAP:
-				s = "A teleport trap.";
+				s = ms.TR_NAME_TELE;
 				break;
 			case d.DARTTRAP:
-				s = "A dart trap.";
+				s = ms.TR_NAME_DART;
 				break;
 			case d.POOL:
-				s = "A magic pool.";
+				s = ms.TR_NAME_POOL;
 				break;
 			case d.POST:
-				s = "A trading post.";
+				s = ms.TR_NAME_POST;
 				break;
 			case d.MAZETRAP:
-				s = "A maze trap.";
+				s = ms.TR_NAME_MAZE;
 				break;
 			default:
-				s = "A bottomless pit.";		/* shouldn't get here */
+				s = ms.TR_NAME_DET;		/* shouldn't get here */
 		}
 		return s;
 	}

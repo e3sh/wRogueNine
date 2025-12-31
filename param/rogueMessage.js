@@ -587,6 +587,27 @@ function rogueMessage(r){
             "zemure",
             "devil Asmodeus",
         ],
+
+        KILLNAME_ARROW: "crooked arrow",
+		KILLNAME_DART: "sharp dart",
+		KILLNAME_BOLT: "jagged bolt",
+		KILLNAME_POOL: "magic pool",
+		KILLNAME_ROD: "exploding rod",
+		KILLNAME_SCROLL: "burning scroll",
+		KILLNAME_STONE: "transmogrification to stone",
+		KILLNAME_STARVE: "starvation",
+
+        TR_NAME_DOOR: "A trapdoor.",
+        TR_NAME_BEAR: "A beartrap.",
+        TR_NAME_SLEEP: "A sleeping gas trap.",
+        TR_NAME_ARROW: "An arrow trap.",
+        TR_NAME_TELE: "A teleport trap.",
+        TR_NAME_DART: "A dart trap.",
+        TR_NAME_POOL: "A magic pool.",
+        TR_NAME_POST:"A trading post.",
+        TR_NAME_MAZE: "A maze trap.",
+        TR_NAME_DET: "A bottomless pit.",
+
     }
     return ms;
    

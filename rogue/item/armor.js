@@ -41,7 +41,7 @@ function armor(r){
 			return;
 		}
 		waste_time();
-		r.UI.msg(ms.WEAR_3(a_magic[obj.o_which].mi_name));
+		r.UI.msg(ms.WEAR_3(ms.A_MAGIC[obj.o_which]));//a_magic[obj.o_which].mi_name));
 		r.player.set_cur_armor(obj);
 		setoflg(obj,d.ISKNOW);
 		r.nochange = false;

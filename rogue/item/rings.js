@@ -506,6 +506,7 @@ function rings(r){
 		const rnd = r.rnd;
 		const setoflg = r.setoflg;
 		const itemvol = r.player.encumb.itemvol;
+		const getindex = r.player.misc.getindex;
 
 		const things = v.things;
 
@@ -552,7 +553,7 @@ function rings(r){
 		}
 		what.o_type = d.RING;
 		what.o_weight = things[d.TYP_RING].mi_wght;
-		what.o_typname = things[d.TYP_RING].mi_name;
+		what.o_typname = ms.THINGS[d.TYP_RING]; //things[d.TYP_RING].mi_name;
 		what.o_vol = itemvol(what);
 
 		return what;

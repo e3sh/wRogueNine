@@ -587,7 +587,28 @@ function rogueMessage_jp(r){
             "鬼火",
             "悪魔アスモデウス",
         ],
-     }
+        KILLNAME_ARROW: "曲がった矢",
+		KILLNAME_DART: "鋭いダーツ",
+		KILLNAME_BOLT: "ギザギザのボルト",
+		KILLNAME_POOL: "魔法のプール",
+		KILLNAME_ROD: "爆発するロッド",
+		KILLNAME_SCROLL: "燃える巻物",
+		KILLNAME_STONE: "石への変容",
+		KILLNAME_STARVE: "飢餓",
+
+        TR_NAME_DOOR: "落とし戸の罠",
+        TR_NAME_BEAR: "トラバサミの罠",    
+        TR_NAME_SLEEP: "睡眠ガスの罠",
+        TR_NAME_ARROW: "矢の罠",
+        TR_NAME_TELE: "テレポートの罠",
+        TR_NAME_DART: "ダーツの罠",
+        TR_NAME_POOL: "魔法のプール",
+        TR_NAME_POST:"交易所",
+        TR_NAME_MAZE: "迷路トラップ",
+        TR_NAME_DET: "底なし穴",
+
+
+    }
     return ms;
    
 }

@@ -82,7 +82,7 @@
 		
 		//r.UI.mvaddstr(12, 43, vowelstr(killer));
 
-		r.UI.msg(ms.DEATH(killer));
+		r.UI.msg(ms.DEATH(killname_msg(monst)));
 		
 		r.UI.mvaddstr(14, 36 - (killer.length / 2), killer);
 		purse -= purse/10;
@@ -457,6 +457,29 @@
 				case d.K_SCROLL:	return "burning scroll";
 				case d.K_STONE: 	return "transmogrification to stone";
 				case d.K_STARVE:	return "starvation";
+		}
+		return "Bob Kindelberger";
+	}
+		/*
+	* killname_msg:
+	*	Returns what the hero was killed by.
+	*/  
+	//char *
+	function killname_msg(monst)
+	//unsigned char monst;
+	{
+		if (monst < d.MAXMONS + 1)
+			return ms.MONS_NAME[monst];
+		else		/* things other than monsters */
+			switch (monst) {
+				case d.K_ARROW:	return ms.KILLNAME_ARROW;
+				case d.K_DART:	return ms.KILLNAME_DART;
+				case d.K_BOLT:	return ms.KILLNAME_BOLT;
+				case d.K_POOL:	return ms.KILLNAME_POOL;
+				case d.K_ROD:	return ms.KILLNAME_ROD;
+				case d.K_SCROLL:return ms.KILLNAME_SCROLL;
+				case d.K_STONE: return ms.KILLNAME_STONE;
+				case d.K_STARVE:return ms.KILLNAME_STARVE;
 		}
 		return "Bob Kindelberger";
 	}
