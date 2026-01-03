@@ -353,6 +353,9 @@ function command(r){
 			if (ki.includes("KeyC")) ch = 'C';
 		}
 
+		if (ki.includes("KeyH")){
+			window.open('roguedoc_jp.txt', '_blank');
+		}
 
 		//if (ki.includes("KeyS")) {
 

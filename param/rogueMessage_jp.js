@@ -19,6 +19,7 @@ function rogueMessage_jp(r){
         //gameManager
         FRUIT: "みずみずしい果物",
         MAINSTART: "ダンジョンの扉を開けるから、ちょっと待ってくれ...",
+        NEWGAME: "新しい冒険を始めます",
         RESTART: "前回の続きから再開します", 
 
         //item

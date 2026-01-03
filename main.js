@@ -1,6 +1,8 @@
 // main NONTITLE(PwrRnkup) 2024/04/13- dncth16
 //----------------------------------------------------------------------
-function main() {
+function main(mode) {
+
+    localStorage.setItem("rogue.lang",mode? "jp":"en");
 
     const sysParam = { canvasId: "layer0", 
             screen: [{ resolution: { w: 960, h: 600 , x:0, y:0 } }]

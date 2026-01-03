@@ -573,6 +573,9 @@ function battle(r){
 				hplus + str_plus(att)
 				))
 			{
+		        const lf = "<=";//String.fromCharCode(11);//"<-";27
+        		const ri = "=>";//String.fromCharCode(18)+">";//"->";28
+
 				let proll, sthp = def.s_hpt;
 
 				proll = r.roll(ndice, nsides);
@@ -582,6 +585,8 @@ function battle(r){
 					r.UI.set_battledmg(Math.max(0, damage));
 				}
 				r.UI.comment(`${(def != him)?" fight":"attack"}:${damage} ${Math.max(0,def.s_hpt)}/${sthp}`);
+				//r.UI.msg(`${(def != him)?" damage to":" damagefrom "}: ${damage}`);
+				r.UI.addmsg(`${(def != him)?lf:ri}${damage})`);
 				did_hit = true;
 			}
 			//if (cp.indexOf('/') == -1)

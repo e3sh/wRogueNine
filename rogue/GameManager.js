@@ -5,8 +5,12 @@ function GameManager(g){
     const t = rogueTypes();
     const v = {};//globalValiableInit();
 
-    //const ms = rogueMessage(this);
-    const ms = rogueMessage_jp(this);
+    let lang;
+    if (Boolean(localStorage.getItem("rogue.lang"))){
+        lang = localStorage.getItem("rogue.lang");
+    }
+
+    const ms = (lang == "jp")? rogueMessage_jp(this): rogueMessage(this);
 
     //props
 
@@ -404,6 +408,7 @@ function GameManager(g){
         }else{
             firstinv = true;
             r.UI.msg(ms.MAINSTART);
+            r.UI.msg(ms.NEWGAME);
 
             r.player.purse = 0;
             r.player.food_left = d.HUNGERTIME;
@@ -501,6 +506,7 @@ function GameManager(g){
     this.playit = function()
     {
         const roomin = r.monster.chase.roomin;
+        const do_daemons = r.daemon.do_daemons;
 
         const player = r.player.get_player();
         const hero = r.player.get_hero();
@@ -509,6 +515,8 @@ function GameManager(g){
         r.player.set_player(player);
         r.oldrp = roomin(hero);
         r.nochange = false;
+
+        do_daemons(d.BEFORE);
 
         r.setScene(d.SCE_MAIN);
         SceneFunc();

@@ -31,12 +31,12 @@ class sceneControl extends GameTask {
 			const wName = ["0:MAIN_BG","1:MAIN","2:MAIN_FG","3:STATUS",
 				"4:EQUIP","5:MESSAGE","6:WINDOW","7:COMMENT","8:ENTITY"];
 			for (let i in wName){
-				g.console[i].printw(`console:${wName[i]}`);
-				g.console[i].insertln();
+				//g.console[i].printw(`console:${wName[i]}`);
+				//g.console[i].insertln();
 			}
 
 			stf = false;
-			waitc = 0;
+			waitc = 60;
 			this.runstep = 0;
 
 			keyon = g.time();
@@ -59,8 +59,8 @@ class sceneControl extends GameTask {
 				io.debugview = false;
 				io.overlapview = false;
 				for (let i=0; i<=6; i++){
-					g.console[i].insertln();
-					g.console[i].printw(`rouge.start()`);
+					//g.console[i].insertln();
+					//g.console[i].printw(`rouge.start()`);
 				}
 				//g.console[3].clear();
 				//                     

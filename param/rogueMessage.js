@@ -19,6 +19,7 @@ function rogueMessage(r){
         //gameManager
         FRUIT: "juicy-fruit",
         MAINSTART: "Hello player, One moment while I open the door to the dungeon...",
+        NEWGAME: "Starting a new adventure.",
         RESTART: "We will resume from where we left off last time.", 
 
         //item

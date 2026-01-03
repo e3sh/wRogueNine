@@ -297,13 +297,17 @@ function things_f(r){
 		* Take it out of the pack
 		*/
 		if (op.o_count >= 2 && op.o_type != d.WEAPON) {
-			nll = new_item(new t.object());//sizeof *op);
 			op.o_count--;
 			op.o_vol = itemvol(op);
+			ll.l_data = op;
+			
+			nll = new_item(r.clone_object(op));//new t.object());//sizeof *op);
 			op = OBJPTR(nll);
-			op = (OBJPTR(ll));
+			//op = (OBJPTR(ll));
 			op.o_count = 1;
 			op.o_vol = itemvol(op);
+			nll.l_data = op;
+
 			ll = nll;
 		}
 		else {
@@ -315,7 +319,7 @@ function things_f(r){
 		}
 		else {			/* put on dungeon floor */
 			if (r.levtype == d.POSTLEV) {
-				op.o_pos = hero;	/* same place as hero */
+				op.o_pos = {x: hero.x, y: hero.y};	/* same place as hero */
 				ll.l_data = op;
 				fall(ll,false);
 				if (item == null)	/* if item wasn't sold */
@@ -324,7 +328,7 @@ function things_f(r){
 			else {
 				r.dungeon.lvl_obj = r.attach(r.dungeon.lvl_obj , ll);
 				r.UI.mvaddch(hero.y, hero.x, op.o_type);
-				op.o_pos = hero;
+				op.o_pos = {x: hero.x, y: hero.y};
 				ll.l_data = op;
 				r.UI.msg(ms.DROP_4(inv_name(op, true)));
 			}
