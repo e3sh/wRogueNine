@@ -5,6 +5,7 @@ Base SuperRogue9.0
 
 ```
 * [wRogueNine](https://e3sh.github.io/wRogueNine/rogue9.html)　playGame
+* [wRogueNine(jp)](https://e3sh.github.io/wRogueNine/rogue9_jp.html)
 
 # References
 * [SuperRogue9.0](http://rogue.rogueforge.net/super-rogue-9-0/) original rogue source code
